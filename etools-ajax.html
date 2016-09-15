@@ -25,6 +25,13 @@ If any of the url or endpoint properties changes, the ajax requests automaticall
 the new request we search to see if we already have this data in local cache storage. If data is found and did not expired
 automatically fire/return response with found data. If data for the new endpoint is not found or is expired then make the request.
 
+#### Ajax response handling:
+
+- success: check if the request data should be cached, add data to caching storage, fire a success response with
+returned data to be used in parent element (where you can have a new on-response action (page specific) that manages received data)
+
+- error: fire an error event to be cached in parent element (a new on-error handling, page specific)
+
 
 
 
@@ -142,19 +149,21 @@ automatically fire/return response with found data. If data for the new endpoint
           }
           return cacheKey;
         },
-        _validateEndpointObject: function(endpoint) {
-          if (endpoint.hasOwnProperty('url') && endpoint.url !== '') {
+        _validateEndpointObject: function(endpoint, log) {
+          if (endpoint !== null && endpoint.hasOwnProperty('url') && endpoint.url !== '') {
             return true;
           }
-          console.error('Endpoint object must have url property set')
+          if (log) {
+            console.error('[etools-ajax] Endpoint object must have url property set')
+          }
           return false;
         },
         _endpointChanged: function (newEndpoint) {
           if (!this._validateEndpointObject(newEndpoint)) {
             return;
           }
-          // Check if endpoint has expire property set
-          if (newEndpoint.exp) {
+          // Check if endpoint has expire property set and it's bigger than 0
+          if (newEndpoint.hasOwnProperty('exp') && newEndpoint.exp > 0) {
             // check if we have cached data
             var now = Date.now();
             // determine request cache key
@@ -163,7 +172,7 @@ automatically fire/return response with found data. If data for the new endpoint
             if (this.cachingStorage === 'loki') {
               // data is cached in loki database
 
-              // TODO: implement loki caching
+              // TODO: get data from loki database
 
 
             } else {
@@ -173,7 +182,7 @@ automatically fire/return response with found data. If data for the new endpoint
 
             if ((rsp) && ((rsp.exp - now) > 0)) {
               // else fire response where rsp.detail is the info from localstorage/loki
-              this.fire('response', rsp.detail);
+              this.fire('response', rsp.detail, {bubbles: false});
             } else {
               // If expired shoot a new request
               this.url = newEndpoint.url;
@@ -183,39 +192,33 @@ automatically fire/return response with found data. If data for the new endpoint
             this.url = newEndpoint.url;
           }
         },
-        handleError: function (event, error) {
-          this._stopLoading();
-          console.log('handling the error from etools-ajax');
-          console.log('add error checking and validation here');
-          // TODO: alert with needed errors.
-          console.error([error.error, 'while loading', event.srcElement.url].join(': '));
-          // in case the user is logged out...
-          if ([401, 403].indexOf(error.request.status) !== -1) {
-            window.location = this.getEp('login');
-            return;
+        _cacheEndpointData: function() {
+          // check if the request data should be cached
+          if (this.url !== null && this._validateEndpointObject(this.endpoint, false) && this.url === this.endpoint.url) {
+            if (this.endpoint.hasOwnProperty('exp') && this.endpoint.exp > 0) {
+              return true;
+            }
           }
-          app.$.alert.showText('Page has not loaded sucessfully ' + event.srcElement.url);
-          this.fire('error', {
-            request: event,
-            error: error.error
-          }, {bubbles: false});
+          return false;
         },
-
         handleResponse: function (response) {
-          // TODO: check if endpoint should be in localstorage
-          // TODO: if true place response in localstorage + expiration time (expiration time should be taken based on each endpoint)
-          console.log(response.detail.xhr.response);
-//          return false;
-          // set local storage
-          if (this.ep && this.ep.exp) {
-            var localVal = {
-              detail: response.detail.xhr.response,
-              exp: this.ep.exp + Date.now(),
-            };
+          if (this._cacheEndpointData()) {
+            // store received data in local caching storage
+            var cacheKey = this._getEndpointCacheKey(this.endpoint);
+            if (this.cachingStorage === 'loki') {
+              // loki database storage
 
-//            window.localStorage.setItem(this.ep.url, JSON.stringify(localVal));
+              // TODO: save data to loki database
+
+            } else {
+              // localstorage
+              var requestData = {
+                detail: response.detail.xhr.response,
+                exp: this.endpoint.exp + Date.now(),
+              };
+              window.localStorage.setItem(cacheKey, JSON.stringify(requestData));
+            }
           }
-
           // set response object
           var data = response.detail.xhr.response;
 
@@ -223,8 +226,17 @@ automatically fire/return response with found data. If data for the new endpoint
             data = JSON.parse(data);
           }
 
-          this.fire('response', data);
+          this.fire('response', data, {bubbles: false});
           this._stopLoading();
+        },
+        handleError: function (event, error) {
+          this._stopLoading();
+          console.error('[etools-ajax] ' + [error.error, 'while loading', event.srcElement.url].join(': '));
+
+          this.fire('error', {
+            request: event,
+            error: error.error
+          }, {bubbles: false});
         },
 
         sendPostRequest: function () {
