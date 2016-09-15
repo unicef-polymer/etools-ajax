@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+  <head>
+    <title>etools-ajax demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+
+    <link rel="import" href="../etools-ajax.html">
+    <link rel="import" href="csrf-cookie.html">
+
+    <style is="custom-style" include="demo-pages-shared-styles">
+      .vertical-section-container {
+        max-width: 900px;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="vertical-section-container centered">
+      <h1>etools-ajax demo</h1>
+      <demo-snippet>
+        <template is="dom-bind">
+          <csrf-cookie csrf-token="{{token}}"></csrf-cookie>
+          <etools-ajax endpoint="http://silex-test-app.local/countries-data"></etools-ajax>
+        </template>
+      </demo-snippet>
+    </div>
+
+  </body>
+</html>
