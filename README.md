@@ -109,9 +109,9 @@ _sendUnsafeRequest private method. Body property is used to set the request payl
 triggered when url or body properties are changing.
 
 ```html
-<etools-ajax method="POST" url="http://silex-test-app.local/handle-post-put-delete-data" body="{{postTestData}}"></etools-ajax>
-<etools-ajax method="PUT" url="http://silex-test-app.local/handle-post-put-delete-data" body="{{putTestData}}"></etools-ajax>
-<etools-ajax method="DELETE" url="http://silex-test-app.local/handle-post-put-delete-data" body="{{deleteTestData}}"></etools-ajax>
+<etools-ajax method="POST" url="http://silex-test-app.local/handle-post-request" body="{{postTestData}}"></etools-ajax>
+<etools-ajax method="PUT" url="http://silex-test-app.local/handle-put-request" body="{{putTestData}}"></etools-ajax>
+<etools-ajax method="DELETE" url="http://silex-test-app.local/handle-delete-request" body="{{deleteTestData}}"></etools-ajax>
 ```
 
 #### Authorization
