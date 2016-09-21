@@ -126,7 +126,7 @@ var auth = {
 }
 ```
 ```html
-<etools-ajax endpoint="[[endpoints.getData]]" params="{{testParams}}" auth="{{auth}}"></etools-ajax>
+<etools-ajax endpoint="[[endpoints.getData]]" params="[[testParams]]" auth="[[auth]]"></etools-ajax>
 ```
 
 ## Install
