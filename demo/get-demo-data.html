@@ -1,0 +1,76 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../etools-ajax.html">
+
+<dom-module id="get-demo-data">
+  <template>
+    <etools-ajax endpoint="[[endpoints.getToken]]" on-response="_handleResponse"></etools-ajax>
+  </template>
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'get-demo-data',
+        properties: {
+          csrfToken: {
+            type: Object,
+            value: null
+          },
+          endpoints: {
+            type: Object,
+            notify: true
+          },
+          testParams: {
+            type: Object,
+            value: {
+              id: 1,
+              name: 'Global'
+            },
+            notify: true
+          },
+          auth: {
+            type: Object,
+            value: {
+              authorization: 'Bearer lt8fnG9CNmLmsmRX8LTp0pVeJqkccEceXfNM8s_f624'
+            },
+            notify: true
+          }
+        },
+        ready: function() {
+          // define endpoints
+          this.endpoints = {
+            getToken: {
+              url: 'http://silex-test-app.local/get-csrf-token',
+              exp: 1*60*60*1000
+            },
+            getData: {
+              url: 'http://silex-test-app.local/countries-data',
+              exp: 1*60*60*1000, // cache set for 1h
+              cachingKey: 'testingAjaxGetData'
+            },
+            submitData: {
+              url: 'http://silex-test-app.local/handle-post-put-delete-data',
+            }
+          };
+          var _this = this;
+          setTimeout(function(){
+            _this.testParams = {
+              id: 12,
+              name: 'Sudan'
+            }
+          },5000);
+        },
+        _handleResponse: function(res) {
+          // get csr token and set cookie
+          this.csrfToken = res.detail;
+          // set cookie
+          var d = new Date();
+          d.setTime(d.getTime() + (1*60*60*1000));
+          var expires = "expires="+ d.toUTCString(); // cookie will expire in 1 hour
+          document.cookie = "csrftoken=" + this.csrfToken.token_value + "; " + expires + "; path=/";
+        }
+      });
+
+    })();
+  </script>
+</dom-module>

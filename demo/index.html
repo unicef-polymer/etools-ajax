@@ -10,24 +10,90 @@
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
 
     <link rel="import" href="../etools-ajax.html">
-    <link rel="import" href="csrf-cookie.html">
+    <link rel="import" href="get-demo-data.html">
+    <link rel="import" href="unsafe-ajax-demo-data.html">
 
     <style is="custom-style" include="demo-pages-shared-styles">
       .vertical-section-container {
         max-width: 900px;
+        line-height: 1.456;
       }
     </style>
   </head>
   <body>
 
     <div class="vertical-section-container centered">
+
       <h1>etools-ajax demo</h1>
+
+      <h3>Getting data (safe requests, methods: GET|HEAD|OPTIONS|TRACE)</h3>
+      <p>
+        No caching:
+      </p>
       <demo-snippet>
-        <template is="dom-bind">
-          <csrf-cookie csrf-token="{{token}}"></csrf-cookie>
-          <etools-ajax endpoint="http://silex-test-app.local/countries-data"></etools-ajax>
+        <template>
+          <etools-ajax url="http://silex-test-app.local/countries-data" logs="true"></etools-ajax>
         </template>
       </demo-snippet>
+
+      <p>Cache request. By default the element will use localstorage. <i>LokiJS database element is not ready yet.</i></p>
+      <demo-snippet>
+        <template is="dom-bind">
+          <get-demo-data endpoints="{{endpoints}}" test-params="{{testParams}}" auth="{{auth}}"></get-demo-data>
+
+          <!--
+          getData = {
+              url: 'http://silex-test-app.local/countries-data',
+              exp: 1*60*60*1000, // cache set for 1h
+              cachingKey: 'testingAjaxGetData'
+          }
+          -->
+
+          <etools-ajax endpoint="[[endpoints.getData]]" logs="true"></etools-ajax>
+
+          <!--
+          testParams = {
+              id: 1,
+              name: 'Global'
+          }
+
+          auth = {
+              authorization: 'Bearer lt8fnG9CNmLmsmRX8LTp0pVeJqkccEceXfNM8s_f624'
+          }
+          -->
+
+          <etools-ajax endpoint="[[endpoints.getData]]" params="{{testParams}}" auth="{{auth}}" logs="true"></etools-ajax>
+
+        </template>
+      </demo-snippet>
+
+      <h3>Submitting data (unsafe requests, methods such as: POST|PUT|DELETE)</h3>
+      <p>
+        No caching is made for this requests.
+      </p>
+      <demo-snippet>
+        <template is="dom-bind">
+          <unsafe-ajax-demo-data body-post="{{postTestData}}" body-put="{{putTestData}}" body-delete="{{deleteTestData}}"></unsafe-ajax-demo-data>
+
+          <etools-ajax url="http://silex-test-app.local/handle-post-put-delete-data" method="POST" body="{{postTestData}}" logs="true"></etools-ajax>
+          <etools-ajax url="http://silex-test-app.local/handle-post-put-delete-data" method="PUT" body="{{putTestData}}" csrf-check="disabled" logs="true"></etools-ajax>
+          <etools-ajax url="http://silex-test-app.local/handle-post-put-delete-data" method="DELETE" body="{{deleteTestData}}" logs="true"></etools-ajax>
+        </template>
+      </demo-snippet>
+
+      <p>
+        <strong>Demo notes:</strong>
+        For this demo to work you need a local server setup with 3 API routes enabled:
+      </p>
+      <ul>
+        <li>GET /countries-data</li>
+        <li>GET /get-csrf-token</li>
+        <li>POST|PUT|DELETE|PATCH /handle-post-put-delete-data</li>
+      </ul>
+      <p>
+        The response of these routes is up to you to decide.
+      </p>
+
     </div>
 
   </body>

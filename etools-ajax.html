@@ -12,6 +12,7 @@ You can chose to use directly the URL to make the request, no caching will be ma
 Also you can use an endpoint object that contains url, exp (expire date in milliseconds) and cachingKey properties.
 CachingKey property is optional and it's recommended if you use lokiJS as local database for caching.
 If is not set then the url will be the caching key. If exp property is not set then no caching will be made for this endpoint.
+Only GET requests can be cached using this element.
 
 ```
 var endpoint = {
@@ -21,7 +22,7 @@ var endpoint = {
 );
 ```
 
-If any of the url or endpoint properties changes, the ajax requests automatically fires. In endpoint case, before triggering
+If any of the url, params or endpoint properties changes, the ajax requests automatically fires. In endpoint case, before triggering
 the new request we search to see if we already have this data in local cache storage. If data is found and did not expired
 automatically fire/return response with found data. If data for the new endpoint is not found or is expired then make the request.
 
@@ -32,8 +33,27 @@ returned data to be used in parent element (where you can have a new on-response
 
 - error: fire an error event to be cached in parent element (a new on-error handling, page specific)
 
+#### Unsafe requests
 
+Submitting data using unsafe requests with methods such as POST, PUT or DELETE will require a CSRF Token that has to be stored
+in a cookie with the name: 'csrftoken'. When the request is prepared this token is added as a header (x-csrftoken).
+You can disable this behaviour by setting the csrfCheck to 'disabled'.
 
+All requests that are made with other methods than GET, HEAD, OPTIONS or TRACE are considered unsafe and are triggered by
+_sendUnsafeRequest private method. Body property is used to set the request payload data and the request is automatically
+triggered when url or body properties are changing.
+
+#### Authorization
+
+In many cases we need to set authorization data for each request. For example the requests from an application that uses OAuth.
+This authorization data can be set on the request using auth property, which is an object with keys and values that will become
+headers names (each key name) and headers values (key value). Ex:
+
+```
+auth = {
+    authorization: 'Bearer lt8fnG9CNmLmsmRX8LTp0pVeJqkccEceXfNM8s_f624'
+}
+```
 
 @demo demo/index.html 
 -->
@@ -41,13 +61,13 @@ returned data to be used in parent element (where you can have a new on-response
 <dom-module id="etools-ajax">
   <template>
     <iron-ajax
-        auto
         id="customAjax"
         on-response="handleResponse"
         on-error="handleError"
-        handle-as="[[handleAs]]"
+        handle-as="json"
         method="[[method]]"
         params="[[params]]"
+        with-credentials="[[withCredentials]]"
         debounce-duration="300"
         loading="{{loading}}">
     </iron-ajax>
@@ -60,30 +80,52 @@ returned data to be used in parent element (where you can have a new on-response
       Polymer({
         is: 'etools-ajax',
         properties: {
-          authToken: {
-            type: String,
-            value: ''
-          },
-          handleAs: {
-            type: String,
-            value: 'json'
+          auth: {
+            type: Object,
+            value: function () {
+              return null;
+            }
           },
           loading: {
             type: Boolean,
             value: false,
             notify: true
           },
+          logs: {
+            type: Boolean,
+            value: false
+          },
+          handleAs: {
+            type: String,
+            value: 'json'
+          },
           method: {
             type: String,
-            method: 'GET'
+            value: 'GET'
           },
           params: {
             type: Object,
-            value: null
+            value: null,
+            observer: '_paramsChanged'
           },
           body: {
             type: Object,
-            value: null
+            value: null,
+            observer: '_bodyChanged'
+          },
+          cachingStorage: {
+            type: String,
+            value: 'localstorage' // or loki
+          },
+          csrfCheck: {
+            type: String,
+            value: function() {
+              return 'enabled';
+            }
+          },
+          withCredentials: {
+            type: Boolean,
+            value: false
           },
           url: {
             type: String,
@@ -93,10 +135,25 @@ returned data to be used in parent element (where you can have a new on-response
           endpoint: {
             type: Object,
             observer: '_endpointChanged'
-          },
-          cachingStorage: {
-            type: String,
-            value: 'localstorage' // or loki
+          }
+        },
+        triggerRequest: function() {
+          this.$.customAjax.generateRequest();
+        },
+        _log: function(type, message, method, url, params) {
+          if (this.logs) {
+            var logMsg = '[etools-ajax] ';
+            if (message) {
+              logMsg += message;
+            }
+            if (method && url) {
+              logMsg += method + ' ' + url + ' , params: ' + JSON.stringify(params);
+            }
+            if (type === 'error') {
+              console.error(logMsg);
+            } else {
+              console.log(logMsg);
+            }
           }
         },
         _startLoading: function () {
@@ -126,35 +183,65 @@ returned data to be used in parent element (where you can have a new on-response
           }
           return csrfToken;
         },
+        _setAuthorizationHeaders: function() {
+          if (this.auth !== null && typeof this.auth === 'object' && Object.keys(this.auth).length > 0) {
+            // authorization data detected ... add it to request header
+            for(var authHeader in this.auth) {
+              this.$.customAjax.headers[authHeader] = this.auth[authHeader];
+            }
+          }
+        },
+        _paramsChanged: function(newParams) {
+          if (this.url === null) {
+            // endpoint with cached data might be used in this case and the url is null
+            this._endpointChanged(this.endpoint);
+          } else {
+            this._prepareRequest(this.url);
+          }
+        },
+        _bodyChanged: function(newBody) {
+          this._prepareRequest(this.url);
+        },
         _prepareRequest: function (newUrl) {
+          if (newUrl === undefined || newUrl === null || newUrl === '') {
+            return;
+          }
+
+          // check for authorization
+          this._setAuthorizationHeaders();
+
           // if the url is provided we have to prepare the request
           if ((this.method !== undefined) && (!this._csrfSafeMethod(this.method))) {
             // unsafe (post, put, delete) requests should be triggered manually
-
-            // TODO: trigger post/put/delete requests here
-
+            this._sendUnsafeRequest();
             return;
           }
           // assign new url to ajax element , this will automatically fire the request
+          if (this.logs) {
+            this._log('log', false, this.method, this.url, this.params);
+          }
           this.$.customAjax.url = newUrl;
-
           if (newUrl !== null) {
             this._startLoading();
           }
+          this.triggerRequest();
         },
         _getEndpointCacheKey: function(endpoint) {
           var cacheKey = endpoint.url;
           if (typeof endpoint.cachingKey === 'string' && endpoint.cachingKey !== '') {
             cacheKey = endpoint.cachingKey;
           }
+          if (this.params !== null && typeof this.params === 'object' && Object.keys(this.params).length > 0) {
+            cacheKey += '_' + JSON.stringify(this.params);
+          }
           return cacheKey;
         },
         _validateEndpointObject: function(endpoint, log) {
-          if (endpoint !== null && endpoint.hasOwnProperty('url') && endpoint.url !== '') {
+          if (typeof endpoint === 'object' && endpoint.hasOwnProperty('url') && endpoint.url !== '') {
             return true;
           }
           if (log) {
-            console.error('[etools-ajax] Endpoint object must have url property set')
+            console.error('[etools-ajax] Endpoint object must have url property set');
           }
           return false;
         },
@@ -163,7 +250,7 @@ returned data to be used in parent element (where you can have a new on-response
             return;
           }
           // Check if endpoint has expire property set and it's bigger than 0
-          if (newEndpoint.hasOwnProperty('exp') && newEndpoint.exp > 0) {
+          if (this.method === 'GET' && newEndpoint.hasOwnProperty('exp') && newEndpoint.exp > 0) {
             // check if we have cached data
             var now = Date.now();
             // determine request cache key
@@ -174,7 +261,6 @@ returned data to be used in parent element (where you can have a new on-response
 
               // TODO: get data from loki database
 
-
             } else {
               // data is cached in localstorage
               var rsp = JSON.parse(window.localStorage.getItem(cacheKey) || null);
@@ -182,9 +268,13 @@ returned data to be used in parent element (where you can have a new on-response
 
             if ((rsp) && ((rsp.exp - now) > 0)) {
               // else fire response where rsp.detail is the info from localstorage/loki
+              if (this.logs) {
+                this._log('log', 'Return data from caching storage (key: ' + cacheKey + ') for ', this.method, newEndpoint.url, this.params);
+              }
               this.fire('response', rsp.detail, {bubbles: false});
             } else {
               // If expired shoot a new request
+              this._log('log', 'Fire new request to get data from ' + newEndpoint.url);
               this.url = newEndpoint.url;
             }
           } else {
@@ -194,7 +284,9 @@ returned data to be used in parent element (where you can have a new on-response
         },
         _cacheEndpointData: function() {
           // check if the request data should be cached
-          if (this.url !== null && this._validateEndpointObject(this.endpoint, false) && this.url === this.endpoint.url) {
+          if (this.method === 'GET' && this.url !== null
+              && this._validateEndpointObject(this.endpoint, false)
+              && this.url === this.endpoint.url) {
             if (this.endpoint.hasOwnProperty('exp') && this.endpoint.exp > 0) {
               return true;
             }
@@ -231,25 +323,32 @@ returned data to be used in parent element (where you can have a new on-response
         },
         handleError: function (event, error) {
           this._stopLoading();
-          console.error('[etools-ajax] ' + [error.error, 'while loading', event.srcElement.url].join(': '));
+          this._log('error', error.error + ' while loading ' + event.srcElement.url);
 
           this.fire('error', {
             request: event,
             error: error.error
           }, {bubbles: false});
         },
-
-        sendPostRequest: function () {
-          console.log('unsafe method', this.method);
-          var csrfToken = this._getCSRFCookie();
+        _sendUnsafeRequest: function () {
+          if (this.body === null || this.body === undefined) {
+            return;
+          }
           this.$.customAjax.auto = false;
           this.$.customAjax.body = this.body;
           this.$.customAjax.contentType = 'application/json';
-          this.$.customAjax.headers = {
-            'X-CSRFToken': csrfToken
-          };
+
+          if (this.csrfCheck !== 'disabled') {
+            var csrfToken = this._getCSRFCookie();
+            if (csrfToken !== null) {
+              this.$.customAjax.headers['x-csrftoken'] = csrfToken;
+            }
+          }
+
+          this._log('log', 'CSRF ' + this.csrfCheck + ', token: ' + csrfToken + ' ', this.method, this.url, this.body);
+
           this.$.customAjax.url = this.url;
-          this.$.customAjax.generateRequest();
+          this.triggerRequest();
           this._startLoading();
           return;
         },
