@@ -87,14 +87,14 @@ You can set `debounceTime` to ensure you won't fire multiple request when the ur
 #### Ajax response handling:
 
 - success: check if the request data should be cached, add data to caching storage, fire a success response with
-returned data to be used in parent element (where you can have a new on-response action (page specific) that manages received data)
+returned data to be used in parent element (where you can have on-success action (page specific) that manages received data)
 
-- error: fire an error event to be handled in parent element (a new on-error handling, page specific)
+- error: fire an error event to be handled in parent element (on-fail handling, page specific)
 
 ```html
 <etools-ajax url="http://silex-test-app.local/countries-data" 
-  on-response="handleResponse"
-  on-error="handleError"></etools-ajax>
+  on-success="handleResponse"
+  on-fail="handleError"></etools-ajax>
 ```
 ```javascript
 function handleResponse(response) {

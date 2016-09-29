@@ -28,9 +28,9 @@ automatically fire/return response with found data. If data for the new endpoint
 #### Ajax response handling:
 
 - success: check if the request data should be cached, add data to caching storage, fire a success response with
-returned data to be used in parent element (where you can have a new on-response action (page specific) that manages received data)
+returned data to be used in parent element (where you can have a on-success action (page specific) that manages received data)
 
-- error: fire an error event to be handled in parent element (a new on-error handling, page specific)
+- error: fire an error event to be handled in parent element (element on-fail event, page specific)
 
 #### Unsafe requests
 
@@ -278,7 +278,7 @@ auth = {
               if (this.logs) {
                 this._log('log', 'Return data from caching storage (key: ' + cacheKey + ') for ', this.method, newEndpoint.url, this.params);
               }
-              this.fire('response', rsp.detail, {bubbles: false});
+              this.fire('success', rsp.detail, {bubbles: false});
             } else {
               // If expired shoot a new request
               this._log('log', 'Fire new request to get data from ' + newEndpoint.url);
@@ -325,14 +325,14 @@ auth = {
             data = JSON.parse(data);
           }
 
-          this.fire('response', data, {bubbles: false});
+          this.fire('success', data, {bubbles: false});
           this._stopLoading();
         },
         handleError: function (event, error) {
           this._stopLoading();
           this._log('error', error.error + ' while loading ' + event.srcElement.url);
 
-          this.fire('error', {
+          this.fire('fail', {
             request: event,
             error: error.error
           }, {bubbles: false});

@@ -3,7 +3,7 @@
 
 <dom-module id="get-demo-data">
   <template>
-    <etools-ajax endpoint="[[endpoints.getToken]]" on-response="_handleResponse" logs="true"></etools-ajax>
+    <etools-ajax endpoint="[[endpoints.getToken]]" on-success="_handleResponse" logs="true"></etools-ajax>
   </template>
   <script>
     (function() {
@@ -63,6 +63,7 @@
         },
         _handleResponse: function(res) {
           // get csr token and set cookie
+          console.log(res.detail);
           this.csrfToken = res.detail;
           // set cookie
           var d = new Date();
