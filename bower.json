@@ -1,7 +1,7 @@
 {
   "name": "etools-ajax",
   "description": "Polymer element for handling ajax requests",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "license": "https://github.com/unicef-polymer/etools-ajax/blob/master/LICENSE.md",
   "main": "etools-ajax.html",
   "dependencies": {

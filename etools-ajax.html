@@ -1,6 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-ajax/iron-ajax.html">
-<!--<link rel="import" href="../../behaviors/common/utils.html">-->
 <!--
 `etools-ajax`
 
@@ -68,7 +67,6 @@ auth = {
         method="[[method]]"
         params="[[params]]"
         with-credentials="[[withCredentials]]"
-        debounce-duration="300"
         loading="{{loading}}">
     </iron-ajax>
   </template>
@@ -98,6 +96,10 @@ auth = {
           handleAs: {
             type: String,
             value: 'json'
+          },
+          debounceTime: {
+            type: Number,
+            value: 300
           },
           method: {
             type: String,
@@ -202,11 +204,7 @@ auth = {
         _bodyChanged: function(newBody) {
           this._prepareRequest(this.url);
         },
-        _prepareRequest: function (newUrl) {
-          if (newUrl === undefined || newUrl === null || newUrl === '') {
-            return;
-          }
-
+        _setRequestDataAndFire: function(newUrl) {
           // check for authorization
           this._setAuthorizationHeaders();
 
@@ -225,6 +223,15 @@ auth = {
             this._startLoading();
           }
           this.triggerRequest();
+        },
+        _prepareRequest: function (newUrl) {
+          if (newUrl === undefined || newUrl === null || newUrl === '') {
+            return;
+          }
+          // add debounce
+          this.debounce('prepareAndFireRequest', function() {
+            this._setRequestDataAndFire(newUrl);
+          }, this.debounceTime);
         },
         _getEndpointCacheKey: function(endpoint) {
           var cacheKey = endpoint.url;

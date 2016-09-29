@@ -13,6 +13,8 @@ each property of this object will become a header with it's corresponding value
  
 * csrfCheck - String, default: 'enabled' - if set to 'disabled' will remove x-csrftoken header from request 
 
+* debounceTime - Number, default: 300 (milliseconds)
+
 * endpoint - Object, default: null
 
 * handleAs - String, default: json
@@ -76,6 +78,11 @@ var testParams = {
 If any of the url, params or endpoint properties changes, the ajax requests automatically fires. In endpoint case, before triggering
 the new request we search to see if we already have this data in local cache storage. If data is found and did not expired,
 automatically fire/return response with found data. If data for the new endpoint is not found or is expired then make the request.
+
+You can set `debounceTime` to ensure you won't fire multiple request when the url, endpoint, params or body are changed.
+```html
+<etools-ajax endpoint="[[endpoint]]" params="[[testParams]]" debounce-time="300"></etools-ajax>
+```
 
 #### Ajax response handling:
 

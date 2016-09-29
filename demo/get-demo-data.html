@@ -3,7 +3,7 @@
 
 <dom-module id="get-demo-data">
   <template>
-    <etools-ajax endpoint="[[endpoints.getToken]]" on-response="_handleResponse"></etools-ajax>
+    <etools-ajax endpoint="[[endpoints.getToken]]" on-response="_handleResponse" logs="true"></etools-ajax>
   </template>
   <script>
     (function() {
@@ -59,6 +59,7 @@
               name: 'Sudan'
             }
           },5000);
+
         },
         _handleResponse: function(res) {
           // get csr token and set cookie
