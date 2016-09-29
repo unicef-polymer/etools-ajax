@@ -229,9 +229,13 @@ auth = {
             return;
           }
           // add debounce
-          this.debounce('prepareAndFireRequest', function() {
+          if (this.debounceTime > 0) {
+            this.debounce('prepareAndFireRequest', function () {
+              this._setRequestDataAndFire(newUrl);
+            }, this.debounceTime);
+          } else {
             this._setRequestDataAndFire(newUrl);
-          }, this.debounceTime);
+          }
         },
         _getEndpointCacheKey: function(endpoint) {
           var cacheKey = endpoint.url;
