@@ -13,7 +13,7 @@ each property of this object will become a header with it's corresponding value
  
 * csrfCheck - String, default: 'enabled' - if set to 'disabled' will remove x-csrftoken header from request 
 
-* debounceTime - Number, default: 300 (milliseconds)
+* debounceTime - Number, default: 300 (milliseconds); if is set to 0, debounce is disabled
 
 * endpoint - Object, default: null
 
