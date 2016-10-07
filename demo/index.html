@@ -39,7 +39,7 @@
       <p>Cache request. By default the element will use localstorage. <i>LokiJS database element is not ready yet.</i></p>
       <demo-snippet>
         <template is="dom-bind">
-          <get-demo-data endpoints="{{endpoints}}" test-params="{{testParams}}" auth="{{auth}}"></get-demo-data>
+          <get-demo-data endpoints="{{endpoints}}" test-params="{{testParams}}" auth="{{auth}}" response-handlers="{{responseHandlers}}" custom-db="{{customDb}}"></get-demo-data>
 
           <!--
           getData = {
@@ -48,8 +48,15 @@
               cachingKey: 'testingAjaxGetData'
           }
           -->
-
+          <!-- data will be cached in localstorage-->
           <etools-ajax endpoint="[[endpoints.getData]]" logs="true"></etools-ajax>
+
+          <!-- data will be cached in etools-ajax element's dexie db  -->
+          <etools-ajax endpoint="[[endpoints.caountriesDataEndpOne]]" logs="true" caching-storage="dexie"></etools-ajax>
+
+          <!-- data will be cached in a dexie db defined by you, your d schema must contain a collectin named
+          'collectionsList' with name and expire fields and the collection you will store the data returned by ajax request(array of objects) -->
+          <etools-ajax endpoint="[[endpoints.caountriesDataEndpThree]]" logs="true" alternate-dexie-db="{{customDb}}" dexie-db-collection="countries"></etools-ajax>
 
           <!--
           testParams = {
@@ -62,7 +69,7 @@
           }
           -->
 
-          <etools-ajax endpoint="[[endpoints.getData]]" params="{{testParams}}" auth="{{auth}}" logs="true"></etools-ajax>
+          <!--<etools-ajax endpoint="[[endpoints.getData]]" params="{{testParams}}" auth="{{auth}}" logs="true"></etools-ajax>-->
 
         </template>
       </demo-snippet>

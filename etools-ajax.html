@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../etools-dexiejs/etools-dexiejs.html">
 <link rel="import" href="../iron-ajax/iron-ajax.html">
 <!--
 `etools-ajax`
@@ -9,7 +10,7 @@ Polymer element for handling ajax requests.
 
 You can chose to use directly the URL to make the request, no caching will be made in this case.
 Also you can use an endpoint object that contains url, exp (cache kept for x milliseconds) and cachingKey properties.
-CachingKey property is optional and it's recommended if you use lokiJS as local database for caching.
+CachingKey property is optional and it's recommended if you use Dexie.js as local database for caching.
 If is not set then the url will be the caching key + json string of the params. If exp property is not set then no caching will be made for this endpoint.
 Only GET requests can be cached using this element.
 
@@ -54,11 +55,24 @@ auth = {
 }
 ```
 
+#### Using Dexie.js instead of localstorage for caching
+
+For a better browser storage use property: `cachingStorage="dexie"` and etools-ajax will not chache data in localstorage,
+it will use a dexie db (based on IndexedDb) called `etoolsAjaxCacheDb` to store request data.
+
+If you do not want to use etools-ajax default dexie db you can provide your own database, but this rules are applied in this case:
+  - property `alternateDexieDb` should be your dexie db instance
+  - property `dexieDbCollection` should be the collection where the request is gonna put the return data (Important: it has to be an array of objects)
+  - your dexie db schema should contain a collection called `collectionsList` with indexes: '&name,expire' (unique name field index and expire field index)
+
 @demo demo/index.html 
 -->
 
 <dom-module id="etools-ajax">
   <template>
+    <template is="dom-if" if="_enableDexie(cachingStorage)">
+      <etools-dexiejs id="etoolsAjaxCacheDb" db-name="etoolsAjaxCacheDb" on-db-ready="_dexieDbReady"></etools-dexiejs>
+    </template>
     <iron-ajax
         id="customAjax"
         on-response="handleResponse"
@@ -117,7 +131,21 @@ auth = {
           },
           cachingStorage: {
             type: String,
-            value: 'localstorage' // or loki
+            value: function() {
+              return 'localstorage'; // or dexie
+            }
+          },
+          alternateDexieDb: {
+            type: Object,
+            value: function() {
+              return null;
+            }
+          },
+          dexieDbCollection: {
+            type: String,
+            value: function() {
+              return '';
+            }
           },
           csrfCheck: {
             type: String,
@@ -139,11 +167,9 @@ auth = {
             observer: '_endpointChanged'
           }
         },
-        triggerRequest: function() {
-          this.$.customAjax.generateRequest();
-        },
-        _log: function(type, message, method, url, params) {
-          if (this.logs) {
+
+        _log: function(type, message, method, url, params, forceDisplay) {
+          if (this.logs || forceDisplay) {
             var logMsg = '[etools-ajax] ';
             if (message) {
               logMsg += message;
@@ -252,41 +278,46 @@ auth = {
             return true;
           }
           if (log) {
-            console.error('[etools-ajax] Endpoint object must have url property set');
+            this._log('error', 'Endpoint object must have url property set');
           }
           return false;
+        },
+        _checkEndpointCachedData: function(rsp, cacheKey, newEndpoint) {
+          // check if we have cached data
+          var now = Date.now();
+          if ((rsp) && ((rsp.exp - now) > 0)) {
+            // else fire response where rsp.detail is the info from localstorage/dexie
+            if (this.logs) {
+              this._log('log', 'Return data from caching storage (' +
+                  (this._useCustomDexieDb() ? ('custom DexieDb, collection: ' + this.dexieDbCollection) : (this.cachingStorage +
+                  ', key: ' + (cacheKey))) + ') for ', this.method, newEndpoint.url, this.params);
+            }
+            this.fire('success', rsp.detail, {bubbles: false});
+          } else {
+            // If expired shoot a new request
+            this._log('log', 'Fire new request to get data from ' + newEndpoint.url);
+            this.url = newEndpoint.url;
+          }
         },
         _endpointChanged: function (newEndpoint) {
           if (!this._validateEndpointObject(newEndpoint)) {
             return;
           }
+          // determine request cache key
+          var cacheKey = this._getEndpointCacheKey(newEndpoint);
+
           // Check if endpoint has expire property set and it's bigger than 0
           if (this.method === 'GET' && newEndpoint.hasOwnProperty('exp') && newEndpoint.exp > 0) {
-            // check if we have cached data
-            var now = Date.now();
-            // determine request cache key
-            var cacheKey = this._getEndpointCacheKey(newEndpoint);
-            //  Try to get info from cache storage
-            if (this.cachingStorage === 'loki') {
-              // data is cached in loki database
-
-              // TODO: get data from loki database
-
+            if (this._enableDexie(this.cachingStorage) && !this._useCustomDexieDb()) {
+              // data is cached in default dexie database
+              this._getDexieData(cacheKey, newEndpoint);
+            } else if (this._useCustomDexieDb()) {
+              // data is cached in a custom database (user's choice)
+              this._getDexieDataFromCustomDb(cacheKey, newEndpoint);
             } else {
               // data is cached in localstorage
               var rsp = JSON.parse(window.localStorage.getItem(cacheKey) || null);
-            }
-
-            if ((rsp) && ((rsp.exp - now) > 0)) {
-              // else fire response where rsp.detail is the info from localstorage/loki
-              if (this.logs) {
-                this._log('log', 'Return data from caching storage (key: ' + cacheKey + ') for ', this.method, newEndpoint.url, this.params);
-              }
-              this.fire('success', rsp.detail, {bubbles: false});
-            } else {
-              // If expired shoot a new request
-              this._log('log', 'Fire new request to get data from ' + newEndpoint.url);
-              this.url = newEndpoint.url;
+              this._checkEndpointCachedData(rsp, cacheKey, newEndpoint);
             }
           } else {
             // no caching set, fire a new request
@@ -304,21 +335,127 @@ auth = {
           }
           return false;
         },
+        _enableDexie: function(cacheStorage) {
+          return cacheStorage === 'dexie';
+        },
+        _useCustomDexieDb: function() {
+          if (this.alternateDexieDb instanceof Dexie && this.dexieDbCollection !== "" && this.alternateDexieDb[this.dexieDbCollection]) {
+            if (this.alternateDexieDb.collectionsList) {
+              return true;
+            } else {
+              this._log('error', 'Invalid dexie version store for provided db. Missing "collectionsList : \"&name,expire\""');
+            }
+          }
+          return false;
+        },
+        _dexieDbReady: function() {
+          if (!this._enableDexie(this.cachingStorage)) {
+            return;
+          }
+          this.async(function() {
+            this.ajaxCacheDb = this.$$('#etoolsAjaxCacheDb').getDb();
+            this.ajaxCacheDb.version(1).stores({
+              ajaxCachedData: "cacheKey,data,expire"
+            });
+            this.ajaxCacheDb.open().catch (function (err) {
+              this._log('error', 'Failed to open db: ' + (err.stack || err), null, null, null, true);
+            });
+            // clean expired data
+            this._cleanDexieExpiredData();
+
+            if (typeof this.getDexieCacheKey === 'string' && this.getDexieCacheKey !== '') {
+              this._getDexieData(this.getDexieCacheKey, this.endpoint);
+              this.getDexieCacheKey = null;
+            }
+
+          }.bind(this));
+        },
+        _cleanDexieExpiredData: function() {
+          if (this.ajaxCacheDb) {
+            var now = Date.now();
+            this.ajaxCacheDb.ajaxCachedData.where('expire').belowOrEqual(now).delete().then(function(result) {
+              if (result > 0) {
+                this._log('log', 'Clean dexie cached data. Items removed nr:' + result);
+              }
+            }.bind(this)).catch(function(err) {
+              this._log('error', 'Failed to clean db: ' + (err.stack || err), null, null, null, true);
+            }.bind(this));
+          }
+        },
+        _getDexieData: function(key, endpoint) {
+          if (this.ajaxCacheDb) {
+            this.ajaxCacheDb.ajaxCachedData.where('cacheKey').equals(key).toArray().then(function(result) {
+              var rsp = null;
+              if (result.length > 0) {
+                rsp = {
+                  detail: result[0].data,
+                  exp: result[0].expire
+                }
+              }
+              this._checkEndpointCachedData(rsp, key, endpoint);
+            }.bind(this));
+
+          } else {
+            this.getDexieCacheKey = key;
+          }
+
+        },
+        _getDexieDataFromCustomDb: function(cacheKey, newEndpoint) {
+          this.alternateDexieDb.collectionsList.where('name').equals(this.dexieDbCollection).toArray().then(function(result) {
+            if (result.length > 0) {
+              // collection already exists, get it's data
+              this.alternateDexieDb[this.dexieDbCollection].toArray().then(function(collectionData) {
+                var rsp = {
+                  detail: collectionData,
+                  exp: result[0].expire
+                }
+                this._checkEndpointCachedData(rsp, cacheKey, newEndpoint);
+              }.bind(this)).catch(function(err) {
+                this._checkEndpointCachedData(null, cacheKey, newEndpoint);
+              }.bind(this));
+            } else {
+              this._checkEndpointCachedData(null, cacheKey, newEndpoint);
+            }
+          }.bind(this));
+        },
+        triggerRequest: function() {
+          this.$.customAjax.generateRequest();
+        },
         handleResponse: function (response) {
           if (this._cacheEndpointData()) {
             // store received data in local caching storage
             var cacheKey = this._getEndpointCacheKey(this.endpoint);
-            if (this.cachingStorage === 'loki') {
-              // loki database storage
 
-              // TODO: save data to loki database
+            var requestData = {
+              detail: response.detail.xhr.response,
+              exp: this.endpoint.exp + Date.now(),
+            };
 
+            if (this._enableDexie(this.cachingStorage) && !this._useCustomDexieDb()) {
+              // dexiejs database storage based on IndexedDB
+              if (this.ajaxCacheDb) {
+                this.ajaxCacheDb.ajaxCachedData.where('cacheKey').equals(cacheKey).delete().then(function(result){
+                  this.ajaxCacheDb.ajaxCachedData.add({cacheKey: cacheKey, data: requestData.detail, expire: requestData.exp});
+                }.bind(this));
+              }
+            } else if (this._useCustomDexieDb()) {
+              if (Array.isArray(requestData.detail)) {
+                /**
+                 * in this case the result should be an array;
+                 * in the custom dexie database:
+                 *    - save a record with collection name and expire time in 'collectionsList' collection
+                 *    - save all the objects from returned array in specified collection
+                 */
+                this.alternateDexieDb.collectionsList.put({name: this.dexieDbCollection, expire: requestData.exp}).then(function() {
+                  this.alternateDexieDb[this.dexieDbCollection].clear().then(function() {
+                    this.alternateDexieDb[this.dexieDbCollection].bulkAdd(requestData.detail);
+                  }.bind(this));
+                }.bind(this));
+              } else {
+                this._log('error', 'The ajax response has to be an array of objects to be able to save them in you dexie db collection!');
+              }
             } else {
               // localstorage
-              var requestData = {
-                detail: response.detail.xhr.response,
-                exp: this.endpoint.exp + Date.now(),
-              };
               window.localStorage.setItem(cacheKey, JSON.stringify(requestData));
             }
           }
@@ -362,9 +499,7 @@ auth = {
           this.triggerRequest();
           this._startLoading();
           return;
-        },
-
-
+        }
 
       });
     })();

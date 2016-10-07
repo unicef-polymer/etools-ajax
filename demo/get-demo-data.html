@@ -1,8 +1,10 @@
 <link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../etools-dexiejs/etools-dexiejs.html">
 <link rel="import" href="../etools-ajax.html">
 
 <dom-module id="get-demo-data">
   <template>
+    <etools-dexiejs id="customDb" db-name="customTestDb" on-db-ready="_dexieDbReady"></etools-dexiejs>
     <etools-ajax endpoint="[[endpoints.getToken]]" on-success="_handleResponse" logs="true"></etools-ajax>
   </template>
   <script>
@@ -34,6 +36,11 @@
               authorization: 'Bearer lt8fnG9CNmLmsmRX8LTp0pVeJqkccEceXfNM8s_f624'
             },
             notify: true
+          },
+          customDb: {
+            type: Object,
+            value: null,
+            notify: true
           }
         },
         ready: function() {
@@ -41,16 +48,32 @@
           this.endpoints = {
             getToken: {
               url: 'http://silex-test-app.local/get-csrf-token',
-              exp: 1*60*60*1000
+              exp: 5*60*1000,
+              cachingKey: 'csrfToken'
             },
             getData: {
               url: 'http://silex-test-app.local/countries-data',
-              exp: 1*60*60*1000, // cache set for 1h
+              exp: 2*60*1000, // cache set for 2m
               cachingKey: 'testingAjaxGetData'
             },
             submitData: {
               url: 'http://silex-test-app.local/handle-post-put-delete-data',
-            }
+            },
+            caountriesDataEndpOne: {
+              url: 'http://silex-test-app.local/countries-data',
+              exp: 3*60*1000, // cache set for 3m
+              cachingKey: 'countriesDataEndpOne'
+            },
+            caountriesDataEndpTwo: {
+              url: 'http://silex-test-app.local/countries-data',
+              exp: 6*60*1000, // cache set for 6m
+              cachingKey: 'countriesDataEndpTwo'
+            },
+            caountriesDataEndpThree: {
+              url: 'http://silex-test-app.local/countries-data',
+              exp: 4*60*1000, // cache set for 4m
+              cachingKey: 'countriesDataEndpThree'
+            },
           };
           var _this = this;
           setTimeout(function(){
@@ -70,7 +93,20 @@
           d.setTime(d.getTime() + (1*60*60*1000));
           var expires = "expires="+ d.toUTCString(); // cookie will expire in 1 hour
           document.cookie = "csrftoken=" + this.csrfToken.token_value + "; " + expires + "; path=/";
+        },
+        _dexieDbReady: function() {
+          var db = this.$.customDb.getDb();
+          db.version(1).stores({
+            collectionsList: "&name,expire",
+            countries: 'id, name'
+          });
+          db.open().catch (function (err) {
+           console.error('error', 'Failed to open db: ' + (err.stack || err));
+          });
+          this.customDb = db;
         }
+
+
       });
 
     })();

@@ -4,6 +4,8 @@ Polymer element for handling ajax requests.
 
 ### Element properties
 
+* alternateDexieDb - Object, default null, it should be a valid dexie db instance
+
 * auth - Object, default: null - useful to set request authorization data; 
 each property of this object will become a header with it's corresponding value
 
@@ -14,6 +16,8 @@ each property of this object will become a header with it's corresponding value
 * csrfCheck - String, default: 'enabled' - if set to 'disabled' will remove x-csrftoken header from request 
 
 * debounceTime - Number, default: 300 (milliseconds); if is set to 0, debounce is disabled
+
+* dexieDbCollection - String, default '', a valid alternateDexieDb collection name
 
 * endpoint - Object, default: null
 
@@ -40,7 +44,7 @@ You can chose to use directly the URL to make the request, no caching will be ma
 ```
 
 Also you can use an endpoint object that contains url, exp (cache kept for x milliseconds) and cachingKey properties.
-CachingKey property is optional and it's recommended if you use lokiJS as local database for caching.
+CachingKey property is optional and it's recommended if you use Dexie.js as local database for caching.
 If is not set then the url will be the main caching key part. Final cache key is created using this private method 
 (url/cacheKey + JSON string of params): 
 
@@ -83,6 +87,36 @@ You can set `debounceTime` to ensure you won't fire multiple request when the ur
 ```html
 <etools-ajax endpoint="[[endpoint]]" params="[[testParams]]" debounce-time="300"></etools-ajax>
 ```
+
+#### Using Dexie.js instead of localstorage for caching
+     
+ For a better browser storage use property: `cachingStorage="dexie"` and etools-ajax will not chache data in localstorage,
+ it will use a dexie db (based on IndexedDb) called `etoolsAjaxCacheDb` to store request data.
+ 
+ ```html
+ <!-- request data will be stored in  etoolsAjaxCacheDb dexie database, collection ajaxCachedData with the generated cache key -->
+ <etools-ajax endpoint="[[endpoint]]" caching-storage="dexie"></etools-ajax>
+ ```
+ 
+ If you do not want to use etools-ajax default dexie db you can provide your own database, but this rules are applied in this case:
+   - property `alternateDexieDb` should be your dexie db instance
+   - property `dexieDbCollection` should be the collection where the request is gonna put the return data (Important: it has to be an array of objects)
+   - your dexie db schema should contain a collection called `collectionsList` with indexes: '&name,expire' (unique name field index and expire field index)
+
+ ```html
+ <!--
+ // this.$.customDb = etools-dexiejs element
+var db = this.$.customDb.getDb();
+db.version(1).stores({
+ collectionsList: "&name,expire",
+ countries: 'id, name'
+});
+this.customDb = db;
+ -->
+<etools-ajax endpoint="[[endpoints.caountries]]" alternate-dexie-db="{{customDb}}" dexie-db-collection="countries"></etools-ajax>
+ ```
+
+For more info about Dexie.js databases check the [documentation](https://github.com/dfahlander/Dexie.js/wiki).
 
 #### Ajax response handling:
 
