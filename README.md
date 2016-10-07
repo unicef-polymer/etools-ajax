@@ -90,7 +90,7 @@ You can set `debounceTime` to ensure you won't fire multiple request when the ur
 
 #### Using Dexie.js instead of localstorage for caching
      
- For a better browser storage use property: `cachingStorage="dexie"` and etools-ajax will not chache data in localstorage,
+ For a better browser storage use property: `cachingStorage="dexie"` and etools-ajax will not cache data in localstorage,
  it will use a dexie db (based on IndexedDb) called `etoolsAjaxCacheDb` to store request data.
  
  ```html
@@ -113,7 +113,7 @@ db.version(1).stores({
 });
 this.customDb = db;
  -->
-<etools-ajax endpoint="[[endpoints.caountries]]" alternate-dexie-db="{{customDb}}" dexie-db-collection="countries"></etools-ajax>
+<etools-ajax endpoint="[[endpoints.countries]]" alternate-dexie-db="{{customDb}}" dexie-db-collection="countries"></etools-ajax>
  ```
 
 For more info about Dexie.js databases check the [documentation](https://github.com/dfahlander/Dexie.js/wiki).
