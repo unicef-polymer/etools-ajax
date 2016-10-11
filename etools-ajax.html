@@ -60,6 +60,11 @@ auth = {
 For a better browser storage use property: `cachingStorage="dexie"` and etools-ajax will not cache data in localstorage,
 it will use a dexie db (based on IndexedDb) called `etoolsAjaxCacheDb` to store request data.
 
+Since etools-ajax can be used in multiple apps running on the same domain(like eTools apps) you might want to set a prefix
+for element's default dexie db name. In this way you will avoid conflicts with other apps that are using etools-ajax.
+For example you can have 2 identical caching keys that will override each other's data. We do not want that, so make sure
+you set somewhere in your app a global variable, named `etoolsAjaxDefaultDexieDbPrefix`, a string prefix that identifies your app.
+
 If you do not want to use etools-ajax default dexie db you can provide your own database, but this rules are applied in this case:
   - property `alternateDexieDb` should be your dexie db instance
   - property `dexieDbCollection` should be the collection where the request is gonna put the return data (Important: it has to be an array of objects)
@@ -71,7 +76,7 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
 <dom-module id="etools-ajax">
   <template>
     <template is="dom-if" if="_enableDexie(cachingStorage)">
-      <etools-dexiejs id="etoolsAjaxCacheDb" db-name="etoolsAjaxCacheDb" on-db-ready="_dexieDbReady"></etools-dexiejs>
+      <etools-dexiejs id="etoolsAjaxCacheDb" db-name="[[etoolsAjaxCacheDb]]" on-db-ready="_dexieDbReady"></etools-dexiejs>
     </template>
     <iron-ajax
         id="customAjax"
@@ -166,6 +171,22 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
             type: Object,
             observer: '_endpointChanged'
           }
+        },
+
+        ready: function() {
+          /**
+           * Init default dexie db name.
+           * Optionally you can set a prefix for etools-ajax default database to avoid conflicts with other apps
+           * that are using etools-ajax. For example you can have 2 identical caching keys that will override each
+           * other's data. We do not want that, so make sure you set somewhere in your app a global variable,
+           * named etoolsAjaxDefaultDexieDbPrefix, a string prefix that identifies your app.
+           */
+
+          var prefix = '';
+          if (typeof etoolsAjaxDefaultDexieDbPrefix !== 'undefined' && etoolsAjaxDefaultDexieDbPrefix !== '') {
+            prefix = etoolsAjaxDefaultDexieDbPrefix + '_';
+          }
+          this.etoolsAjaxCacheDb = prefix + 'etoolsAjaxCacheDb';
         },
 
         _log: function(type, message, method, url, params, forceDisplay) {

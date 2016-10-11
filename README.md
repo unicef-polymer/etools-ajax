@@ -93,6 +93,11 @@ You can set `debounceTime` to ensure you won't fire multiple request when the ur
  For a better browser storage use property: `cachingStorage="dexie"` and etools-ajax will not cache data in localstorage,
  it will use a dexie db (based on IndexedDb) called `etoolsAjaxCacheDb` to store request data.
  
+ Since etools-ajax can be used in multiple apps running on the same domain(like eTools apps) you might want to set a prefix
+ for element's default dexie db name. In this way you will avoid conflicts with other apps that are using etools-ajax.
+ For example you can have 2 identical caching keys that will override each other's data. We do not want that, so make sure
+ you set somewhere in your app a global variable, named `etoolsAjaxDefaultDexieDbPrefix`, a string prefix that identifies your app.
+ 
  ```html
  <!-- request data will be stored in  etoolsAjaxCacheDb dexie database, collection ajaxCachedData with the generated cache key -->
  <etools-ajax endpoint="[[endpoint]]" caching-storage="dexie"></etools-ajax>
