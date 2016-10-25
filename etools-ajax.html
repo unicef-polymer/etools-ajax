@@ -137,7 +137,7 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           cachingStorage: {
             type: String,
             value: function() {
-              return 'localstorage'; // or dexie
+              return 'localstorage'; // or dexie or custom
             }
           },
           alternateDexieDb: {
@@ -187,6 +187,16 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
             prefix = etoolsAjaxDefaultDexieDbPrefix + '_';
           }
           this.etoolsAjaxCacheDb = prefix + 'etoolsAjaxCacheDb';
+
+          if (this.cachingStorage === 'custom') {
+            if (typeof etoolsCustomDexieDb !== 'undefined' && etoolsCustomDexieDb instanceof Dexie) {
+              this.alternateDexieDb = etoolsCustomDexieDb;
+            } else {
+              this._log('error',
+                  'cachingStorage set to "custom" but etoolsCustomDexieDb is undefined or not instance of Dexie',
+                  null, null, null, true);
+            }
+          }
         },
 
         _log: function(type, message, method, url, params, forceDisplay) {
@@ -309,9 +319,14 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           if ((rsp) && ((rsp.exp - now) > 0)) {
             // else fire response where rsp.detail is the info from localstorage/dexie
             if (this.logs) {
-              this._log('log', 'Return data from caching storage (' +
-                  (this._useCustomDexieDb() ? ('custom DexieDb, collection: ' + this.dexieDbCollection) : (this.cachingStorage +
-                  ', key: ' + (cacheKey))) + ') for ', this.method, newEndpoint.url, this.params);
+              var logMsg = 'Return data from caching storage (';
+              if (this._useCustomDexieDb()) {
+                logMsg += 'custom DexieDb, collection: ' + this.dexieDbCollection;
+              } else {
+                logMsg += (this.cachingStorage === 'custom' ? 'localstorage' : this.cachingStorage) + ', key: ' + (cacheKey);
+              }
+              logMsg += ') for ';
+              this._log('log', logMsg, this.method, newEndpoint.url, this.params);
             }
             this.fire('success', rsp.detail, {bubbles: false});
           } else {

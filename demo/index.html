@@ -6,11 +6,22 @@
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
+    <link rel="import" href="../../etools-dexiejs/etools-dexiejs.html">
+
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
 
     <script>
       var etoolsAjaxDefaultDexieDbPrefix = 'plyElment_';
+
+      // custom dexie db that will be used by etoolsAjax
+      var etoolsCustomDexieDb = new Dexie('etoolsCustomDexieDb');
+      etoolsCustomDexieDb.version(1).stores({
+        collectionsList: "&name,expire",
+        countries: 'id, name'
+      });
+
+
     </script>
 
     <link rel="import" href="../etools-ajax.html">
@@ -63,6 +74,17 @@
           <etools-ajax endpoint="[[endpoints.caountriesDataEndpThree]]" logs="true" alternate-dexie-db="{{customDb}}" dexie-db-collection="countries"></etools-ajax>
 
           <!--
+            use custom dexie db defined somewhere in a app config file
+
+            var etoolsCustomDexieDb = new Dexie('etoolsCustomDexieDb');
+            etoolsCustomDexieDb.version(1).stores({
+              collectionsList: "&name,expire",
+              countries: 'id, name'
+            });
+           -->
+          <etools-ajax endpoint="[[endpoints.caountriesDataEndpThree]]" logs="true" caching-storage="custom" dexie-db-collection="countries"></etools-ajax>
+
+          <!--
           testParams = {
               id: 1,
               name: 'Global'
@@ -73,7 +95,7 @@
           }
           -->
 
-          <!--<etools-ajax endpoint="[[endpoints.getData]]" params="{{testParams}}" auth="{{auth}}" logs="true"></etools-ajax>-->
+          <etools-ajax endpoint="[[endpoints.getData]]" params="{{testParams}}" auth="{{auth}}" logs="true"></etools-ajax>
 
         </template>
       </demo-snippet>
