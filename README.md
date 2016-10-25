@@ -11,7 +11,7 @@ each property of this object will become a header with it's corresponding value
 
 * body - Object, default: null - used for unsafe request payload data (POST, PUT, DELETE)
 
-* cachingStorage - String, default: 'localstorage' - set caching storage type; only localstorage available in this moment 
+* cachingStorage - String, default: 'localstorage' - set caching storage type: localstorage, dexie, custom 
  
 * csrfCheck - String, default: 'enabled' - if set to 'disabled' will remove x-csrftoken header from request 
 
@@ -103,7 +103,9 @@ You can set `debounceTime` to ensure you won't fire multiple request when the ur
  <etools-ajax endpoint="[[endpoint]]" caching-storage="dexie"></etools-ajax>
  ```
  
- If you do not want to use etools-ajax default dexie db you can provide your own database, but this rules are applied in this case:
+ If you do not want to use etools-ajax default dexie db you can provide your own database.
+ 
+ Case 1:
    - property `alternateDexieDb` should be your dexie db instance
    - property `dexieDbCollection` should be the collection where the request is gonna put the return data (Important: it has to be an array of objects)
    - your dexie db schema should contain a collection called `collectionsList` with indexes: '&name,expire' (unique name field index and expire field index)
@@ -120,6 +122,25 @@ this.customDb = db;
  -->
 <etools-ajax endpoint="[[endpoints.countries]]" alternate-dexie-db="{{customDb}}" dexie-db-collection="countries"></etools-ajax>
  ```
+ 
+Case 2: 
+   - you can init `etoolsCustomDexieDb` variable with your custom dexie db somewhere in your config app and make sure is global
+   - on your etools-ajax set `cachingStorage` property to `custom`
+   - do not forget to provide the custom db collection where the data will be cached (`dexieDbCollection`)
+
+```javascript
+// in your app config (global)
+var etoolsCustomDexieDb = new Dexie('etoolsCustomDexieDb');
+etoolsCustomDexieDb.version(1).stores({
+  collectionsList: "&name,expire",
+  countries: 'id, name'
+});
+```
+
+```html
+<!-- in your polymer element -->
+<etools-ajax endpoint="[[endpoints.caountries]]" caching-storage="custom" dexie-db-collection="countries"></etools-ajax>
+```
 
 For more info about Dexie.js databases check the [documentation](https://github.com/dfahlander/Dexie.js/wiki).
 
