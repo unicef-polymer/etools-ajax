@@ -6,24 +6,11 @@
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
-    <link rel="import" href="../../etools-dexiejs/etools-dexiejs.html">
 
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
 
-    <script>
-      var etoolsAjaxDefaultDexieDbPrefix = 'plyElment_';
-
-      // custom dexie db that will be used by etoolsAjax
-      var etoolsCustomDexieDb = new Dexie('etoolsCustomDexieDb');
-      etoolsCustomDexieDb.version(1).stores({
-        collectionsList: "&name,expire",
-        countries: 'id, name'
-      });
-
-
-    </script>
-
+    <link rel="import" href="dexie-conf.html">
     <link rel="import" href="../etools-ajax.html">
     <link rel="import" href="get-demo-data.html">
     <link rel="import" href="unsafe-ajax-demo-data.html">
@@ -45,11 +32,11 @@
       <p>
         No caching:
       </p>
-      <demo-snippet>
+      <!-- <demo-snippet>
         <template>
           <etools-ajax url="http://silex-test-app.local/countries-data" logs="true"></etools-ajax>
         </template>
-      </demo-snippet>
+      </demo-snippet> -->
 
       <p>Cache request. By default the element will use localstorage. <i>LokiJS database element is not ready yet.</i></p>
       <demo-snippet>
@@ -67,11 +54,11 @@
           <etools-ajax endpoint="[[endpoints.getData]]" logs="true"></etools-ajax>
 
           <!-- data will be cached in etools-ajax element's dexie db  -->
-          <etools-ajax endpoint="[[endpoints.caountriesDataEndpOne]]" logs="true" caching-storage="dexie"></etools-ajax>
+          <!--<etools-ajax endpoint="[[endpoints.caountriesDataEndpOne]]" logs="true" caching-storage="dexie"></etools-ajax>-->
 
           <!-- data will be cached in a dexie db defined by you, your d schema must contain a collectin named
           'collectionsList' with name and expire fields and the collection you will store the data returned by ajax request(array of objects) -->
-          <etools-ajax endpoint="[[endpoints.caountriesDataEndpThree]]" logs="true" alternate-dexie-db="{{customDb}}" dexie-db-collection="countries"></etools-ajax>
+          <!--<etools-ajax endpoint="[[endpoints.caountriesDataEndpThree]]" logs="true" alternate-dexie-db="{{customDb}}" dexie-db-collection="countries"></etools-ajax>-->
 
           <!--
             use custom dexie db defined somewhere in a app config file
@@ -82,7 +69,7 @@
               countries: 'id, name'
             });
            -->
-          <etools-ajax endpoint="[[endpoints.caountriesDataEndpThree]]" logs="true" caching-storage="custom" dexie-db-collection="countries"></etools-ajax>
+          <!--<etools-ajax endpoint="[[endpoints.caountriesDataEndpThree]]" logs="true" caching-storage="custom" dexie-db-collection="countries"></etools-ajax>-->
 
           <!--
           testParams = {
@@ -95,7 +82,7 @@
           }
           -->
 
-          <etools-ajax endpoint="[[endpoints.getData]]" params="{{testParams}}" auth="{{auth}}" logs="true"></etools-ajax>
+          <!--<etools-ajax endpoint="[[endpoints.getData]]" params="{{testParams}}" auth="{{auth}}" logs="true"></etools-ajax>-->
 
         </template>
       </demo-snippet>
@@ -104,15 +91,15 @@
       <p>
         No caching is made for this requests.
       </p>
-      <demo-snippet>
-        <template is="dom-bind">
-          <unsafe-ajax-demo-data body-post="{{postTestData}}" body-put="{{putTestData}}" body-delete="{{deleteTestData}}"></unsafe-ajax-demo-data>
+      <!--<demo-snippet>-->
+        <!--<template is="dom-bind">-->
+          <!--<unsafe-ajax-demo-data body-post="{{postTestData}}" body-put="{{putTestData}}" body-delete="{{deleteTestData}}"></unsafe-ajax-demo-data>-->
 
-          <etools-ajax url="http://silex-test-app.local/handle-post-put-delete-data" method="POST" body="{{postTestData}}" logs="true"></etools-ajax>
-          <etools-ajax url="http://silex-test-app.local/handle-post-put-delete-data" method="PUT" body="{{putTestData}}" csrf-check="disabled" logs="true"></etools-ajax>
-          <etools-ajax url="http://silex-test-app.local/handle-post-put-delete-data" method="DELETE" body="{{deleteTestData}}" logs="true"></etools-ajax>
-        </template>
-      </demo-snippet>
+          <!--<etools-ajax url="http://silex-test-app.local/handle-post-put-delete-data" method="POST" body="{{postTestData}}" logs="true"></etools-ajax>-->
+          <!--<etools-ajax url="http://silex-test-app.local/handle-post-put-delete-data" method="PUT" body="{{putTestData}}" csrf-check="disabled" logs="true"></etools-ajax>-->
+          <!--<etools-ajax url="http://silex-test-app.local/handle-post-put-delete-data" method="DELETE" body="{{deleteTestData}}" logs="true"></etools-ajax>-->
+        <!--</template>-->
+      <!--</demo-snippet>-->
 
       <p>
         <strong>Demo notes:</strong>
