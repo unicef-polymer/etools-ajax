@@ -1,0 +1,33 @@
+<link rel="import" href="../../polymer/polymer.html">
+<!--<link rel="import" href="../etools-ajax.html">-->
+
+<dom-module id="multipart-demo-data">
+
+  <script>
+    (function() {
+      // jscs:disable
+      'use strict';
+
+      Polymer({
+        is: 'multipart-demo-data',
+        properties: {
+          bodyPost: {
+            type: Object,
+            value: {
+              id: "13",
+              firstName: "John",
+              lastName: "Doe",
+              someFile: function () {
+                var content = '<a id="a"><b id="b">hey!</b></a>';
+                return new Blob([content], { type: "text/xml"});
+              }()
+            },
+            notify: true
+          }
+        }
+
+      });
+
+    })();
+  </script>
+</dom-module>

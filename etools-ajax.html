@@ -134,6 +134,10 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
             value: null,
             observer: '_bodyChanged'
           },
+          multiPart: {
+            type: Boolean,
+            value: false
+          },
           cachingStorage: {
             type: String,
             value: function() {
@@ -280,6 +284,19 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
             this._startLoading();
           }
           this.triggerRequest();
+        },
+        _prepareMultiPartFormData: function() {
+          var self = this;
+          if(!self.multiPart) {
+            return;
+          }
+          var body = new FormData();
+          var keys = Object.keys(self.body);
+
+          keys.forEach(function(key){
+            body.append(key, self.body[key]);
+          });
+          self.$.customAjax.body = body;
         },
         _prepareRequest: function (newUrl) {
           if (newUrl === undefined || newUrl === null || newUrl === '') {
@@ -521,8 +538,14 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
             return;
           }
           this.$.customAjax.auto = false;
-          this.$.customAjax.body = this.body;
-          this.$.customAjax.contentType = 'application/json';
+
+          if(!this.multiPart) {
+            this.$.customAjax.body = this.body;
+            this.$.customAjax.contentType = 'application/json';
+          }
+          else {
+            this._prepareMultiPartFormData();
+          }
 
           if (this.csrfCheck !== 'disabled') {
             var csrfToken = this._getCSRFCookie();
