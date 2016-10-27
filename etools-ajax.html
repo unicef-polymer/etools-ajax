@@ -458,12 +458,20 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           this.$.customAjax.generateRequest();
         },
         handleResponse: function (response) {
+          
+          // set response object
+          var data = response.detail.xhr.response;
+
+          if (this.handleAs === 'json' && (typeof data === 'string')) {
+            data = JSON.parse(data);
+          }
+
           if (this._cacheEndpointData()) {
             // store received data in local caching storage
             var cacheKey = this._getEndpointCacheKey(this.endpoint);
 
             var requestData = {
-              detail: response.detail.xhr.response,
+              detail: data,
               exp: this.endpoint.exp + Date.now(),
             };
 
@@ -495,13 +503,7 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
               window.localStorage.setItem(cacheKey, JSON.stringify(requestData));
             }
           }
-          // set response object
-          var data = response.detail.xhr.response;
-
-          if (this.handleAs === 'json' && (typeof data === 'string')) {
-            data = JSON.parse(data);
-          }
-
+          
           this.fire('success', data, {bubbles: false});
           this._stopLoading();
         },
