@@ -181,6 +181,26 @@ triggered when url or body properties are changing.
 <etools-ajax method="DELETE" url="http://silex-test-app.local/handle-delete-request" body="{{deleteTestData}}"></etools-ajax>
 ```
 
+#### Multipart Form Data
+If the attribute multi-part is set in the element the body is converted to a FormData object, this allow to send attachment through a POST call.
+
+```html
+<!-- 
+body is an object that contains data blobs
+body = {
+    id: "13",
+    firstName: "John",
+    lastName: "Doe",
+    someFile: function () {
+      var content = '<a id="a"><b id="b">hey!</b></a>';
+      return new Blob([content], { type: "text/xml"});
+  }(),
+  bigImage: imgBlob
+}
+-->
+<etools-ajax url="http://silex-test-app.local/handle-post-put-delete-data" method="POST" multi-part body="{{body}}" logs="true"></etools-ajax>
+```
+
 #### Authorization
 
 In many cases we need to set authorization data for each request. For example the requests from an application that uses OAuth.
@@ -207,6 +227,11 @@ Make sure you have the [Polymer CLI](https://www.npmjs.com/package/polymer-cli) 
 
 ## Running Tests
 
+You need to have `web-component-tester` installed (if not run `npm install -g web-component-tester`)
+```bash
+$ wtc
 ```
-$ polymer test
+or 
+```bash
+$ wtc -p
 ```
