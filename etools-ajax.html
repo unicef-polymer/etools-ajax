@@ -43,6 +43,10 @@ All requests that are made with other methods than GET, HEAD, OPTIONS or TRACE a
 _sendUnsafeRequest private method. Body property is used to set the request payload data and the request is automatically
 triggered when url or body properties are changing.
 
+
+#### Multipart Form Data
+If the attribute multi-part is set in the element the body is converted to a FormData object, this allow to send attachment through a POST call.
+
 #### Authorization
 
 In many cases we need to set authorization data for each request. For example the requests from an application that uses OAuth.
@@ -133,6 +137,10 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
             type: Object,
             value: null,
             observer: '_bodyChanged'
+          },
+          multiPart: {
+            type: Boolean,
+            value: false
           },
           cachingStorage: {
             type: String,
@@ -280,6 +288,19 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
             this._startLoading();
           }
           this.triggerRequest();
+        },
+        _prepareMultiPartFormData: function() {
+          var self = this;
+          if(!self.multiPart) {
+            return;
+          }
+          var body = new FormData();
+          var keys = Object.keys(self.body);
+
+          keys.forEach(function(key){
+            body.append(key, self.body[key]);
+          });
+          self.$.customAjax.body = body;
         },
         _prepareRequest: function (newUrl) {
           if (newUrl === undefined || newUrl === null || newUrl === '') {
@@ -521,8 +542,14 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
             return;
           }
           this.$.customAjax.auto = false;
-          this.$.customAjax.body = this.body;
-          this.$.customAjax.contentType = 'application/json';
+
+          if(!this.multiPart) {
+            this.$.customAjax.body = this.body;
+            this.$.customAjax.contentType = 'application/json';
+          }
+          else {
+            this._prepareMultiPartFormData();
+          }
 
           if (this.csrfCheck !== 'disabled') {
             var csrfToken = this._getCSRFCookie();
