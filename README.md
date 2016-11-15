@@ -21,6 +21,8 @@ each property of this object will become a header with it's corresponding value
 
 * endpoint - Object, default: null
 
+* downloadCsv - Boolean, default: false - if true then the ajax response data will be downloaded as CSV file
+
 * handleAs - String, default: json
 
 * loading - Boolean, default: false - notifies if request is in progress
