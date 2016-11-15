@@ -74,7 +74,7 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
   - property `dexieDbCollection` should be the collection where the request is gonna put the return data (Important: it has to be an array of objects)
   - your dexie db schema should contain a collection called `collectionsList` with indexes: '&name,expire' (unique name field index and expire field index)
 
-@demo demo/index.html 
+@demo demo/index.html
 -->
 
 <dom-module id="etools-ajax">
@@ -83,14 +83,14 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
       <etools-dexiejs id="etoolsAjaxCacheDb" db-name="[[etoolsAjaxCacheDb]]" on-db-ready="_dexieDbReady"></etools-dexiejs>
     </template>
     <iron-ajax
-        id="customAjax"
-        on-response="handleResponse"
-        on-error="handleError"
-        handle-as="json"
-        method="[[method]]"
-        params="[[params]]"
-        with-credentials="[[withCredentials]]"
-        loading="{{loading}}">
+      id="customAjax"
+      on-response="handleResponse"
+      on-error="handleError"
+      handle-as="json"
+      method="[[method]]"
+      params="[[params]]"
+      with-credentials="[[withCredentials]]"
+      loading="{{loading}}">
     </iron-ajax>
   </template>
 
@@ -116,10 +116,6 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
             type: Boolean,
             value: false
           },
-          handleAs: {
-            type: String,
-            value: 'json'
-          },
           debounceTime: {
             type: Number,
             value: 300
@@ -139,6 +135,10 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
             observer: '_bodyChanged'
           },
           multiPart: {
+            type: Boolean,
+            value: false
+          },
+          downloadCsv: {
             type: Boolean,
             value: false
           },
@@ -201,8 +201,8 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
               this.alternateDexieDb = etoolsCustomDexieDb;
             } else {
               this._log('error',
-                  'cachingStorage set to "custom" but etoolsCustomDexieDb is undefined or not instance of Dexie',
-                  null, null, null, true);
+                'cachingStorage set to "custom" but etoolsCustomDexieDb is undefined or not instance of Dexie',
+                null, null, null, true);
             }
           }
         },
@@ -283,6 +283,12 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           if (this.logs) {
             this._log('log', false, this.method, this.url, this.params);
           }
+
+          if(this.downloadCsv) {
+            this._prepareCSVDownload();
+          }
+
+
           this.$.customAjax.url = newUrl;
           if (newUrl !== null) {
             this._startLoading();
@@ -301,6 +307,12 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
             body.append(key, self.body[key]);
           });
           self.$.customAjax.body = body;
+        },
+        _prepareCSVDownload: function() {
+          var self = this;
+          self.$.customAjax.headers['Accept'] ='text/csv';
+          self.$.customAjax.headers['Content-Type'] = 'text';
+          self.$.customAjax.handleAs = 'blob';
         },
         _prepareRequest: function (newUrl) {
           if (newUrl === undefined || newUrl === null || newUrl === '') {
@@ -384,8 +396,8 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
         _cacheEndpointData: function() {
           // check if the request data should be cached
           if (this.method === 'GET' && this.url !== null
-              && this._validateEndpointObject(this.endpoint, false)
-              && this.url === this.endpoint.url) {
+            && this._validateEndpointObject(this.endpoint, false)
+            && this.url === this.endpoint.url) {
             if (this.endpoint.hasOwnProperty('exp') && this.endpoint.exp > 0) {
               return true;
             }
@@ -479,7 +491,6 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           this.$.customAjax.generateRequest();
         },
         handleResponse: function (response) {
-          
           // set response object
           var data = response.detail.xhr.response;
 
@@ -524,7 +535,7 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
               window.localStorage.setItem(cacheKey, JSON.stringify(requestData));
             }
           }
-          
+
           this.fire('success', data, {bubbles: false});
           this._stopLoading();
         },
@@ -550,6 +561,7 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           else {
             this._prepareMultiPartFormData();
           }
+
 
           if (this.csrfCheck !== 'disabled') {
             var csrfToken = this._getCSRFCookie();
