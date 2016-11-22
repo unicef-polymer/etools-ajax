@@ -15,6 +15,7 @@
     <link rel="import" href="get-demo-data.html">
     <link rel="import" href="unsafe-ajax-demo-data.html">
     <link rel="import" href="multipart-demo-data.html">
+    <link rel="import" href="demo-unauthorized-and-forbidden.html">
 
     <style is="custom-style" include="demo-pages-shared-styles">
       .vertical-section-container {
@@ -102,13 +103,22 @@
         </template>
       </demo-snippet>
 
-
-
       <demo-snippet>
         <template is="dom-bind">
           <multipart-demo-data body-post="{{postTestData}}" ></multipart-demo-data>
 
           <etools-ajax url="http://silex-test-app.local/handle-post-put-delete-data" method="POST" multi-part body="{{postTestData}}" logs="true"></etools-ajax>
+        </template>
+      </demo-snippet>
+
+
+      <demo-snippet>
+        <template>
+          <!--
+          <etools-ajax url="http://silex-test-app.local/respond-with-status-code/401" method="GET" on-forbidden="_handleForbidden" logs="true"></etools-ajax>
+          <etools-ajax url="http://silex-test-app.local/respond-with-status-code/403" method="GET" on-unauthorized="_handleUnauthorized" logs="true"></etools-ajax>
+          -->
+          <demo-unauthorized-and-forbidden></demo-unauthorized-and-forbidden>
         </template>
       </demo-snippet>
 
