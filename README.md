@@ -167,6 +167,10 @@ function handleError(response) {
 }
 ```
 
+- unauthorized: event fired if the response status code is 401
+
+- forbidden: event fired if the response status code is 403
+
 #### Unsafe requests
 
 Submitting data using unsafe requests with methods such as POST, PUT or DELETE will require a CSRF Token that has to be stored
