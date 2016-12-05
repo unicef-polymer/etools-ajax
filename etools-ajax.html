@@ -541,6 +541,16 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
         },
         handleError: function (event, error) {
           this._stopLoading();
+
+          if (error.request.status === 401) {
+            this.fire('unauthorized', {error: error}, {bubbles: false});
+            return;
+          }
+
+          if (error.request.status === 403) {
+            this.fire('forbidden', {error: error}, {bubbles: false});
+            return;
+          }
           this._log('error', error.error + ' while loading ' + event.srcElement.url);
 
           this.fire('fail', {
