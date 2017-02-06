@@ -494,7 +494,7 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           // set response object
           var data = response.detail.xhr.response;
 
-          if (this.handleAs === 'json' && (typeof data === 'string')) {
+          if (typeof data === 'string') {
             data = JSON.parse(data);
           }
 
