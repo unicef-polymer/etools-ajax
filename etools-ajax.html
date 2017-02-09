@@ -178,6 +178,10 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           endpoint: {
             type: Object,
             observer: '_endpointChanged'
+          },
+          experimentalObjBody: {
+            type: Boolean,
+            value: false
           }
         },
 
@@ -307,8 +311,49 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           var body = new FormData();
           var keys = Object.keys(self.body);
 
-          keys.forEach(function(key){
-            body.append(key, self.body[key]);
+          keys.forEach(function(key) {
+            if (self.experimentalObjBody) {
+              if (Array.isArray(self.body[key])) {
+                if (self.body[key].length === 0) {
+                  body.append(key, []);
+                } else {
+                  self.body[key].forEach(function(arrData, mainIndex) {
+                    if (arrData !== null && typeof arrData === 'object' && !Array.isArray(arrData) &&
+                        arrData instanceof File === false && arrData instanceof Blob === false) {
+                      // objects
+                      Object.keys(arrData).forEach(function(keyArrData) {
+                        if (Array.isArray(arrData[keyArrData])) {
+                          if (arrData[keyArrData].length === 0) {
+                              body.append(key + '[' + mainIndex + '][' + keyArrData + ']', arrData[keyArrData]);
+                          } else {
+                            arrData[keyArrData].forEach(function(aData) {
+                              body.append(key + '[' + mainIndex + '][' + keyArrData + '][]', aData);
+                            });
+                          }
+                        } else {
+                          body.append(key + '[' + mainIndex + '][' + keyArrData + ']', arrData[keyArrData]);
+                        }
+                      });
+                    } else {
+                      // strings, null, numbers, files/blobs
+                      body.append(key + '[]', arrData);
+                    }
+                  });
+                }
+              } else if (self.body[key] !== null && typeof self.body[key] === 'object'
+                  && !Array.isArray(self.body[key]) && (self.body[key] instanceof File === false &&
+                  self.body[key] instanceof Blob === false)) {
+                  // just custom object
+                  Object.keys(self.body[key]).forEach(function(keyArrData) {
+                    body.append(key + '[' + keyArrData + ']', self.body[key][keyArrData]);
+                  });
+              } else {
+                // for Blob, File, strings
+                body.append(key, self.body[key]);
+              }
+            } else {
+              body.append(key, self.body[key]);
+            }
           });
           self.$.customAjax.body = body;
         },
@@ -625,7 +670,6 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           else {
             this._prepareMultiPartFormData();
           }
-
 
           if (this.csrfCheck !== 'disabled') {
             var csrfToken = this._getCSRFCookie();
