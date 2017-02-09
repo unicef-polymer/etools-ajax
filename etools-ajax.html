@@ -665,9 +665,8 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
 
           if(!this.multiPart) {
             this.$.customAjax.body = this.body;
-            this.$.customAjax.contentType = 'application/json';
-          }
-          else {
+            this.setContentType('application/json');
+          } else {
             this._prepareMultiPartFormData();
           }
 
@@ -684,6 +683,10 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           this.triggerRequest();
           this._startLoading();
           return;
+        },
+
+        setContentType: function(contentType) {
+          this.$.customAjax.contentType = contentType;
         }
 
       });
