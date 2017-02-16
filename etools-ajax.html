@@ -304,22 +304,6 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           this.triggerRequest();
         },
 
-
-
-        _hasFiles: function(data) {
-          if (data.length === 0) {
-            return false;
-          }
-          var hasF = false;
-          for(var i=0; i<data.length; i++) {
-            if (data[i] instanceof File === true || data[i] instanceof Blob === true) {
-              hasF = true;
-              break;
-            }
-          }
-          return hasF;
-        },
-
         _isArray: function(data) {
           return Array.isArray(data);
         },
