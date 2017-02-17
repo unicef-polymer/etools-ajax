@@ -182,6 +182,10 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           prepareMultipartData: {
             type: Boolean,
             value: false
+          },
+          customMultipartData: {
+            type: Boolean,
+            value: false
           }
         },
 
@@ -325,7 +329,7 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
                 if (self._isSimpleObject(arrData)) {
                   // Object, not null
                   Object.keys(arrData).forEach(function(keyArrData) {
-                    body = self._prepareFormData(self, body, arrData[keyArrData], k + '[' + keyArrData + ']');
+                    body = self._prepareFormData(self, body, arrData[keyArrData], k + '[_obj][' + keyArrData + ']');
                   });
                 } else if (self._isFile(arrData)) {
                   // File or Blobs
@@ -342,7 +346,7 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           } else if (self._isSimpleObject(data)) {
               // Object, not null
               Object.keys(data).forEach(function(keyArrData) {
-                body = self._prepareFormData(self, body, data[keyArrData], key + '[' + keyArrData + ']');
+                body = self._prepareFormData(self, body, data[keyArrData], key + '[_obj][' + keyArrData + ']');
               });
           } else {
             // for Blob, File, strings, null vals
@@ -356,16 +360,22 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           if(!self.multiPart) {
             return;
           }
-          var body = new FormData();
-          var keys = Object.keys(self.body);
+          var body = null;
+          if (!this.customMultipartData) {
+            body = new FormData();
+            var keys = Object.keys(self.body);
 
-          keys.forEach(function(key) {
-            if (self.prepareMultipartData) {
-              body = self._prepareFormData(self, body, self.body[key], key);
-            } else {
-              body.append(key, self.body[key]);
-            }
-          });
+            keys.forEach(function(key) {
+              if (self.prepareMultipartData) {
+                body = self._prepareFormData(self, body, self.body[key], key);
+              } else {
+                body.append(key, self.body[key]);
+              }
+            });
+          } else {
+            // assuming this.body is already a prepared FormData
+            body = this.body;
+          }
           self.$.customAjax.body = body;
         },
         _prepareCSVDownload: function() {

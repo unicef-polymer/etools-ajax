@@ -15,11 +15,75 @@
             type: Object,
             value: null,
             notify: true
+          },
+          customBody: {
+            type: Object,
+            value: null,
+            notify: true
           }
         },
 
         ready: function() {
           this._processImgFile('big-image.jpg'); // image of more than 8Mb placed inside demo folder
+
+          var partnerData = {
+            id: 54,
+            staffMembers: [
+              {
+                id: 1,
+                name: 'Adrian Hangan',
+                email: 'adrian.hangan@test.test'
+              },
+              {
+                id: 2,
+                name: 'Robert Avram',
+                email: 'robert.avram@test.test'
+              },
+            ],
+            assessments: [
+              {
+                id: 1,
+                signed_date: '2017-02-17',
+                assessmentFile: function () {
+                  var content = '<a id="assessment_1"><b>First assessment content</b></a>';
+                  return new Blob([content], { type: "text/xml"});
+                }()
+              },
+              {
+                id: 2,
+                signed_date: '2017-02-17',
+                assessmentFile: function () {
+                  var content = '<a id="assessment_2"><b>Second assessment content</b></a>';
+                  return new Blob([content], { type: "text/xml"});
+                }()
+              }
+            ],
+            attachements: [],
+            vendorId: null
+          }
+
+          var body = new FormData();
+          Object.keys(partnerData).forEach(function(key) {
+            var data = partnerData[key];
+            if (key !== 'assessments') {
+              body.append(key, JSON.stringify(data));
+            } else {
+              // setup assessments
+              if (data.length) {
+                data.forEach(function(assessment, index) {
+                  Object.keys(assessment).forEach(function(assessKey) {
+                    body.append(key + '[' + index + '][' + assessKey + ']', assessment[assessKey]);
+                  });
+                }); 
+              } else {
+                body.append(key, []);
+              }
+            }
+          });
+
+          this.set('customBody', body);
+
+          console.log('======= Parse backend data example ========', this._prepareData());
         },
 
         _processImgFile: function (imageURL) {
@@ -93,6 +157,37 @@
 
           image.onload = onload;
           image.src = imageURL;
+        },
+
+        _prepareData: function() {
+          var result = { 
+            id: JSON.parse('54'),
+            staffMembers: JSON.parse('[{"id":1,"name":"Adrian Hangan","email":"adrian.hangan@test.test"},{"id":2,"name":"Robert Avram","email":"robert.avram@test.test"}]'),  
+            assessments: [],
+            attachements: JSON.parse('[]'),
+            vendorId: JSON.parse('null')
+          };
+          var assessments = {
+            'assessments[0][type]': 'some string | file',
+            'assessments[0][signed_date]': 'some string | file',
+            'assessments[0][file]': 'some file',
+            'assessments[1][type]': 'some string | file',
+            'assessments[1][signed_date]': 'some string | file',
+            'assessments[1][file]': 'some file'
+          };
+          Object.keys(assessments).forEach(function(key) {
+            var prop = key.substring(0, key.length - 1).replace('][', ' ');
+            prop = prop.replace(']', '');
+            prop = prop.replace('assessments[', '');
+            prop = prop.split(' ');
+            console.log(prop);
+            if (!result.assessments[prop[0]]) {
+              result.assessments[prop[0]] = {};
+            }
+            result.assessments[prop[0]][prop[1]] = assessments[key];
+          });
+         
+          return result;
         }
 
       });

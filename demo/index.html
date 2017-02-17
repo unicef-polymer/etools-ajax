@@ -105,11 +105,11 @@
 
       <demo-snippet>
         <template is="dom-bind">
-          <multipart-demo-data body-post="{{postTestData}}" ></multipart-demo-data>
+          <multipart-demo-data custom-body="{{customBody}}" ></multipart-demo-data>
 
           <etools-ajax url="http://silex-test-app.local/handle-post-put-delete-data" 
-            method="POST" multi-part prepare-multipart-data
-            body="{{postTestData}}" logs="true"></etools-ajax>
+            method="POST" multi-part custom-multipart-data
+            body="[[customBody]]" logs="true"></etools-ajax>
         </template>
       </demo-snippet>
 
