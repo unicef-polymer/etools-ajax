@@ -187,6 +187,10 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
             type: Boolean,
             value: false
           },
+          renewDataOnExpiry: {
+            type: Boolean,
+            value: false
+          },
           _refreshInterval: {
             type: Object,
             value: null
@@ -479,12 +483,16 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           }
         },
         _setAutomaticDataRefreshLoop: function() {
+          if (!this.renewDataOnExpiry) {
+            return;
+          }
           if (!this.endpoint || !this.endpoint.exp) {
             return;
           }
 
           var refreshInterval = setInterval(function() {
-            this._prepareRequest(this.url);
+            this.set('url', null);
+            this.set('url', this.endpoint.url);
           }.bind(this), this.endpoint.exp);
 
           this.set('_refreshInterval', refreshInterval);
@@ -643,7 +651,6 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
                   expire: requestData.exp}).then(function() {
                   // clear old data and add new data to collection
                   this.alternateDexieDb[this.dexieDbCollection].clear().then(function() {
-
                     this.alternateDexieDb[this.dexieDbCollection].bulkAdd(requestData.detail).then(function() {
                       // bulkAdd completed, fire success
                       this._fireHandleResponseSuccess(requestData.detail);
