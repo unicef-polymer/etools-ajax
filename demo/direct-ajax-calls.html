@@ -1,0 +1,42 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../etools-ajax-v2.html">
+<dom-module id="direct-ajax-calls">
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'direct-ajax-calls',
+        properties: {
+
+        },
+        ready: function() {
+          this._setCookie();
+
+          EtoolsAjax.setConfigDefaults({
+            baseURL: 'https://httpbin.org'
+          });
+
+          EtoolsAjax.get('/get').then(function (response) {
+            console.log('response', response);
+          })
+          .catch(function (error) {
+            console.log('error', error);
+          });
+        },
+
+        _setCookie: function() {
+          // set cookie
+          var cookieVal = 'someCookieValue123';
+          var d = new Date();
+          d.setTime(d.getTime() + (1*60*60*1000));
+          var expires = "expires="+ d.toUTCString(); // cookie will expire in 1 hour
+          document.cookie = "csrftoken=" + cookieVal + "; " + expires + "; path=/";
+        }
+
+      });
+
+    })();
+  </script>
+</dom-module>
