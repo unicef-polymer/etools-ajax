@@ -8,22 +8,28 @@
 
       Polymer({
         is: 'direct-ajax-calls',
+        
+        behaviors: [EtoolsRequest],
+
         properties: {
 
         },
+
         ready: function() {
           this._setCookie();
 
-          EtoolsAjax.setConfigDefaults({
-            baseURL: 'https://httpbin.org'
-          });
+          // EtoolsAjax.setConfigDefaults({
+          //   baseURL: 'https://httpbin.org'
+          // });
 
-          EtoolsAjax.get('/get').then(function (response) {
-            console.log('response', response);
-          })
-          .catch(function (error) {
-            console.log('error', error);
-          });
+          // EtoolsAjax.get('/get').then(function (response) {
+          //   console.log('response', response);
+          // })
+          // .catch(function (error) {
+          //   console.log('error', error);
+          // });
+
+          this.send({url: 'https://httpbin.org/get'});
         },
 
         _setCookie: function() {

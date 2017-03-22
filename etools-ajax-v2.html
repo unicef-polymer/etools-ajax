@@ -1,6 +1,11 @@
 <link rel="import" href="es6-obj-assign-polyfil.html">
 <link rel="import" href="../etools-dexiejs/dexiejs.html">
 <link rel="import" href="axios.html">
+
+
+<link rel="import" href="../iron-ajax/iron-request.html">
+
+
 <script>
   (function(window, axios) {
     'use strict';
@@ -152,8 +157,73 @@
       };
       return etoolsAjax;
     }
-
+ 
     // make EtoolsAjax global if not already
     window.EtoolsAjax = window.EtoolsAjax || defineEtoolsAjax();
+
+    function defineEtoolsRequest() {
+      var etoolsRequest = {
+        
+        send: function(reqConfig) {
+          var request = /** @type {!IronRequestElement} */ (document.createElement('iron-request'));
+          console.log(request);
+          var reqConfigOptions = this._prepareConfigOptions(reqConfig);
+          request.completes.then(function(request) {
+            console.log(request.response);
+          }).catch(function(request, error) {
+            console.log({
+              request: request,
+              error: error,
+              status: request.xhr.status,
+              statusText: request.xhr.statusText,
+              response: request.xhr.response
+            });
+          }).then(function() {
+            console.log('done');
+          });
+          request.send(reqConfigOptions);
+          return request;
+        },
+
+        _prepareConfigOptions: function(reqConfig) {
+          return {
+            url: reqConfig.url || '',
+            method: reqConfig.method || 'GET',
+            headers: this._requestHeaders('application/json', reqConfig.body, reqConfig.headers),
+            body: reqConfig.body || {},
+            async: !reqConfig.sync,
+            handleAs: reqConfig.handleAs || 'json',
+            jsonPrefix: reqConfig.jsonPrefix || '',
+            withCredentials: !!reqConfig.withCredentials,
+            timeout: reqConfig.timeout || 0
+          };
+        },
+       
+        _requestHeaders(cType, body, aditionalHeaders) {
+          var headers = {};
+          var contentType = cType;
+          if (contentType == null && (typeof body === 'string')) {
+            contentType = 'application/x-www-form-urlencoded';
+          }
+          if (contentType) {
+            headers['content-type'] = contentType;
+          }
+          var header;
+          if (aditionalHeaders instanceof Object) {
+            for (header in aditionalHeaders) {
+              headers[header] = aditionalHeaders[header].toString();
+            }
+          }
+          return headers;
+        },
+
+      };
+
+      return etoolsRequest;
+    }
+
+    window.EtoolsRequest = window.EtoolsRequest || defineEtoolsRequest();
+
+
   })(window, axios);
 </script>
