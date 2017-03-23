@@ -1,0 +1,22 @@
+<script>
+  (function(window) {
+    'use strict';
+
+    function defineEtoolsAjaxDataBehavior() {
+      var etoolsAjaxDataBehavior = {
+
+        properties: {
+          etoolsAjaxCacheDb: {
+            type: Object,
+            value: null
+          }
+        },
+
+
+      };
+      return etoolsAjaxDataBehavior;
+    }
+
+    window.EtoolsAjaxDataBehavior = window.EtoolsAjaxDataBehavior || defineEtoolsAjaxDataBehavior();
+  })(window);
+</script>

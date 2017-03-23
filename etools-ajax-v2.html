@@ -1,165 +1,13 @@
 <link rel="import" href="es6-obj-assign-polyfil.html">
-<link rel="import" href="../etools-dexiejs/dexiejs.html">
-<link rel="import" href="axios.html">
-
-
 <link rel="import" href="../iron-ajax/iron-request.html">
-
+<link rel="import" href="etools-ajax-logs-behavior.html">
+<link rel="import" href="etools-ajax-data-behavior.html">
+<link rel="import" href="etools-ajax-cache-behavior.html">
+<link rel="import" href="etools-endpoints-behavior.html">
 
 <script>
-  (function(window, axios) {
+  (function(window) {
     'use strict';
-
-    function defineEtoolsAjax() {
-      var etoolsAjax = {
-
-        config: {
-          timeout: 60000
-        },
-
-        showLogs: false,
-
-        useCSRF: false,
-        csrf: {
-          xsrfHeaderName: 'x-csrftoken',
-          xsrfCookieName: 'csrftoken'
-        },
-
-        cacheDb: null,
-
-        _log: function(type, message, method, url, params, forceDisplay, aditionalData) {
-          var logMsg = '[etools-ajax] ';
-          if (this.showLogs || forceDisplay) {
-            if (message) {
-              logMsg += message;
-            }
-            if (method && url) {
-              logMsg += method + ' ' + url + ' , params: ' + JSON.stringify(params);
-            }
-            if (type === 'error') {
-              console.error(logMsg);
-            } else {
-              console.log(logMsg);
-            }
-          }
-          if (type === 'warn') {
-            console.warn(logMsg + ' ' + message, aditionalData);
-          }
-        },
-
-        setConfigDefaults: function(config, csrf) {
-          // set global configs
-          if (config && typeof config === 'object') {
-            if (typeof config.useCSRF !== 'undefined') {
-              this.useCSRF = config.useCSRF;
-              delete config.useCSRF;
-            }
-            if (typeof config.showLogs !== 'undefined') {
-              this.showLogs = config.showLogs;
-              delete config.showLogs;
-            }
-            if (typeof config.cacheDb instanceof Dexie) {
-              this.cacheDb = config.cacheDb;
-              delete config.cacheDb;
-            }
-
-            this.config = this._prepareConfig(config);
-          }
-          // config/activate csrf
-          if (csrf && typeof csrf === 'object' && csrf.headerName && csrf.cookieName) {
-            this.csrf = Object.assign({}, csrf);
-            this.useCSRF = true;
-          }
-        },
-
-        _prepareConfig: function(config) {
-          return Object.assign({}, this.config, config);
-        },
-
-        _getResponseType: function(config) {
-          config = config ? config : this.config;
-          if (config && config.responseType) {
-            return config.responseType;
-          }
-          if (axios.defaults.responseType) {
-            return axios.defaults.responseType;
-          }
-          return 'json'; // default
-        },
-
-        _validateEndpointObject: function(endpoint) {
-          if (typeof endpoint === 'object' && typeof endpoint.url === 'string' && endpoint.url !== '') {
-            return true;
-          }
-          return false;
-        },
-
-        _getEndpointUrl: function(endpoint) {
-          var url = null;
-          if (!this._validateEndpointObject(endpoint)) {
-            if (typeof endpoint === 'string' && endpoint !== '') {
-              url = endpoint;
-            }
-          } else {
-            url = endpoint.url;
-          }
-          return url;
-        },
-
-        _getEndpointCacheKey: function(endpoint, params) {
-          var cacheKey = endpoint.url;
-          if (typeof endpoint.cachingKey === 'string' && endpoint.cachingKey !== '') {
-            cacheKey = endpoint.cachingKey;
-          }
-          if (params) {
-            cacheKey += '_' + JSON.stringify(params);
-          }
-          return cacheKey;
-        },
-
-        get: function(endpoint, config) {
-          // get URL
-          var url = this._getEndpointUrl(endpoint);
-          if (!url) {
-            // no url, do not continue
-            return;
-          }
-          // check for cached data
-          if (typeof endpoint === 'object' && typeof endpoint.exp === 'number' && endpoint.exp > 0) {
-
-          }
-
-          config = this._prepareConfig(config);
-          var _this = this;
-          return new Promise(function(resolve, reject) {
-            axios.get(url, config).then(function (response) {
-              if (_this._getResponseType(config) === 'json' && typeof response.data === 'string') {
-                response.data = JSON.parse(response.data);
-              }
-              resolve(response.data);
-            })
-            .catch(function (error) {
-              reject(error.response);
-            });
-          });
-        },
-
-        post: function(url, data) {
-          console.log('fire post request');
-        },
-        patch: function(url, data) {
-          console.log('fire path request');
-        },
-        delete: function(url, data) {
-          console.log('fire delete request');
-        }
-
-      };
-      return etoolsAjax;
-    }
- 
-    // make EtoolsAjax global if not already
-    window.EtoolsAjax = window.EtoolsAjax || defineEtoolsAjax();
 
     function defineEtoolsRequest() {
       var etoolsRequest = {
@@ -179,9 +27,7 @@
             }
           }
         },
-        observers: [
-          '_checkRequestProgress(progress)'
-        ],
+
         sendRequest: function(reqConfig) {
           var request = /** @type {!IronRequestElement} */ (document.createElement('iron-request'));
           var reqConfigOptions = this._prepareConfigOptions(reqConfig);
@@ -258,14 +104,13 @@
             clearInterval(this.checkReqProgress);
           }
         }
-
       };
 
       return etoolsRequest;
     }
 
-    window.EtoolsRequest = window.EtoolsRequest || defineEtoolsRequest();
-
-
-  })(window, axios);
+    window.EtoolsRequest = window.EtoolsRequest ||
+      [EtoolsAjaxLogsBehavior, EtoolsAjaxDataBehavior, EtoolsEndpointsBehavior,
+        EtoolsAjaxCacheBehavior, defineEtoolsRequest()];
+  })(window);
 </script>

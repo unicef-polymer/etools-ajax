@@ -1,0 +1,40 @@
+<script>
+  (function(window) {
+    'use strict';
+
+    function defineEtoolsAjaxLogs() {
+      var etoolsAjaxLogs = {
+
+        properties: {
+          showEtoolsAjaxLogs: {
+            type: Boolean,
+            value: false
+          }
+        },
+
+        etoolsAjaxLog: function(type, message, method, url, params, forceDisplay, aditionalData) {
+          var logMsg = '[etools-ajax] ';
+          if (this.showEtoolsAjaxLogs || forceDisplay) {
+            if (message) {
+              logMsg += message;
+            }
+            if (method && url) {
+              logMsg += method + ' ' + url + ' , params: ' + JSON.stringify(params);
+            }
+            if (type === 'error') {
+              console.error(logMsg);
+            } else {
+              console.log(logMsg);
+            }
+          }
+          if (type === 'warn') {
+            console.warn(logMsg + ' ' + message, aditionalData);
+          }
+        }
+      };
+      return etoolsAjaxLogs;
+    }
+
+    window.EtoolsAjaxLogsBehavior = window.EtoolsAjaxLogsBehavior || defineEtoolsAjaxLogs();
+  })(window);
+</script>
