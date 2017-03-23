@@ -29,7 +29,15 @@
           //   console.log('error', error);
           // });
 
-          this.send({url: 'https://httpbin.org/get'});
+          this.sendRequest({
+//            method: 'POST',
+            url: 'http://silex-test-app.local/countries-data',
+            checkProgress: true
+          }).then(function(resp) {
+            console.log(resp);
+          }).catch(function(err) {
+            console.log(err);
+          });
         },
 
         _setCookie: function() {

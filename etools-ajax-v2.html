@@ -163,33 +163,56 @@
 
     function defineEtoolsRequest() {
       var etoolsRequest = {
-        
-        send: function(reqConfig) {
+        properties: {
+          reqProgress: {
+            type: Object,
+            notify: true,
+            readOnly: true,
+            value: function() {
+              return null;
+            }
+          },
+          checkReqProgress: {
+            type: Object,
+            value: function() {
+              return null;
+            }
+          }
+        },
+        observers: [
+          '_checkRequestProgress(progress)'
+        ],
+        sendRequest: function(reqConfig) {
           var request = /** @type {!IronRequestElement} */ (document.createElement('iron-request'));
-          console.log(request);
           var reqConfigOptions = this._prepareConfigOptions(reqConfig);
-          request.completes.then(function(request) {
-            console.log(request.response);
-          }).catch(function(request, error) {
-            console.log({
-              request: request,
-              error: error,
-              status: request.xhr.status,
-              statusText: request.xhr.statusText,
-              response: request.xhr.response
-            });
-          }).then(function() {
-            console.log('done');
+
+          this._checkRequestProgress(request, reqConfig.checkProgress);
+
+          return new Promise(function(resolve, reject) {
+            request.completes.then(function(request) {
+              var responseData = request.response;
+              if (reqConfigOptions.handleAs === 'json' && typeof responseData === 'string') {
+                responseData = JSON.parse(responseData);
+              }
+              resolve(responseData);
+            }).catch(function(request, error) {
+              var errorDetails = {
+                error: error,
+                status: request.xhr.status,
+                statusText: request.xhr.statusText,
+                response: request.xhr.response
+              };
+              reject(errorDetails);
+            }.bind(this, request));
+            request.send(reqConfigOptions);
           });
-          request.send(reqConfigOptions);
-          return request;
         },
 
         _prepareConfigOptions: function(reqConfig) {
           return {
             url: reqConfig.url || '',
             method: reqConfig.method || 'GET',
-            headers: this._requestHeaders('application/json', reqConfig.body, reqConfig.headers),
+            headers: this._getRequestHeaders('application/json', reqConfig.body, reqConfig.headers),
             body: reqConfig.body || {},
             async: !reqConfig.sync,
             handleAs: reqConfig.handleAs || 'json',
@@ -199,7 +222,7 @@
           };
         },
        
-        _requestHeaders(cType, body, aditionalHeaders) {
+        _getRequestHeaders: function(cType, body, aditionalHeaders) {
           var headers = {};
           var contentType = cType;
           if (contentType == null && (typeof body === 'string')) {
@@ -216,6 +239,25 @@
           }
           return headers;
         },
+
+        _checkRequestProgress: function(request, checkProgress) {
+          if (!checkProgress || !request || !request.progress) {
+            return;
+          }
+          this.checkReqProgress = setInterval(function() {
+            if (request.progress.constructor === Object && Object.keys(request.progress).length > 0) {
+              this._setReqProgress(request.progress);
+              if (!request.progress.lengthComputable || request.progress.loaded === request.progress.total) {
+                this._stopReqProgressCheck();
+              }
+            }
+          }.bind(this), 0);
+        },
+        _stopReqProgressCheck: function() {
+          if (this.checkReqProgress) {
+            clearInterval(this.checkReqProgress);
+          }
+        }
 
       };
 
