@@ -33,9 +33,10 @@
           var reqConfigOptions = this._prepareConfigOptions(reqConfig);
 
           this._checkRequestProgress(request, reqConfig.checkProgress);
-
+          var _this = this;
           return new Promise(function(resolve, reject) {
             request.completes.then(function(request) {
+              _this.etoolsAjaxLog('log', 'have response', null, null, null, true);
               var responseData = request.response;
               if (reqConfigOptions.handleAs === 'json' && typeof responseData === 'string') {
                 responseData = JSON.parse(responseData);
