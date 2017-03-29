@@ -1,5 +1,17 @@
 <link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../etools-dexiejs/etools-dexiejs.html">
 <link rel="import" href="../etools-ajax-v2.html">
+
+<script>
+  // custom dexie db that will be used by etoolsAjax
+  var etoolsCustomDexieDb = new Dexie('etoolsAjax2DexieDb');
+  etoolsCustomDexieDb.version(1).stores({
+    collectionsList: "&name,expire",
+    ajaxCachedData: "cacheKey,data,expire"
+  });
+
+</script>
+
 <dom-module id="direct-ajax-calls">
 
   <script>
@@ -8,7 +20,7 @@
 
       Polymer({
         is: 'direct-ajax-calls',
-        
+
         behaviors: [EtoolsRequest],
 
         properties: {
@@ -16,6 +28,10 @@
         },
 
         ready: function() {
+
+          this.etoolsAjaxCacheDb = etoolsCustomDexieDb;
+          console.log(this.etoolsAjaxCacheDb);
+
           this._setCookie();
 
           // EtoolsAjax.setConfigDefaults({
@@ -31,7 +47,7 @@
 
           this.sendRequest({
 //            method: 'POST',
-            url: 'http://silex-test-app.local/countries-data',
+            url: 'https://httpbin.org/get',
             checkProgress: true
           }).then(function(resp) {
             console.log(resp);

@@ -24,24 +24,69 @@
             type: Object,
             value: function() {
               return null;
-            }
+            },
+
+            // ironRequestOptions: {
+            //   type:Object,
+            //   value: function() {
+            //     return {
+            //         url: '',
+            //         method:'GET',
+            //         headers: '',
+            //         body: '',
+            //         async: true,
+            //         handleAs: 'json',
+            //         jsonPrefix: '',
+            //         withCredentials: false,
+            //         timeout: 0
+            //     }
+            //   }
+            // },
           }
         },
 
         sendRequest: function(reqConfig) {
-          var request = /** @type {!IronRequestElement} */ (document.createElement('iron-request'));
-          var reqConfigOptions = this._prepareConfigOptions(reqConfig);
 
+          /**
+           endpoint: {
+             url: 'http://...'
+             exp: 10000,
+             cachingKey: 'blabla'
+           }
+           - if endpoint, set reqConfig.url = endpoint.url
+           - if GET & endpoint.exp check cached data in dexie
+           */
+          var preparedConfigOptions =  this._prepareConfigOptions(reqConfig);
+          var reqConfigOptions = preparedConfigOptions.ironRequestOptions;
+          var cachingInfo = preparedConfigOptions.cachingInfo;
+
+          var cachedResponse = _tryGetCachedData(cachingInfo);
+          if(cachedResponse) {
+             return new Promise(function(resolve) {
+               resolve(cachedResponse);
+               });
+          }
+
+          var request = /** @type {!IronRequestElement} */ (document.createElement('iron-request'));
           this._checkRequestProgress(request, reqConfig.checkProgress);
+
           var _this = this;
+
           return new Promise(function(resolve, reject) {
             request.completes.then(function(request) {
               _this.etoolsAjaxLog('log', 'have response', null, null, null, true);
               var responseData = request.response;
-              if (reqConfigOptions.handleAs === 'json' && typeof responseData === 'string') {
+
+              if (this.reqConfigOptions.handleAs === 'json' && typeof responseData === 'string') {
                 responseData = JSON.parse(responseData);
               }
+
+              if(cachingInfo.requestIsViableForCaching) {
+                this.cacheEndpointData(responseData, cachingInfo);
+              }
+
               resolve(responseData);
+
             }).catch(function(request, error) {
               var errorDetails = {
                 error: error,
@@ -51,24 +96,42 @@
               };
               reject(errorDetails);
             }.bind(this, request));
-            request.send(reqConfigOptions);
+
+            request.send(this.ironRequestOptions);
+
           });
+        },
+
+        _tryGetCachedData: function(cachingInfo) {
+           if (cachingInfo.requestIsViableForCaching) {
+              return this.getEndpointDataFromCache(cachingInfo);
+           }
+           return null;
         },
 
         _prepareConfigOptions: function(reqConfig) {
           return {
-            url: reqConfig.url || '',
-            method: reqConfig.method || 'GET',
-            headers: this._getRequestHeaders('application/json', reqConfig.body, reqConfig.headers),
-            body: reqConfig.body || {},
-            async: !reqConfig.sync,
-            handleAs: reqConfig.handleAs || 'json',
-            jsonPrefix: reqConfig.jsonPrefix || '',
-            withCredentials: !!reqConfig.withCredentials,
-            timeout: reqConfig.timeout || 0
-          };
+                  ironRequestOptions : {
+                      url: this._extractUrl(reqConfig),
+                      method: reqConfig.method || 'GET',
+                      headers: this._getRequestHeaders('application/json', reqConfig.body, reqConfig.headers),
+                      body: reqConfig.body || {},
+                      async: !reqConfig.sync,
+                      handleAs: reqConfig.handleAs || 'json',
+                      jsonPrefix: reqConfig.jsonPrefix || '',
+                      withCredentials: !!reqConfig.withCredentials,
+                      timeout: reqConfig.timeout || 0
+                   },
+                   cachingInfo : this.setCachingInfo(reqConfig)
+                 };
         },
-       
+
+        _extractUrl: function(reqConfig){
+          if(endpoint && endpoint.url)
+            return endpoint.url;
+          return '';
+        },
+
         _getRequestHeaders: function(cType, body, aditionalHeaders) {
           var headers = {};
           var contentType = cType;
