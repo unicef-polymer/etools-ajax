@@ -160,7 +160,9 @@
           headers['content-type'] = this._determineContentType(body);
 
           this._addClientConfiguredHeaders(headers, reqConfig.headers);
-          this._addCsrfHeader(headers, reqConfig.csrfCheck)
+
+          if(!this._csrfSafeMethod(reqConfig.method))
+            this._addCsrfHeader(headers, reqConfig.csrfCheck)
 
           return headers;
         },
@@ -184,6 +186,31 @@
           }
         },
 
+         _csrfSafeMethod: function (method) {
+          // these HTTP methods do not require CSRF protection
+          return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        },
+
+        _getCSRFCookie: function () {
+          // check for a csrftoken cookie and return its value
+          var csrfCookieName = 'csrftoken';
+          var csrfToken = null;
+          if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+              var cookie = cookies[i].trim();
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, csrfCookieName.length + 1) === (csrfCookieName + '=')) {
+                csrfToken = decodeURIComponent(cookie.substring(csrfCookieName.length + 1));
+                break;
+              }
+            }
+          }
+          return csrfToken;
+        },
+
+         //* Content-Type set here can be overriden later
+         // by headers sent from the client
         _determineContentType: function(body) {
           var contentType = 'application/json';
 
