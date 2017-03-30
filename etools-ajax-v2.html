@@ -117,13 +117,20 @@
                       headers: this._getRequestHeaders(reqConfig),
                       body: this._getRequestBody(reqConfig),
                       async: !reqConfig.sync,
-                      handleAs: reqConfig.handleAs || 'json',
+                      handleAs: this._getHandleAs(reqConfig),
                       jsonPrefix: reqConfig.jsonPrefix || '',
                       withCredentials: !!reqConfig.withCredentials,
                       timeout: reqConfig.timeout || 0
                    },
                    cachingInfo : this.setCachingInfo(reqConfig)
                  };
+        },
+
+        _getHandleAs: function(reqConfig) {
+          var handleAs =  reqConfig.handleAs || 'json';
+          if(reqConfig.downloadCsv)
+            handleAs = 'blob';
+          return handleAs;
         },
 
         _getRequestUrl: function(reqConfig){
@@ -166,6 +173,11 @@
           var headers = {};
 
           headers['content-type'] = this._determineContentType(body);
+
+          if (reqConfig.downloadCsv) {
+            headers['Accept'] ='text/csv';
+            headers['Content-Type'] = 'text';
+          }
 
           this._addClientConfiguredHeaders(headers, reqConfig.headers);
 

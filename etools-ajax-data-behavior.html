@@ -5,13 +5,6 @@
     function defineEtoolsAjaxDataBehavior() {
       var etoolsAjaxDataBehavior = {
 
-        properties: {
-          // etoolsAjaxCacheDb: { TODO why is this here?
-          //   type: Object,
-          //   value: null
-          // }
-        },
-
         _prepareMultiPartFormData: function(inputBody, prepareMultipartData) {
           var formBody = new FormData();
           var keys = Object.keys(inputBody);
