@@ -177,10 +177,10 @@
         },
 
         _addCsrfHeader: function(headers, csrfCheck) {
-            if (csrfCheck && csrfCheck !== 'disabled') {
+            if (csrfCheck !== 'disabled') {
               var csrfToken = this._getCSRFCookie();
 
-              if (csrfToken !== null) {
+              if (csrfToken) {
                 headers['x-csrftoken'] = csrfToken;
               }
           }
