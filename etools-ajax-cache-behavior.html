@@ -49,12 +49,11 @@
                requestIsViableForCaching : true,
                url: reqConfig.endpoint.url,
                exp: reqConfig.endpoint.exp,
-               cacheKey: this._getEndpointCacheKey(reqConfig.endpoint),
-               params: reqConfig.params
+               cacheKey: this._getEndpointCacheKey(reqConfig.endpoint, reqConfig.params),
              };
           }
 
-          return {};
+          return null;
         },
 
         cacheEndpointData: function(responseData, cachingInfo) {
@@ -78,7 +77,7 @@
           if(this.ajaxCacheDb) {
                 this.ajaxCacheDb.ajaxCachedData.where('cacheKey').equals(cacheKey).delete().then(function(result) {
 
-                  this.this.ajaxCacheDb.ajaxCachedData.add({cacheKey: cacheKey, data: dataToCache.detail,
+                  this.ajaxCacheDb.ajaxCachedData.add({cacheKey: cacheKey, data: dataToCache.detail,
                     expire: dataToCache.exp}).then(function(result) {
                     // data added in dexie db
                   }.bind(this))
@@ -253,13 +252,13 @@
           return endpoint && endpoint.hasOwnProperty('exp') && endpoint.exp > 0;
         },
 
-        _getEndpointCacheKey: function(endpoint) {
+        _getEndpointCacheKey: function(endpoint, params) {
           var cacheKey = endpoint.url;
           if (this._isNonEmptyString(endpoint.cachingKey)) {
               cacheKey = endpoint.cachingKey;
           }
           if (this._isNonEmptyObject(this.params)) {
-             cacheKey += '_' + JSON.stringify(this.params);
+             cacheKey += '_' + JSON.stringify(params);
           }
           return cacheKey;
         },
