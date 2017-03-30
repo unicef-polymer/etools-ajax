@@ -7,7 +7,7 @@
   var etoolsCustomDexieDb = new Dexie('etoolsAjax2DexieDb');
   etoolsCustomDexieDb.version(1).stores({
     collectionsList: "&name,expire",
-    ajaxCachedData: "cacheKey,data,expire"
+    ajaxCachedData: "&cacheKey,data,expire"
   });
 
 </script>
