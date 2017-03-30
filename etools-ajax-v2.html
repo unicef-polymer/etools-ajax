@@ -114,7 +114,7 @@
                   ironRequestOptions : {
                       url: this._extractUrl(reqConfig),
                       method: reqConfig.method || 'GET',
-                      headers: this._getRequestHeaders('application/json', reqConfig.body, reqConfig.headers),
+                      headers: this._getRequestHeaders(reqConfig),
                       body: reqConfig.body || {},
                       async: !reqConfig.sync,
                       handleAs: reqConfig.handleAs || 'json',
@@ -154,22 +154,44 @@
            return queryStr;
         },
 
-        _getRequestHeaders: function(cType, body, aditionalHeaders) {
+        _getRequestHeaders: function(reqConfig) {
           var headers = {};
-          var contentType = cType;
-          if (contentType == null && (typeof body === 'string')) {
-            contentType = 'application/x-www-form-urlencoded';
-          }
-          if (contentType) {
-            headers['content-type'] = contentType;
-          }
+
+          headers['content-type'] = this._determineContentType(body);
+
+          this._addClientConfiguredHeaders(headers, reqConfig.headers);
+          this._addCsrfHeader(headers, reqConfig.csrfCheck)
+
+          return headers;
+        },
+
+        _addClientConfiguredHeaders: function(headers, aditionalHeaders) {
           var header;
-          if (aditionalHeaders instanceof Object) {
+          if (aditionalHeaders && aditionalHeaders instanceof Object) {
             for (header in aditionalHeaders) {
               headers[header] = aditionalHeaders[header].toString();
             }
           }
-          return headers;
+        },
+
+        _addCsrfHeader: function(headers, csrfCheck) {
+            if (csrfCheck && csrfCheck !== 'disabled') {
+              var csrfToken = this._getCSRFCookie();
+
+              if (csrfToken !== null) {
+                headers['x-csrftoken'] = csrfToken;
+              }
+          }
+        },
+
+        _determineContentType: function(body) {
+          var contentType = 'application/json';
+
+          if(typeof body === 'string') {
+             contentType = 'application/x-www-form-urlencoded';
+          }
+
+          return contentType;
         },
 
         _checkRequestProgress: function(request, checkProgress) {
