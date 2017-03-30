@@ -112,10 +112,10 @@
         _prepareConfigOptions: function(reqConfig) {
           return {
                   ironRequestOptions : {
-                      url: this._extractUrl(reqConfig),
+                      url: this._getRequestUrl(reqConfig),
                       method: reqConfig.method || 'GET',
                       headers: this._getRequestHeaders(reqConfig),
-                      body: reqConfig.body || {},
+                      body: this._getRequestBody(reqConfig),
                       async: !reqConfig.sync,
                       handleAs: reqConfig.handleAs || 'json',
                       jsonPrefix: reqConfig.jsonPrefix || '',
@@ -126,7 +126,7 @@
                  };
         },
 
-        _extractUrl: function(reqConfig){
+        _getRequestUrl: function(reqConfig){
           var url = '';
           if(endpoint && endpoint.url) {
              url = endpoint.url;
@@ -149,9 +149,17 @@
              queryStr += key + '=' + params[key] +'&';
            };
 
-           queryStr = queryStr.substring(0, queryStr.length-1);//remove trailing &
+           queryStr = queryStr.substring(0, queryStr.length - 1);//remove trailing &
 
            return queryStr;
+        },
+
+        _getRequestBody: function(reqConfig) {
+          var body = reqConfig.body || {};
+          if (reqConfig.multiPart) {
+            body = this._prepareMultiPartFormData(body, reqConfig.prepareMultipartData);
+          }
+          return body;
         },
 
         _getRequestHeaders: function(reqConfig) {
@@ -161,7 +169,7 @@
 
           this._addClientConfiguredHeaders(headers, reqConfig.headers);
 
-          if(!this._csrfSafeMethod(reqConfig.method))
+          if (!this._csrfSafeMethod(reqConfig.method))
             this._addCsrfHeader(headers, reqConfig.csrfCheck)
 
           return headers;
@@ -182,11 +190,13 @@
 
               if (csrfToken) {
                 headers['x-csrftoken'] = csrfToken;
+
+                this._log('log', 'CSRF ' + this.csrfCheck + ', token: ' + csrfToken + ' ', this.method, this.url, this.body);
               }
           }
         },
 
-         _csrfSafeMethod: function (method) {
+        _csrfSafeMethod: function (method) {
           // these HTTP methods do not require CSRF protection
           return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
         },
