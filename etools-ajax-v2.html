@@ -141,9 +141,9 @@
              return '';
            }
            if (url.indexOf("?") < 0) {
-              queryStr += '?';
+              queryStr = '?';
             } else {
-              queryStr += '&';
+              queryStr = '&';
             }
            for (var key in params) {
              queryStr += key + '=' + params[key] +'&';
