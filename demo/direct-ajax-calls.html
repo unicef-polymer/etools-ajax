@@ -6,7 +6,7 @@
   // custom dexie db that will be used by etoolsAjax
   var etoolsCustomDexieDb = new Dexie('etoolsAjax2DexieDb');
   etoolsCustomDexieDb.version(1).stores({
-    collectionsList: "&name, expire",
+    collectionsMap: "&name, expire",
     ajaxDefaultDataCollection: "&cacheKey, data, expire",
     countries: "&id, name"
   });

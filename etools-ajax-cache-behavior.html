@@ -14,6 +14,10 @@
             type: String,
             value: 'ajaxDefaultDataCollection'
           },
+          etoolsAjaxCacheCollectionsMap: {
+            type: String,
+            value: 'collectionsMap'
+          },
 
           cachingStorage: {
             type: String,
@@ -53,49 +57,73 @@
         },
 
         /**
-         * etoolsAjaxCacheDb should be instance of Dexie and have defined a table with name: tableCollectionName
+         * etoolsAjaxCacheDb should be instance of Dexie
+         * cacheTableName and collectionsMap table should be defined
          */
         cachingCanBeMade: function(cacheTableName) {
-          if (this.etoolsAjaxCacheDb instanceof Dexie) {
-            var tables = this.etoolsAjaxCacheDb.tables;
-            var collectionTableFound = false;
-            if (tables.length) {
-              var i;
-              for (i = 0; i < tables.length; i++) {
-                if (tables[i].name === cacheTableName) {
-                  collectionTableFound = true;
-                  break;
-                }
-              }
-            }
-            return collectionTableFound;
-          }
-          return false;
+          return this.etoolsAjaxCacheDb instanceof Dexie &&
+            this.etoolsAjaxCacheDb[this.etoolsAjaxCacheCollectionsMap] &&
+            this.etoolsAjaxCacheDb[cacheTableName];
+        },
+
+        _cacheEndpointDataUsingDefaultTable: function(dataToCache) {
+          var _this = this;
+          return this.etoolsAjaxCacheDb[this.etoolsAjaxCacheDefaultTableName].put(dataToCache)
+            .then(function(result) {
+              // data added in dexie db in default table, return existing data
+              console.log('data cached into default table... yey');
+              return dataToCache.data;
+            }).catch(function(err) {
+              // something happened and inserting data in dexie table failed;
+              // just log the error and return the existing data(received from server)
+              _this.etoolsAjaxLog('warn', 'Failed to add data in etools-ajax dexie db. Data not cached.',
+                null, null, null, false, err);
+              return dataToCache.data;
+            });
+        },
+
+        _cacheEndpointDataUsingSpecifiedTable: function(responseData, cachingInfo) {
+          var _this = this;
+          return this.etoolsAjaxCacheDb.transaction('rw',
+            this.etoolsAjaxCacheDb[cachingInfo.cacheTableName],
+            function() {
+            // make all add actions using transaction
+            // cachingInfo.cacheTableName name and expire time for it must be added into collections map
+            return _this.etoolsAjaxCacheDb[_this.etoolsAjaxCacheCollectionsMap].put({
+              name: cachingInfo.cacheTableName,
+              expire: cachingInfo.exp + Date.now()
+            });
+          }).then(function(result) {
+            // cachingInfo.cacheTableName name and expire time for it added into collections map
+            // save request response into specified table
+            return _this.etoolsAjaxCacheDb[cachingInfo.cacheTableName].bulkPut(responseData);
+          }).then(function(result) {
+            // request response saved into specified table
+            // transaction succeeded
+            return responseData;
+          }).catch(function(error) {
+            // transaction failed
+            // just log the error and return the existing data(received from server)
+            _this.etoolsAjaxLog('warn', 'Failed to add data in etools-ajax dexie specified table. Data not cached.',
+              null, null, null, false, err);
+            return responseData;
+          });
         },
 
         cacheEndpointData: function(responseData, cachingInfo) {
-          var dataToCache = {
-            cacheKey: cachingInfo.cacheKey,
-            data: responseData,
-            expire: cachingInfo.exp + Date.now()
-          };
-          var _this = this;
           if (cachingInfo.cacheTableName === this.etoolsAjaxCacheDefaultTableName) {
+            var dataToCache = {
+              cacheKey: cachingInfo.cacheKey,
+              data: responseData,
+              expire: cachingInfo.exp + Date.now()
+            };
             // cache data into default dexie table
-            return this.etoolsAjaxCacheDb[this.etoolsAjaxCacheDefaultTableName].put(dataToCache)
-              .then(function(result) {
-                // data added in dexie db in default table, return existing data
-                return responseData;
-              })
-              .catch(function(err) {
-                // something happened and inserting data in dexie table failed;
-                // just log the error and return the existing data(received from server)
-                _this.etoolsAjaxLog('warn', 'Failed to add data in etools-ajax dexie db. Data not cached.', null, null, null, false, err);
-                return responseData;
-              });
+            console.log('data cached into default table started');
+            return this._cacheEndpointDataUsingDefaultTable(dataToCache);
           } else {
             // cache data into specified dexie table
-
+            console.log('data cached into specified table started');
+            return this._cacheEndpointDataUsingSpecifiedTable(responseData, cachingInfo);
           }
         },
 
