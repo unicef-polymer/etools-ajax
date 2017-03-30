@@ -128,11 +128,10 @@
 
         _extractUrl: function(reqConfig){
           var url = '';
-          if(endpoint && endpoint.url)
-            url = endpoint.url;
-
-          url += this._buildQueryString(url, reqConfig.params);
-
+          if(endpoint && endpoint.url) {
+             url = endpoint.url;
+             url += this._buildQueryString(url, reqConfig.params);
+          }
           return url;
         },
 
