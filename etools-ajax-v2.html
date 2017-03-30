@@ -9,6 +9,13 @@
   (function(window) {
     'use strict';
 
+    function EtoolsRequestError(errorDetails) {
+      this.error = errorDetails.error,
+      this.status = errorDetails.status,
+      this.statusText = errorDetails.statusText,
+      this.response = errorDetails.response
+    }
+
     function defineEtoolsRequest() {
       var etoolsRequest = {
         properties: {
@@ -46,64 +53,59 @@
         },
 
         sendRequest: function(reqConfig) {
-
-          /**
-           endpoint: {
-             url: 'http://...'
-             exp: 10000,
-             cachingKey: 'blabla'
-           }
-           - if endpoint, set reqConfig.url = endpoint.url
-           - if GET & endpoint.exp check cached data in dexie
-           */
+          // prepare request config options
           var preparedConfigOptions =  this._prepareConfigOptions(reqConfig);
           var reqConfigOptions = preparedConfigOptions.ironRequestOptions;
           var cachingInfo = preparedConfigOptions.cachingInfo;
+          console.log(reqConfigOptions, cachingInfo);
+//          if (!reqConfigOptions.url || reqConfigOptions.url === '') {
+//            this.etoolsAjaxLog('warn', 'the url can not be empty string!', null, null, null, true);
+//            return;
+//          }
 
-          var cachedResponse = _tryGetCachedData(cachingInfo);
-          if(cachedResponse) {
-             return new Promise(function(resolve) {
-               resolve(cachedResponse);
-               });
-          }
+//          var cachedResponse = this._tryGetCachedData(cachingInfo);
+//          if(cachedResponse) {
+//             return new Promise(function(resolve) {
+//               resolve(cachedResponse);
+//               });
+//          }
 
           var request = /** @type {!IronRequestElement} */ (document.createElement('iron-request'));
           this._checkRequestProgress(request, reqConfig.checkProgress);
 
           var _this = this;
 
-          return new Promise(function(resolve, reject) {
-            request.completes.then(function(request) {
+            request.send(reqConfigOptions);
+            return request.completes.then(function(request) {
               _this.etoolsAjaxLog('log', 'have response', null, null, null, true);
               var responseData = request.response;
 
-              if (this.reqConfigOptions.handleAs === 'json' && typeof responseData === 'string') {
+              if (reqConfigOptions.handleAs === 'json' && typeof responseData === 'string') {
                 responseData = JSON.parse(responseData);
               }
 
-              if(cachingInfo.requestIsViableForCaching) {
-                this.cacheEndpointData(responseData, cachingInfo);
+              if(cachingInfo && cachingInfo.requestIsViableForCaching &&
+                _this.cachingCanBeMade(cachingInfo.cacheTableName)) {
+                // add/cache response data into dexie db
+                return _this.cacheEndpointData(responseData, cachingInfo);
               }
-
-              resolve(responseData);
-
+              return responseData;
             }).catch(function(request, error) {
+              // request failed
               var errorDetails = {
                 error: error,
                 status: request.xhr.status,
                 statusText: request.xhr.statusText,
                 response: request.xhr.response
               };
-              reject(errorDetails);
+              //reject(errorDetails);
+              throw new EtoolsRequestError(errorDetails);
             }.bind(this, request));
 
-            request.send(this.ironRequestOptions);
-
-          });
         },
 
         _tryGetCachedData: function(cachingInfo) {
-           if (cachingInfo.requestIsViableForCaching) {
+           if (cachingInfo && cachingInfo.requestIsViableForCaching) {
               return this.getEndpointDataFromCache(cachingInfo);
            }
            return null;
@@ -111,7 +113,7 @@
 
         _prepareConfigOptions: function(reqConfig) {
           return {
-                  ironRequestOptions : {
+                  ironRequestOptions: {
                       url: this._extractUrl(reqConfig),
                       method: reqConfig.method || 'GET',
                       headers: this._getRequestHeaders('application/json', reqConfig.body, reqConfig.headers),
@@ -122,13 +124,13 @@
                       withCredentials: !!reqConfig.withCredentials,
                       timeout: reqConfig.timeout || 0
                    },
-                   cachingInfo : this.setCachingInfo(reqConfig)
+                   cachingInfo : this.getCachingInfo(reqConfig)
                  };
         },
 
         _extractUrl: function(reqConfig){
-          if(endpoint && endpoint.url)
-            return endpoint.url;
+          if(reqConfig.endpoint && reqConfig.endpoint.url)
+            return reqConfig.endpoint.url;
           return '';
         },
 

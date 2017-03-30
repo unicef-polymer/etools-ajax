@@ -6,8 +6,9 @@
   // custom dexie db that will be used by etoolsAjax
   var etoolsCustomDexieDb = new Dexie('etoolsAjax2DexieDb');
   etoolsCustomDexieDb.version(1).stores({
-    collectionsList: "&name,expire",
-    ajaxCachedData: "&cacheKey,data,expire"
+    collectionsList: "&name, expire",
+    ajaxDefaultDataCollection: "&cacheKey, data, expire",
+    countries: "&id, name"
   });
 
 </script>
@@ -47,8 +48,12 @@
 
           this.sendRequest({
 //            method: 'POST',
-            url: 'https://httpbin.org/get',
-            checkProgress: true
+            endpoint: {
+              url: 'http://silex-test-app.local/countries-data', //'https://httpbin.org/get',
+              exp: 5*60*1000, // cache set for 5m
+              cachingKey: 'countries',
+              cacheTableName: 'countries'
+            }
           }).then(function(resp) {
             console.log(resp);
           }).catch(function(err) {
