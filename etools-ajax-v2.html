@@ -128,8 +128,8 @@
 
         _getRequestUrl: function(reqConfig){
           var url = '';
-          if(endpoint && endpoint.url) {
-             url = endpoint.url;
+          if(reqConfig.endpoint && reqConfig.endpoint.url) {
+             url = reqConfig.endpoint.url;
              url += this._buildQueryString(url, reqConfig.params);
           }
           return url;
