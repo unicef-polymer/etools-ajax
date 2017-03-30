@@ -127,9 +127,32 @@
         },
 
         _extractUrl: function(reqConfig){
+          var url = '';
           if(endpoint && endpoint.url)
-            return endpoint.url;
-          return '';
+            url = endpoint.url;
+
+          url += this._buildQueryString(url, reqConfig.params);
+
+          return url;
+        },
+
+        _buildQueryString: function(url, params) {
+           var queryStr ='';
+           if (!params || !this._isNonEmptyObject(params)) {
+             return '';
+           }
+           if (url.indexOf("?") < 0) {
+              queryStr += '?';
+            } else {
+              queryStr += '&';
+            }
+           for (var key in params) {
+             queryStr += key + '=' + params[key] +'&';
+           };
+
+           queryStr = queryStr.substring(0, queryStr.length-1);//remove trailing &
+
+           return queryStr;
         },
 
         _getRequestHeaders: function(cType, body, aditionalHeaders) {
