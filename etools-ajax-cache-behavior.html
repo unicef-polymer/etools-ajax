@@ -17,25 +17,6 @@
           etoolsAjaxCacheCollectionsMap: {
             type: String,
             value: 'collectionsMap'
-          },
-
-          cachingStorage: {
-            type: String,
-            value: function() {
-              return 'localstorage'; // or dexie or custom
-            }
-          },
-          alternateDexieDb: {
-            type: Object,
-            value: function() {
-              return null;
-            }
-          },
-          dexieDbCollection: {
-            type: String,
-            value: function() {
-              return '';
-            }
           }
         },
 
@@ -49,7 +30,7 @@
               url: reqConfig.endpoint.url,
               exp: parseInt(reqConfig.endpoint.exp, 10), // ensure this value is integer
               cacheKey: this._getEndpointCacheKey(reqConfig.endpoint, reqConfig.params),
-              cacheTableName: reqConfig.cacheTableName || this.etoolsAjaxCacheDefaultTableName
+              cacheTableName: reqConfig.endpoint.cacheTableName || this.etoolsAjaxCacheDefaultTableName
             };
           }
 
@@ -66,6 +47,9 @@
             this.etoolsAjaxCacheDb[cacheTableName];
         },
 
+        /**
+         * Cache data into dexie db default table (etoolsAjaxCacheDefaultTableName)
+         */
         _cacheEndpointDataUsingDefaultTable: function(dataToCache) {
           var _this = this;
           return this.etoolsAjaxCacheDb[this.etoolsAjaxCacheDefaultTableName].put(dataToCache)
@@ -73,43 +57,55 @@
               // data added in dexie db in default table, return existing data
               console.log('data cached into default table... yey');
               return dataToCache.data;
-            }).catch(function(err) {
+            }).catch(function(error) {
               // something happened and inserting data in dexie table failed;
               // just log the error and return the existing data(received from server)
               _this.etoolsAjaxLog('warn', 'Failed to add data in etools-ajax dexie db. Data not cached.',
-                null, null, null, false, err);
+                null, null, null, false, error);
               return dataToCache.data;
             });
         },
 
+        /**
+         * Cache date into specified dexie db table (reqConfig.endpoint.cacheTableName)
+         */
         _cacheEndpointDataUsingSpecifiedTable: function(responseData, cachingInfo) {
+          var collectionsMapTable = this.etoolsAjaxCacheDb[this.etoolsAjaxCacheCollectionsMap];
+          var specifiedTable = this.etoolsAjaxCacheDb[cachingInfo.cacheTableName];
           var _this = this;
-          return this.etoolsAjaxCacheDb.transaction('rw',
-            this.etoolsAjaxCacheDb[cachingInfo.cacheTableName],
-            function() {
+          return this.etoolsAjaxCacheDb.transaction('rw', collectionsMapTable, specifiedTable, function() {
+            if (responseData instanceof Array === false) {
+              throw new Error('Response data should be array or objects to be ' +
+                'able to cache it into specified table.');
+            }
             // make all add actions using transaction
-            // cachingInfo.cacheTableName name and expire time for it must be added into collections map
-            return _this.etoolsAjaxCacheDb[_this.etoolsAjaxCacheCollectionsMap].put({
+            // specifiedTable name and expire time for it must be added into collectionsMapTable
+            var collectionExpireDetails = {
               name: cachingInfo.cacheTableName,
               expire: cachingInfo.exp + Date.now()
-            });
-          }).then(function(result) {
-            // cachingInfo.cacheTableName name and expire time for it added into collections map
-            // save request response into specified table
-            return _this.etoolsAjaxCacheDb[cachingInfo.cacheTableName].bulkPut(responseData);
+            };
+            // add collection expire mapping details
+            collectionsMapTable.put(collectionExpireDetails);
+            // save bulk data
+            specifiedTable.bulkPut(responseData);
           }).then(function(result) {
             // request response saved into specified table
             // transaction succeeded
+            console.log('transaction succedded...');
             return responseData;
           }).catch(function(error) {
             // transaction failed
             // just log the error and return the existing data(received from server)
-            _this.etoolsAjaxLog('warn', 'Failed to add data in etools-ajax dexie specified table. Data not cached.',
-              null, null, null, false, err);
+            _this.etoolsAjaxLog('warn', 'Failed to add data in etools-ajax dexie specified table: ' +
+              cachingInfo.cacheTableName + '. Data not cached.',
+              null, null, null, false, error);
             return responseData;
           });
         },
 
+        /**
+         * Cache endpoint received data
+         */
         cacheEndpointData: function(responseData, cachingInfo) {
           if (cachingInfo.cacheTableName === this.etoolsAjaxCacheDefaultTableName) {
             var dataToCache = {
@@ -118,69 +114,13 @@
               expire: cachingInfo.exp + Date.now()
             };
             // cache data into default dexie table
+            // single object added into default dexie db table
             console.log('data cached into default table started');
             return this._cacheEndpointDataUsingDefaultTable(dataToCache);
           } else {
-            // cache data into specified dexie table
+            // cache data into specified dexie table, array of objects bulk added into a specified table
             console.log('data cached into specified table started');
             return this._cacheEndpointDataUsingSpecifiedTable(responseData, cachingInfo);
-          }
-        },
-
-        _handleAddToLocalStorage: function(cacheKey, dataToCache) {
-           window.localStorage.setItem(cacheKey, JSON.stringify(dataToCache));
-        },
-        _handleAddToDexie: function(cacheKey , dataToAdd) {
-          if(this.ajaxCacheDb) {
-                this.ajaxCacheDb.ajaxCachedData.where('cacheKey').equals(cacheKey).delete().then(function(result) {
-
-                  this.ajaxCacheDb.ajaxCachedData.add({cacheKey: cacheKey, data: dataToCache.detail,
-                    expire: dataToCache.exp}).then(function(result) {
-                    // data added in dexie db
-                  }.bind(this))
-                  .catch(function(err) {
-                    this._log('warn', 'Failed to add data in etools-ajax dexie db.', null, null, null, false, err);
-                  }.bind(this));
-                }.bind(this)).catch(function(err) {
-                  this._log('warn', 'Failed to delete data from etools-ajax dexie db.', null, null, null, false, err);
-                }.bind(this));
-            } else {
-              this._log('warn', 'No etools-ajax dexie db found.', null, null, null, false, err);
-            }
-        },
-
-        _handleAddToCustomDexie: function(dataToCache) {
-          if (Array.isArray(dataToCache.detail)) {
-              /**
-                * in this case the result should be an array;
-                * in the custom dexie database:
-                *    - save a record with collection name and expire time in 'collectionsList' collection
-                *    - save all the objects from returned array in specified collection
-                */
-              this.alternateDexieDb.collectionsList.put({name: this.dexieDbCollection,
-                expire: dataToCache.exp}).then(function() {
-                // clear old data and add new data to collection
-                this.alternateDexieDb[this.dexieDbCollection].clear().then(function() {
-
-                  this.alternateDexieDb[this.dexieDbCollection].bulkAdd(dataToCache.detail).then(function() {
-                    // bulkAdd completed, fire success
-                  }.bind(this)).catch(function(err) {
-                    this._log('warn', 'Failed to bulk add data in ' + this.dexieDbCollection + ' collection.',
-                        null, null, null, false, err);
-                  }.bind(this));
-
-                }.bind(this)).catch(function(err) {
-                  this._log('warn', 'Failed to clear ' + this.dexieDbCollection + ' collection.',
-                      null, null, null, false, err);
-                }.bind(this));
-
-              }.bind(this)).catch(function(err) {
-                this._log('warn', 'Failed to update etools-ajax collectionsList(collections expire list).',
-                    null, null, null, false, err);
-              }.bind(this));
-            } else {
-              this._log('error', 'The ajax response has to be an array of objects to be able ' +
-                  'to save them in you dexie db collection!');
           }
         },
 
