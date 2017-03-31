@@ -1,4 +1,4 @@
-<link rel="import" href="etools-ajax-logs-behavior.html">
+<link rel="import" href="../etools-behaviors/etools-logs-behavior.html">
 <script>
   (function(window) {
     'use strict';
@@ -94,8 +94,7 @@
             }).catch(function(error) {
               // something happened and inserting data in dexie table failed;
               // just log the error and return the existing data(received from server)
-              self.etoolsAjaxLog('warn', 'Failed to add data in etools-ajax dexie db. Data not cached.',
-                null, null, null, false, error);
+              self.logWarn('Failed to add data in etools-ajax dexie db. Data not cached.', 'etools-ajax', error);
               return dataToCache.data;
             });
         },
@@ -130,9 +129,8 @@
           }).catch(function(error) {
             // transaction failed
             // just log the error and return the existing data(received from server)
-            self.etoolsAjaxLog('warn', 'Failed to add data in etools-ajax dexie specified table: ' +
-              cachingInfo.cacheTableName + '. Data not cached.',
-              null, null, null, false, error);
+            self.logWarn('Failed to add data in etools-ajax dexie specified table: ' +
+              cachingInfo.cacheTableName + '. Data not cached.', 'etools-ajax', error);
             return responseData;
           });
         },
@@ -183,8 +181,8 @@
               // no data
               return null;
             }).catch(function(error) {
-              self.etoolsAjaxLog('warn', 'Failed to get data from etools-ajax dexie db default caching table.',
-                null, null, null, false, error);
+              self.logWarn('Failed to get data from etools-ajax dexie db default caching table.',
+                'etools-ajax', error);
               return null;
             });
         },
@@ -206,9 +204,8 @@
               return null;
             }).catch(function(error) {
               // table not found in list expire map, data read error, other errors
-              self.etoolsAjaxLog('warn', 'Failed to get data from etools-ajax dexie db specified table: ' +
-                cacheTableName + '.',
-                null, null, null, false, error);
+              self.logWarn('Failed to get data from etools-ajax dexie db specified table: ' +
+                cacheTableName + '.', 'etools-ajax', error);
               return null;
             });
         },
@@ -229,6 +226,6 @@
 
     /** @polymerBehavior EtoolsAjaxCacheBehavior */
     window.EtoolsAjaxCacheBehavior = window.EtoolsAjaxCacheBehavior ||
-      [EtoolsAjaxLogsBehavior, defineEtoolsAjaxCacheBehavior()];
+      [EtoolsLogsBehavior, defineEtoolsAjaxCacheBehavior()];
   })(window);
 </script>
