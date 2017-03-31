@@ -51,7 +51,7 @@
          * Cache data into dexie db default table (etoolsAjaxCacheDefaultTableName)
          */
         _cacheEndpointDataUsingDefaultTable: function(dataToCache) {
-          var _this = this;
+          var self = this;
           return this.etoolsAjaxCacheDb[this.etoolsAjaxCacheDefaultTableName].put(dataToCache)
             .then(function(result) {
               // data added in dexie db in default table, return existing data
@@ -60,7 +60,7 @@
             }).catch(function(error) {
               // something happened and inserting data in dexie table failed;
               // just log the error and return the existing data(received from server)
-              _this.etoolsAjaxLog('warn', 'Failed to add data in etools-ajax dexie db. Data not cached.',
+              self.etoolsAjaxLog('warn', 'Failed to add data in etools-ajax dexie db. Data not cached.',
                 null, null, null, false, error);
               return dataToCache.data;
             });
@@ -72,7 +72,7 @@
         _cacheEndpointDataUsingSpecifiedTable: function(responseData, cachingInfo) {
           var collectionsMapTable = this.etoolsAjaxCacheDb[this.etoolsAjaxCacheCollectionsMap];
           var specifiedTable = this.etoolsAjaxCacheDb[cachingInfo.cacheTableName];
-          var _this = this;
+          var self = this;
           return this.etoolsAjaxCacheDb.transaction('rw', collectionsMapTable, specifiedTable, function() {
             if (responseData instanceof Array === false) {
               throw new Error('Response data should be array or objects to be ' +
@@ -96,7 +96,7 @@
           }).catch(function(error) {
             // transaction failed
             // just log the error and return the existing data(received from server)
-            _this.etoolsAjaxLog('warn', 'Failed to add data in etools-ajax dexie specified table: ' +
+            self.etoolsAjaxLog('warn', 'Failed to add data in etools-ajax dexie specified table: ' +
               cachingInfo.cacheTableName + '. Data not cached.',
               null, null, null, false, error);
             return responseData;

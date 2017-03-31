@@ -73,11 +73,11 @@
           var request = /** @type {!IronRequestElement} */ (document.createElement('iron-request'));
           this._checkRequestProgress(request, reqConfig.checkProgress);
 
-          var _this = this;
+          var self = this;
 
             request.send(reqConfigOptions);
             return request.completes.then(function(request) {
-              _this.etoolsAjaxLog('log', 'have response', null, null, null, true);
+              self.etoolsAjaxLog('log', 'have response', null, null, null, true);
               var responseData = request.response;
 
               if (reqConfigOptions.handleAs === 'json' && typeof responseData === 'string') {
@@ -85,9 +85,9 @@
               }
 
               if(cachingInfo && cachingInfo.requestIsViableForCaching &&
-                _this.cachingCanBeMade(cachingInfo.cacheTableName)) {
+                self.cachingCanBeMade(cachingInfo.cacheTableName)) {
                 // add/cache response data into dexie db
-                return _this.cacheEndpointData(responseData, cachingInfo);
+                return self.cacheEndpointData(responseData, cachingInfo);
               }
               return responseData;
             }).catch(function(request, error) {
