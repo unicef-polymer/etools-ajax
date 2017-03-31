@@ -9,6 +9,13 @@
   (function(window) {
     'use strict';
 
+    function EtoolsRequestError(errorDetails) {
+      this.error = errorDetails.error,
+      this.status = errorDetails.status,
+      this.statusText = errorDetails.statusText,
+      this.response = errorDetails.response
+    }
+
     function defineEtoolsRequest() {
       var etoolsRequest = {
         properties: {
@@ -46,64 +53,58 @@
         },
 
         sendRequest: function(reqConfig) {
-
-          /**
-           endpoint: {
-             url: 'http://...'
-             exp: 10000,
-             cachingKey: 'blabla'
-           }
-           - if endpoint, set reqConfig.url = endpoint.url
-           - if GET & endpoint.exp check cached data in dexie
-           */
+          // prepare request config options
           var preparedConfigOptions =  this._prepareConfigOptions(reqConfig);
           var reqConfigOptions = preparedConfigOptions.ironRequestOptions;
           var cachingInfo = preparedConfigOptions.cachingInfo;
+          console.log(reqConfigOptions, cachingInfo);
+//          if (!reqConfigOptions.url || reqConfigOptions.url === '') {
+//            this.etoolsAjaxLog('warn', 'the url can not be empty string!', null, null, null, true);
+//            return;
+//          }
 
-          var cachedResponse = _tryGetCachedData(cachingInfo);
-          if(cachedResponse) {
-             return new Promise(function(resolve) {
-               resolve(cachedResponse);
-               });
-          }
+//          var cachedResponse = this._tryGetCachedData(cachingInfo);
+//          if(cachedResponse) {
+//             return new Promise(function(resolve) {
+//               resolve(cachedResponse);
+//               });
+//          }
 
           var request = /** @type {!IronRequestElement} */ (document.createElement('iron-request'));
           this._checkRequestProgress(request, reqConfig.checkProgress);
 
-          var _this = this;
+          var self = this;
 
-          return new Promise(function(resolve, reject) {
-            request.completes.then(function(request) {
-              _this.etoolsAjaxLog('log', 'have response', null, null, null, true);
+            request.send(reqConfigOptions);
+            return request.completes.then(function(request) {
+              self.etoolsAjaxLog('log', 'have response', null, null, null, true);
               var responseData = request.response;
 
-              if (this.reqConfigOptions.handleAs === 'json' && typeof responseData === 'string') {
+              if (reqConfigOptions.handleAs === 'json' && typeof responseData === 'string') {
                 responseData = JSON.parse(responseData);
               }
 
-              if(cachingInfo.requestIsViableForCaching) {
-                this.cacheEndpointData(responseData, cachingInfo);
+              if(cachingInfo && cachingInfo.requestIsViableForCaching &&
+                self.cachingCanBeMade(cachingInfo.cacheTableName)) {
+                // add/cache response data into dexie db
+                return self.cacheEndpointData(responseData, cachingInfo);
               }
-
-              resolve(responseData);
-
+              return responseData;
             }).catch(function(request, error) {
+              // request failed
               var errorDetails = {
                 error: error,
                 status: request.xhr.status,
                 statusText: request.xhr.statusText,
                 response: request.xhr.response
               };
-              reject(errorDetails);
+              //reject(errorDetails);
+              throw new EtoolsRequestError(errorDetails);
             }.bind(this, request));
-
-            request.send(this.ironRequestOptions);
-
-          });
         },
 
         _tryGetCachedData: function(cachingInfo) {
-           if (cachingInfo.requestIsViableForCaching) {
+           if (cachingInfo && cachingInfo.requestIsViableForCaching) {
               return this.getEndpointDataFromCache(cachingInfo);
            }
            return null;
@@ -122,7 +123,7 @@
                       withCredentials: !!reqConfig.withCredentials,
                       timeout: reqConfig.timeout || 0
                    },
-                   cachingInfo : this.setCachingInfo(reqConfig)
+                   cachingInfo : this.getCachingInfo(reqConfig)
                  };
         },
 
@@ -172,40 +173,44 @@
         _getRequestHeaders: function(reqConfig) {
           var headers = {};
 
-          headers['content-type'] = this._determineContentType(body);
+          headers['content-type'] = this._determineContentType(reqConfig.body);
 
           if (reqConfig.downloadCsv) {
             headers['Accept'] ='text/csv';
             headers['Content-Type'] = 'text';
           }
 
-          this._addClientConfiguredHeaders(headers, reqConfig.headers);
-
-          if (!this._csrfSafeMethod(reqConfig.method))
-            this._addCsrfHeader(headers, reqConfig.csrfCheck)
-
+          var clientConfiguredHeaders = this._getClientConfiguredHeaders(reqConfig.headers);
+          var csrfHeaders = {};
+          if (!this._csrfSafeMethod(reqConfig.method)) {
+            csrfHeaders = this._getCsrfHeader(reqConfig.csrfCheck)
+          }
+          headers = Object.assign({}, headers, clientConfiguredHeaders, csrfHeaders);
           return headers;
         },
 
-        _addClientConfiguredHeaders: function(headers, aditionalHeaders) {
+        _getClientConfiguredHeaders: function(aditionalHeaders) {
           var header;
+          var clientHeaders = {};
           if (aditionalHeaders && aditionalHeaders instanceof Object) {
             for (header in aditionalHeaders) {
-              headers[header] = aditionalHeaders[header].toString();
+              clientHeaders[header] = aditionalHeaders[header].toString();
             }
           }
+          return clientHeaders;
         },
 
-        _addCsrfHeader: function(headers, csrfCheck) {
-            if (csrfCheck !== 'disabled') {
-              var csrfToken = this._getCSRFCookie();
+        _getCsrfHeader: function(csrfCheck) {
+          var csrfHeaders = {};
+          if (csrfCheck !== 'disabled') {
+            var csrfToken = this._getCSRFCookie();
 
-              if (csrfToken) {
-                headers['x-csrftoken'] = csrfToken;
-
-                this._log('log', 'CSRF ' + this.csrfCheck + ', token: ' + csrfToken + ' ', this.method, this.url, this.body);
-              }
+            if (csrfToken) {
+              csrfHeaders['x-csrftoken'] = csrfToken;
+              this._log('log', 'CSRF ' + this.csrfCheck + ', token: ' + csrfToken + ' ', this.method, this.url, this.body);
+            }
           }
+          return csrfHeaders;
         },
 
         _csrfSafeMethod: function (method) {
