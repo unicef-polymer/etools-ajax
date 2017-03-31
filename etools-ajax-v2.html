@@ -173,40 +173,44 @@
         _getRequestHeaders: function(reqConfig) {
           var headers = {};
 
-          headers['content-type'] = this._determineContentType(body);
+          headers['content-type'] = this._determineContentType(reqConfig.body);
 
           if (reqConfig.downloadCsv) {
             headers['Accept'] ='text/csv';
             headers['Content-Type'] = 'text';
           }
 
-          this._addClientConfiguredHeaders(headers, reqConfig.headers);
-
-          if (!this._csrfSafeMethod(reqConfig.method))
-            this._addCsrfHeader(headers, reqConfig.csrfCheck)
-
+          var clientConfiguredHeaders = this._getClientConfiguredHeaders(reqConfig.headers);
+          var csrfHeaders = {};
+          if (!this._csrfSafeMethod(reqConfig.method)) {
+            csrfHeaders = this._getCsrfHeader(reqConfig.csrfCheck)
+          }
+          headers = Object.assign({}, headers, clientConfiguredHeaders, csrfHeaders);
           return headers;
         },
 
-        _addClientConfiguredHeaders: function(headers, aditionalHeaders) {
+        _getClientConfiguredHeaders: function(aditionalHeaders) {
           var header;
+          var clientHeaders = {};
           if (aditionalHeaders && aditionalHeaders instanceof Object) {
             for (header in aditionalHeaders) {
-              headers[header] = aditionalHeaders[header].toString();
+              clientHeaders[header] = aditionalHeaders[header].toString();
             }
           }
+          return clientHeaders;
         },
 
-        _addCsrfHeader: function(headers, csrfCheck) {
-            if (csrfCheck !== 'disabled') {
-              var csrfToken = this._getCSRFCookie();
+        _getCsrfHeader: function(csrfCheck) {
+          var csrfHeaders = {};
+          if (csrfCheck !== 'disabled') {
+            var csrfToken = this._getCSRFCookie();
 
-              if (csrfToken) {
-                headers['x-csrftoken'] = csrfToken;
-
-                this._log('log', 'CSRF ' + this.csrfCheck + ', token: ' + csrfToken + ' ', this.method, this.url, this.body);
-              }
+            if (csrfToken) {
+              csrfHeaders['x-csrftoken'] = csrfToken;
+              this._log('log', 'CSRF ' + this.csrfCheck + ', token: ' + csrfToken + ' ', this.method, this.url, this.body);
+            }
           }
+          return csrfHeaders;
         },
 
         _csrfSafeMethod: function (method) {
