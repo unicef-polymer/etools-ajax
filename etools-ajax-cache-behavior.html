@@ -1,3 +1,4 @@
+<link rel="import" href="etools-ajax-logs-behavior.html">
 <script>
   (function(window) {
     'use strict';
@@ -191,146 +192,13 @@
             // check for data cached into specified table
             return this._getDataFromSpecifiedCacheTable(cachingInfo.cacheTableName);
           }
-        },
-
-
-
-
-
-        _getDexieData: function(cachingInfo) {
-          var cacheKey = cachingInfo.cacheKey;
-
-           if (!this.ajaxCacheDb) {
-             this.getDexieCacheKey = cacheKey;
-             return null;
-           }
-
-          this.ajaxCacheDb.ajaxCachedData.where('cacheKey').equals(cacheKey).toArray()
-            .then(function(result) {
-            if (result && result.length > 0 && !this._cacheDataIsExpired(result[0])) {
-               var cachedData = {
-                  detail: result[0].data,
-                  exp: result[0].expire
-                }
-              }
-
-              this._logCachedDataStatus(cachedData, cachingInfo)
-
-              return cachedData;
-
-            }.bind(this))
-            .catch(function(err) {
-                this._logCachedDataError(err, cachingInfo)
-            }.bind(this));
-
-            return null;
-        },
-
-        _logCachedDataError: function(err, cachingInfo) {
-            this._log('warn', 'Failed to get data from etools-ajax dexie db.', null, null, null, false, err);
-            this._logFireNewRequest(cachingInfo.url);
-        },
-        _logCachedDataStatus: function(cachedData, cachingInfo) {
-            if(cachedData)
-            {
-              if (this.logs)
-                  this._logSuccesfulCacheDataRetrieval(cachingInfo);
-            }
-            else {
-              this._logFireNewRequest(cachingInfo.url);
-            }
-        },
-
-        _logFireNewRequest: function(url) {
-            this._log('log', 'Fire new request to get data from ' +  cachingInfo.url);
-        },
-
-        _cacheDataIsExpired: function(cachedData) {
-           var now = Date.now();
-           return (cachedData.exp - now) < 0;
-        },
-
-        _getDexieDataFromCustomDb: function(cachingInfo) {
-          this.alternateDexieDb.collectionsList.where('name').equals(this.dexieDbCollection).toArray().then(function(result) {
-            if (result && result.length > 0 && !this._cacheDataIsExpired(result[0])) {
-              // collection already exists, get it's data
-              this.alternateDexieDb[this.dexieDbCollection].toArray().then(function(collectionData) {
-                var cachedData = {
-                  detail: collectionData,
-                  exp: result[0].expire
-                }
-                this._logCachedDataStatus(cachedData, cachingInfo);
-                return cachedData;
-              }.bind(this)).catch(function(err) {
-                this._logCachedDataError(err, cachingInfo)
-              }.bind(this));
-            } else {
-              this._logFireNewRequest(cachingInfo.url);
-            }
-          }.bind(this));
-          return null;
-        },
-
-       _logSuccesfulCacheDataRetrieval: function(cachingInfo) {
-            var logMsg = 'Return data from caching storage (';
-            if (this._storageIsCustomDexieDb()) {
-              logMsg += 'custom DexieDb, collection: ' + this.dexieDbCollection;
-            } else {
-              logMsg += (this.cachingStorage === 'custom' ? 'localstorage' : this.cachingStorage)
-              + ', key: ' + (cachingInfo.cacheKey);
-            }
-            logMsg += ') for ';
-            this._log('log', logMsg, "GET", cachingInfo.url, cachingInfo.params);
-        },
-
-        _storageIsDexie: function() {
-          return this.cachingStorage === 'dexie';
-        },
-
-        _storageIsCustomDexieDb: function() {
-          if (this.alternateDexieDb instanceof Dexie && this.dexieDbCollection !== ""
-           && this.alternateDexieDb[this.dexieDbCollection]) {
-             if (this.alternateDexieDb.collectionsList) {
-               return true;
-            } else {
-               this._log('error', 'Invalid dexie version store for provided db. Missing "collectionsList : \"&name,expire\""');
-            }
-          }
-          return false;
-        },
-
-        _requestIsViableForCaching: function(reqConfig) {
-          return (reqConfig.method || 'GET') === 'GET' &&  this._expireTimeWasProvided(reqConfig.endpoint)
-        },
-
-        _expireTimeWasProvided: function(endpoint) {
-          return endpoint && endpoint.hasOwnProperty('exp') && endpoint.exp > 0;
-        },
-
-        _getEndpointCacheKey: function(endpoint, params) {
-          var cacheKey = endpoint.url;
-          if (this._isNonEmptyString(endpoint.cachingKey)) {
-              cacheKey = endpoint.cachingKey;
-          }
-          if (this._isNonEmptyObject(this.params)) {
-             cacheKey += '_' + JSON.stringify(params);
-          }
-          return cacheKey;
-        },
-
-        _isNonEmptyString: function(input) {
-          return (input && typeof input === 'string');
-        },
-
-        _isNonEmptyObject: function(input) {
-          return input && typeof input === 'object' && Object.keys(input).length > 0
         }
-
       };
 
       return etoolsAjaxCacheBehavior;
     }
 
-    window.EtoolsAjaxCacheBehavior = window.EtoolsAjaxCacheBehavior || defineEtoolsAjaxCacheBehavior();
+    window.EtoolsAjaxCacheBehavior = window.EtoolsAjaxCacheBehavior ||
+      [EtoolsAjaxLogsBehavior, defineEtoolsAjaxCacheBehavior()];
   })(window);
 </script>
