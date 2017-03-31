@@ -47,6 +47,10 @@
             this.etoolsAjaxCacheDb[cacheTableName];
         },
 
+        _cacheToDefaultTable: function(cacheTableName) {
+          return cacheTableName === this.etoolsAjaxCacheDefaultTableName;
+        },
+
         /**
          * Cache data into dexie db default table (etoolsAjaxCacheDefaultTableName)
          */
@@ -107,7 +111,7 @@
          * Cache endpoint received data
          */
         cacheEndpointData: function(responseData, cachingInfo) {
-          if (cachingInfo.cacheTableName === this.etoolsAjaxCacheDefaultTableName) {
+          if (this._cacheToDefaultTable(cachingInfo.cacheTableName)) {
             var dataToCache = {
               cacheKey: cachingInfo.cacheKey,
               data: responseData,
@@ -124,20 +128,74 @@
           }
         },
 
-        getEndpointDataFromCache: function(cachingInfo) {
-           var cacheKey = cachingInfo.cacheKey;
-
-            if (this._storageIsDexie() && !this._storageIsCustomDexieDb()) { // data is cached in default dexie database
-              return this._getDexieData(cachingInfo);
-            } else if (this._storageIsCustomDexieDb()) {   // data is cached in a custom database (user's choice)
-              return this._getDexieDataFromCustomDb(cachingInfo);
-            } else {
-              // data is cached in localstorage
-              var cachedData = JSON.parse(window.localStorage.getItem(cacheKey) || null);
-              this._logCachedDataStatus(cachedData, cachingInfo);
-              return cachedData;
-            }
+        _isExpiredCachedData: function(dataExp) {
+          // check if we have cached data
+          var now = Date.now();
+          if (dataExp && (dataExp - now) > 0) {
+            // data did not expired
+            return false;
+          }
+          // data expired
+          return true;
         },
+
+        _getDataFromDefaultCacheTable: function(cacheKey) {
+          var self = this;
+          return this.etoolsAjaxCacheDb[this.etoolsAjaxCacheDefaultTableName]
+            .where('cacheKey').equals(cacheKey).toArray()
+            .then(function(result) {
+              if (result.length > 0) {
+                // check expired data
+                if (!self._isExpiredCachedData(result[0].expire)) {
+                  return result[0].data;
+                }
+              }
+              // no data
+              return null;
+            }).catch(function(error) {
+              self.etoolsAjaxLog('warn', 'Failed to get data from etools-ajax dexie db default caching table.',
+                null, null, null, false, error);
+              return null;
+            });
+        },
+
+        _getDataFromSpecifiedCacheTable: function(cacheTableName) {
+          var listsExpireMapTable = this.etoolsAjaxCacheDb[this.etoolsAjaxCacheListsExpireMapTable];
+          var specifiedTable = this.etoolsAjaxCacheDb[cacheTableName];
+          var self = this;
+          return listsExpireMapTable.where('name').equals(cacheTableName).toArray()
+            .then(function(result) {
+              console.log('result from expire map', result);
+              if (result.length > 0) {
+                if (!self._isExpiredCachedData(result[0].expire)) {
+                  // return table content as array
+                  return specifiedTable.toArray();
+                }
+              }
+              // collection data expire details missing
+              return null;
+            }).catch(function(error) {
+              // table not found in list expire map, data read error, other errors
+              self.etoolsAjaxLog('warn', 'Failed to get data from etools-ajax dexie db specified table: ' +
+                cacheTableName + '.',
+                null, null, null, false, error);
+              return null;
+            });
+        },
+
+        getEndpointDataFromCache: function(cachingInfo) {
+          if (this._cacheToDefaultTable(cachingInfo.cacheTableName)) {
+            // check for data cached into default table
+            return this._getDataFromDefaultCacheTable(cachingInfo.cacheKey);
+          } else {
+            // check for data cached into specified table
+            return this._getDataFromSpecifiedCacheTable(cachingInfo.cacheTableName);
+          }
+        },
+
+
+
+
 
         _getDexieData: function(cachingInfo) {
           var cacheKey = cachingInfo.cacheKey;

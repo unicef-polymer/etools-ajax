@@ -52,7 +52,7 @@
               url: 'http://silex-test-app.local/countries-data', //'https://httpbin.org/get',
               exp: 5*60*1000, // cache set for 5m
               cachingKey: 'countries',
-//              cacheTableName: 'countries'
+              cacheTableName: 'countries'
             }
           }).then(function(resp) {
             console.log(resp);
