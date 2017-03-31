@@ -112,12 +112,12 @@
         _prepareConfigOptions: function(reqConfig) {
           return {
                   ironRequestOptions : {
-                      url: this._extractUrl(reqConfig),
+                      url: this._getRequestUrl(reqConfig),
                       method: reqConfig.method || 'GET',
-                      headers: this._getRequestHeaders('application/json', reqConfig.body, reqConfig.headers),
-                      body: reqConfig.body || {},
+                      headers: this._getRequestHeaders(reqConfig),
+                      body: this._getRequestBody(reqConfig),
                       async: !reqConfig.sync,
-                      handleAs: reqConfig.handleAs || 'json',
+                      handleAs: this._getHandleAs(reqConfig),
                       jsonPrefix: reqConfig.jsonPrefix || '',
                       withCredentials: !!reqConfig.withCredentials,
                       timeout: reqConfig.timeout || 0
@@ -126,10 +126,17 @@
                  };
         },
 
-        _extractUrl: function(reqConfig){
+        _getHandleAs: function(reqConfig) {
+          var handleAs =  reqConfig.handleAs || 'json';
+          if(reqConfig.downloadCsv)
+            handleAs = 'blob';
+          return handleAs;
+        },
+
+        _getRequestUrl: function(reqConfig){
           var url = '';
-          if(endpoint && endpoint.url) {
-             url = endpoint.url;
+          if(reqConfig.endpoint && reqConfig.endpoint.url) {
+             url = reqConfig.endpoint.url;
              url += this._buildQueryString(url, reqConfig.params);
           }
           return url;
@@ -149,27 +156,91 @@
              queryStr += key + '=' + params[key] +'&';
            };
 
-           queryStr = queryStr.substring(0, queryStr.length-1);//remove trailing &
+           queryStr = queryStr.substring(0, queryStr.length - 1);//remove trailing &
 
            return queryStr;
         },
 
-        _getRequestHeaders: function(cType, body, aditionalHeaders) {
+        _getRequestBody: function(reqConfig) {
+          var body = reqConfig.body || {};
+          if (reqConfig.multiPart) {
+            body = this._prepareMultiPartFormData(body, reqConfig.prepareMultipartData);
+          }
+          return body;
+        },
+
+        _getRequestHeaders: function(reqConfig) {
           var headers = {};
-          var contentType = cType;
-          if (contentType == null && (typeof body === 'string')) {
-            contentType = 'application/x-www-form-urlencoded';
+
+          headers['content-type'] = this._determineContentType(body);
+
+          if (reqConfig.downloadCsv) {
+            headers['Accept'] ='text/csv';
+            headers['Content-Type'] = 'text';
           }
-          if (contentType) {
-            headers['content-type'] = contentType;
-          }
+
+          this._addClientConfiguredHeaders(headers, reqConfig.headers);
+
+          if (!this._csrfSafeMethod(reqConfig.method))
+            this._addCsrfHeader(headers, reqConfig.csrfCheck)
+
+          return headers;
+        },
+
+        _addClientConfiguredHeaders: function(headers, aditionalHeaders) {
           var header;
-          if (aditionalHeaders instanceof Object) {
+          if (aditionalHeaders && aditionalHeaders instanceof Object) {
             for (header in aditionalHeaders) {
               headers[header] = aditionalHeaders[header].toString();
             }
           }
-          return headers;
+        },
+
+        _addCsrfHeader: function(headers, csrfCheck) {
+            if (csrfCheck !== 'disabled') {
+              var csrfToken = this._getCSRFCookie();
+
+              if (csrfToken) {
+                headers['x-csrftoken'] = csrfToken;
+
+                this._log('log', 'CSRF ' + this.csrfCheck + ', token: ' + csrfToken + ' ', this.method, this.url, this.body);
+              }
+          }
+        },
+
+        _csrfSafeMethod: function (method) {
+          // these HTTP methods do not require CSRF protection
+          return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        },
+
+        _getCSRFCookie: function () {
+          // check for a csrftoken cookie and return its value
+          var csrfCookieName = 'csrftoken';
+          var csrfToken = null;
+          if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+              var cookie = cookies[i].trim();
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, csrfCookieName.length + 1) === (csrfCookieName + '=')) {
+                csrfToken = decodeURIComponent(cookie.substring(csrfCookieName.length + 1));
+                break;
+              }
+            }
+          }
+          return csrfToken;
+        },
+
+         //* Content-Type set here can be overriden later
+         // by headers sent from the client
+        _determineContentType: function(body) {
+          var contentType = 'application/json';
+
+          if(typeof body === 'string') {
+             contentType = 'application/x-www-form-urlencoded';
+          }
+
+          return contentType;
         },
 
         _checkRequestProgress: function(request, checkProgress) {
