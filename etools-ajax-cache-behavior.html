@@ -9,7 +9,9 @@
         properties: {
           etoolsAjaxCacheDb: {
             type: Object,
-            value: null
+            value: function() {
+              return window.EtoolsRequestCacheDb;
+            }
           },
           etoolsAjaxCacheDefaultTableName: {
             type: String,
@@ -23,6 +25,29 @@
 
         _requestIsViableForCaching: function(reqConfig) {
           return (reqConfig.method || 'GET') === 'GET' &&  this._expireTimeWasProvided(reqConfig.endpoint)
+        },
+
+        _expireTimeWasProvided: function(endpoint) {
+          return endpoint && endpoint.hasOwnProperty('exp') && endpoint.exp > 0;
+        },
+
+        _getEndpointCacheKey: function(endpoint, params) {
+          var cacheKey = endpoint.url;
+          if (this._isNonEmptyString(endpoint.cachingKey)) {
+            cacheKey = endpoint.cachingKey;
+          }
+          if (this._isNonEmptyObject(this.params)) {
+            cacheKey += '_' + JSON.stringify(params);
+          }
+          return cacheKey;
+        },
+
+        _isNonEmptyString: function(str) {
+          return typeof str === 'string' && str !== '';
+        },
+
+        _isNonEmptyObject: function(obj) {
+          return obj && typeof obj === 'object' && Object.keys(obj).length > 0;
         },
 
         /**

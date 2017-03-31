@@ -3,7 +3,6 @@
 <link rel="import" href="etools-ajax-logs-behavior.html">
 <link rel="import" href="etools-ajax-data-behavior.html">
 <link rel="import" href="etools-ajax-cache-behavior.html">
-<link rel="import" href="etools-endpoints-behavior.html">
 
 <script>
   (function(window) {
@@ -220,8 +219,10 @@
           return csrfToken;
         },
 
-         //* Content-Type set here can be overriden later
-         // by headers sent from the client
+        /**
+         * Content-Type set here can be overridden later
+         * by headers sent from the client
+         */
         _determineContentType: function(body) {
           var contentType = 'application/json';
 
@@ -256,7 +257,6 @@
     }
 
     window.EtoolsRequest = window.EtoolsRequest ||
-      [EtoolsAjaxLogsBehavior, EtoolsAjaxDataBehavior, EtoolsEndpointsBehavior,
-        EtoolsAjaxCacheBehavior, defineEtoolsRequest()];
+      [EtoolsAjaxLogsBehavior, EtoolsAjaxDataBehavior, EtoolsAjaxCacheBehavior, defineEtoolsRequest()];
   })(window);
 </script>

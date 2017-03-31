@@ -11,6 +11,9 @@
     countries: "&id, name"
   });
 
+  // configure app dexie db to be used for caching
+  window.EtoolsRequestCacheDb = etoolsCustomDexieDb;
+
 </script>
 
 <dom-module id="direct-ajax-calls">
@@ -30,21 +33,10 @@
 
         ready: function() {
 
-          this.etoolsAjaxCacheDb = etoolsCustomDexieDb;
-//          console.log(this.etoolsAjaxCacheDb);
+//          this.etoolsAjaxCacheDb = etoolsCustomDexieDb;
+          console.log(this.etoolsAjaxCacheDb);
 
           this._setCookie();
-
-          // EtoolsAjax.setConfigDefaults({
-          //   baseURL: 'https://httpbin.org'
-          // });
-
-          // EtoolsAjax.get('/get').then(function (response) {
-          //   console.log('response', response);
-          // })
-          // .catch(function (error) {
-          //   console.log('error', error);
-          // });
 
           this.sendRequest({
 //            method: 'POST',
