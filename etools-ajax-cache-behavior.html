@@ -21,6 +21,10 @@
           }
         },
 
+        _requestIsViableForCaching: function(reqConfig) {
+          return (reqConfig.method || 'GET') === 'GET' &&  this._expireTimeWasProvided(reqConfig.endpoint)
+        },
+
         /**
          * Get caching info for the current request
          */
