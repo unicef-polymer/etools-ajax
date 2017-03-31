@@ -1,8 +1,11 @@
 <link rel="import" href="../../polymer/polymer.html">
-<link rel="import" href="../../etools-dexiejs/etools-dexiejs.html">
+<link rel="import" href="../../etools-dexiejs/dexie.html">
+
 <link rel="import" href="../etools-ajax-v2.html">
 
 <script>
+  // set logging level
+  window.EtoolsLogsLevel = window.EtoolsLogsLevel || 'INFO';
   // custom dexie db that will be used by etoolsAjax
   var etoolsCustomDexieDb = new Dexie('etoolsAjax2DexieDb');
   etoolsCustomDexieDb.version(1).stores({

@@ -1,6 +1,6 @@
 <link rel="import" href="es6-obj-assign-polyfil.html">
 <link rel="import" href="../iron-ajax/iron-request.html">
-<link rel="import" href="etools-ajax-logs-behavior.html">
+<link rel="import" href="../etools-behaviors/etools-logs-behavior.html">
 <link rel="import" href="etools-ajax-data-behavior.html">
 <link rel="import" href="etools-ajax-cache-behavior.html">
 
@@ -70,7 +70,7 @@
           var self = this;
           request.send(reqConfigOptions);
           return request.completes.then(function(request) {
-            self.etoolsAjaxLog('log', 'have response', null, null, null, true);
+            console.log('have response...');
             var responseData = request.response;
 
             if (reqConfigOptions.handleAs === 'json' && typeof responseData === 'string') {
@@ -84,6 +84,7 @@
             return responseData;
           }).catch(function(request, error) {
             // request failed
+            self.logError('Request failed', 'etools-ajax', error);
             throw new EtoolsRequestError(error, request.xhr.status, request.xhr.statusText, request.xhr.response);
           }.bind(this, request));
         },
@@ -258,6 +259,6 @@
 
     /** @polymerBehavior EtoolsRequest */
     window.EtoolsRequest = window.EtoolsRequest ||
-      [EtoolsAjaxLogsBehavior, EtoolsAjaxDataBehavior, EtoolsAjaxCacheBehavior, defineEtoolsRequest()];
+      [EtoolsLogsBehavior, EtoolsAjaxDataBehavior, EtoolsAjaxCacheBehavior, defineEtoolsRequest()];
   })(window);
 </script>
