@@ -6,10 +6,13 @@
   // custom dexie db that will be used by etoolsAjax
   var etoolsCustomDexieDb = new Dexie('etoolsAjax2DexieDb');
   etoolsCustomDexieDb.version(1).stores({
-    collectionsMap: "&name, expire",
-    ajaxDefaultDataCollection: "&cacheKey, data, expire",
+    listsExpireMapTable: "&name, expire",
+    ajaxDefaultDataTable: "&cacheKey, data, expire",
     countries: "&id, name"
   });
+
+  // configure app dexie db to be used for caching
+  window.EtoolsRequestCacheDb = etoolsCustomDexieDb;
 
 </script>
 
@@ -30,21 +33,10 @@
 
         ready: function() {
 
-          this.etoolsAjaxCacheDb = etoolsCustomDexieDb;
+//          this.etoolsAjaxCacheDb = etoolsCustomDexieDb;
           console.log(this.etoolsAjaxCacheDb);
 
           this._setCookie();
-
-          // EtoolsAjax.setConfigDefaults({
-          //   baseURL: 'https://httpbin.org'
-          // });
-
-          // EtoolsAjax.get('/get').then(function (response) {
-          //   console.log('response', response);
-          // })
-          // .catch(function (error) {
-          //   console.log('error', error);
-          // });
 
           this.sendRequest({
 //            method: 'POST',
@@ -56,8 +48,8 @@
             }
           }).then(function(resp) {
             console.log(resp);
-          }).catch(function(err) {
-            console.log(err);
+          }).catch(function(error) {
+            console.log(error);
           });
         },
 

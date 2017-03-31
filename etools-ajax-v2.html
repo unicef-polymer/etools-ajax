@@ -3,17 +3,16 @@
 <link rel="import" href="etools-ajax-logs-behavior.html">
 <link rel="import" href="etools-ajax-data-behavior.html">
 <link rel="import" href="etools-ajax-cache-behavior.html">
-<link rel="import" href="etools-endpoints-behavior.html">
 
 <script>
   (function(window) {
     'use strict';
 
-    function EtoolsRequestError(errorDetails) {
-      this.error = errorDetails.error,
-      this.status = errorDetails.status,
-      this.statusText = errorDetails.statusText,
-      this.response = errorDetails.response
+    function EtoolsRequestError(error, statusCode, statusText, response) {
+      this.error = error,
+      this.status = statusCode,
+      this.statusText = statusText,
+      this.response = response
     }
 
     function defineEtoolsRequest() {
@@ -31,83 +30,67 @@
             type: Object,
             value: function() {
               return null;
-            },
-
-            // ironRequestOptions: {
-            //   type:Object,
-            //   value: function() {
-            //     return {
-            //         url: '',
-            //         method:'GET',
-            //         headers: '',
-            //         body: '',
-            //         async: true,
-            //         handleAs: 'json',
-            //         jsonPrefix: '',
-            //         withCredentials: false,
-            //         timeout: 0
-            //     }
-            //   }
-            // },
+            }
           }
         },
 
+        /**
+         * Check for cached data if needed, if no cached data then fire new request
+         * returns Promise
+         */
         sendRequest: function(reqConfig) {
           // prepare request config options
           var preparedConfigOptions =  this._prepareConfigOptions(reqConfig);
           var reqConfigOptions = preparedConfigOptions.ironRequestOptions;
           var cachingInfo = preparedConfigOptions.cachingInfo;
-          console.log(reqConfigOptions, cachingInfo);
-//          if (!reqConfigOptions.url || reqConfigOptions.url === '') {
-//            this.etoolsAjaxLog('warn', 'the url can not be empty string!', null, null, null, true);
-//            return;
-//          }
-
-//          var cachedResponse = this._tryGetCachedData(cachingInfo);
-//          if(cachedResponse) {
-//             return new Promise(function(resolve) {
-//               resolve(cachedResponse);
-//               });
-//          }
-
-          var request = /** @type {!IronRequestElement} */ (document.createElement('iron-request'));
-          this._checkRequestProgress(request, reqConfig.checkProgress);
+          // console.log(reqConfigOptions, cachingInfo);
 
           var self = this;
-
-            request.send(reqConfigOptions);
-            return request.completes.then(function(request) {
-              self.etoolsAjaxLog('log', 'have response', null, null, null, true);
-              var responseData = request.response;
-
-              if (reqConfigOptions.handleAs === 'json' && typeof responseData === 'string') {
-                responseData = JSON.parse(responseData);
+          if (this._isViableForCaching(cachingInfo)) {
+            // we might have data cached; if cached data is available and not expired
+            // return it without making the request
+            return this.getEndpointDataFromCache(cachingInfo).then(function(response) {
+              console.log('cached data', response);
+              if (!response) {
+                return self._doRequest(reqConfigOptions, cachingInfo, reqConfig.checkProgress);
               }
-
-              if(cachingInfo && cachingInfo.requestIsViableForCaching &&
-                self.cachingCanBeMade(cachingInfo.cacheTableName)) {
-                // add/cache response data into dexie db
-                return self.cacheEndpointData(responseData, cachingInfo);
-              }
-              return responseData;
-            }).catch(function(request, error) {
-              // request failed
-              var errorDetails = {
-                error: error,
-                status: request.xhr.status,
-                statusText: request.xhr.statusText,
-                response: request.xhr.response
-              };
-              //reject(errorDetails);
-              throw new EtoolsRequestError(errorDetails);
-            }.bind(this, request));
+              return response;
+            });
+          }
+          // make request
+          return this._doRequest(reqConfigOptions, cachingInfo, reqConfig.checkProgress);
         },
 
-        _tryGetCachedData: function(cachingInfo) {
-           if (cachingInfo && cachingInfo.requestIsViableForCaching) {
-              return this.getEndpointDataFromCache(cachingInfo);
-           }
-           return null;
+        /**
+         * Fire new request
+         */
+        _doRequest: function(reqConfigOptions, cachingInfo, checkProgress) {
+          var request = /** @type {!IronRequestElement} */ (document.createElement('iron-request'));
+          this._checkRequestProgress(request, checkProgress);
+          var self = this;
+          request.send(reqConfigOptions);
+          return request.completes.then(function(request) {
+            self.etoolsAjaxLog('log', 'have response', null, null, null, true);
+            var responseData = request.response;
+
+            if (reqConfigOptions.handleAs === 'json' && typeof responseData === 'string') {
+              responseData = JSON.parse(responseData);
+            }
+
+            if (self._isViableForCaching(cachingInfo)) {
+              // add/cache response data into dexie db
+              return self.cacheEndpointData(responseData, cachingInfo);
+            }
+            return responseData;
+          }).catch(function(request, error) {
+            // request failed
+            throw new EtoolsRequestError(error, request.xhr.status, request.xhr.statusText, request.xhr.response);
+          }.bind(this, request));
+        },
+
+        _isViableForCaching: function(cachingInfo) {
+          return cachingInfo && cachingInfo.requestIsViableForCaching &&
+            this.cachingCanBeMade(cachingInfo.cacheTableName);
         },
 
         _prepareConfigOptions: function(reqConfig) {
@@ -236,8 +219,10 @@
           return csrfToken;
         },
 
-         //* Content-Type set here can be overriden later
-         // by headers sent from the client
+        /**
+         * Content-Type set here can be overridden later
+         * by headers sent from the client
+         */
         _determineContentType: function(body) {
           var contentType = 'application/json';
 
@@ -271,8 +256,8 @@
       return etoolsRequest;
     }
 
+    /** @polymerBehavior EtoolsRequest */
     window.EtoolsRequest = window.EtoolsRequest ||
-      [EtoolsAjaxLogsBehavior, EtoolsAjaxDataBehavior, EtoolsEndpointsBehavior,
-        EtoolsAjaxCacheBehavior, defineEtoolsRequest()];
+      [EtoolsAjaxLogsBehavior, EtoolsAjaxDataBehavior, EtoolsAjaxCacheBehavior, defineEtoolsRequest()];
   })(window);
 </script>
