@@ -12,11 +12,11 @@
           },
           etoolsAjaxCacheDefaultTableName: {
             type: String,
-            value: 'ajaxDefaultDataCollection'
+            value: 'ajaxDefaultDataTable'
           },
-          etoolsAjaxCacheCollectionsMap: {
+          etoolsAjaxCacheListsExpireMapTable: {
             type: String,
-            value: 'collectionsMap'
+            value: 'listsExpireMapTable'
           }
         },
 
@@ -39,11 +39,11 @@
 
         /**
          * etoolsAjaxCacheDb should be instance of Dexie
-         * cacheTableName and collectionsMap table should be defined
+         * cacheTableName and listsExpireMapTable tables should be defined
          */
         cachingCanBeMade: function(cacheTableName) {
           return this.etoolsAjaxCacheDb instanceof Dexie &&
-            this.etoolsAjaxCacheDb[this.etoolsAjaxCacheCollectionsMap] &&
+            this.etoolsAjaxCacheDb[this.etoolsAjaxCacheListsExpireMapTable] &&
             this.etoolsAjaxCacheDb[cacheTableName];
         },
 
@@ -70,22 +70,22 @@
          * Cache date into specified dexie db table (reqConfig.endpoint.cacheTableName)
          */
         _cacheEndpointDataUsingSpecifiedTable: function(responseData, cachingInfo) {
-          var collectionsMapTable = this.etoolsAjaxCacheDb[this.etoolsAjaxCacheCollectionsMap];
+          var listsExpireMapTable = this.etoolsAjaxCacheDb[this.etoolsAjaxCacheListsExpireMapTable];
           var specifiedTable = this.etoolsAjaxCacheDb[cachingInfo.cacheTableName];
           var self = this;
-          return this.etoolsAjaxCacheDb.transaction('rw', collectionsMapTable, specifiedTable, function() {
+          return this.etoolsAjaxCacheDb.transaction('rw', listsExpireMapTable, specifiedTable, function() {
             if (responseData instanceof Array === false) {
               throw new Error('Response data should be array or objects to be ' +
                 'able to cache it into specified table.');
             }
             // make all add actions using transaction
-            // specifiedTable name and expire time for it must be added into collectionsMapTable
-            var collectionExpireDetails = {
+            // specifiedTable name and expire time for it must be added into listsExpireMapTable
+            var listExpireDetails = {
               name: cachingInfo.cacheTableName,
               expire: cachingInfo.exp + Date.now()
             };
-            // add collection expire mapping details
-            collectionsMapTable.put(collectionExpireDetails);
+            // add list expire mapping details
+            listsExpireMapTable.put(listExpireDetails);
             // save bulk data
             specifiedTable.bulkPut(responseData);
           }).then(function(result) {
