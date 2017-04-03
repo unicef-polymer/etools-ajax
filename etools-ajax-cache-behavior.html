@@ -77,7 +77,7 @@
             this.etoolsAjaxCacheDb[cacheTableName];
         },
 
-        _cacheToDefaultTable: function(cacheTableName) {
+        _shouldCacheToDefaultTable: function(cacheTableName) {
           return cacheTableName === this.etoolsAjaxCacheDefaultTableName;
         },
 
@@ -139,7 +139,7 @@
          * Cache endpoint received data
          */
         cacheEndpointData: function(responseData, cachingInfo) {
-          if (this._cacheToDefaultTable(cachingInfo.cacheTableName)) {
+          if (this._shouldCacheToDefaultTable(cachingInfo.cacheTableName)) {
             var dataToCache = {
               cacheKey: cachingInfo.cacheKey,
               data: responseData,
@@ -197,6 +197,7 @@
               if (result.length > 0) {
                 if (!self._isExpiredCachedData(result[0].expire)) {
                   // return table content as array
+                  console.log('returned from cache');
                   return specifiedTable.toArray();
                 }
               }
@@ -211,7 +212,7 @@
         },
 
         getEndpointDataFromCache: function(cachingInfo) {
-          if (this._cacheToDefaultTable(cachingInfo.cacheTableName)) {
+          if (this._shouldCacheToDefaultTable(cachingInfo.cacheTableName)) {
             // check for data cached into default table
             return this._getDataFromDefaultCacheTable(cachingInfo.cacheKey);
           } else {
