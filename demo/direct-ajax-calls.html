@@ -36,24 +36,89 @@
 
         ready: function() {
 
-//          this.etoolsAjaxCacheDb = etoolsCustomDexieDb;
           console.log(this.etoolsAjaxCacheDb);
 
           this._setCookie();
 
+          this.post_Json();
+          this.patch_WithJsonContent();
+         //this.get_WithNoCache();
+         //this.get_WithCacheToDefaultTable();
+         //this.get_WithCacheToSpecifiedTable();
+
+        },
+        post_Json: function() {
+           this.sendRequest({
+             method: 'POST',
+              endpoint: {
+                url: 'http://192.168.1.184/silex-test-app/web/index.php/handle-post-put-delete-data',
+              },
+              body:{
+                 id: "14",
+                 firstName: "JaneTEST",
+                 lastName: "DoeTest"
+              }
+            }).then(function(resp) {
+              console.log(resp);
+            }).catch(function(error) {
+              console.log(error);
+            });
+        },
+        patch_WithJsonContent: function(){
           this.sendRequest({
-//            method: 'POST',
-            endpoint: {
-              url: 'http://192.168.1.184/silex-test-app/web/index.php/countries-data', //'https://httpbin.org/get',
-              exp: 1*60*1000, // cache set for 5m
-              cachingKey: 'countries',
-              cacheTableName: 'countries'
-            }
-          }).then(function(resp) {
-            console.log(resp);
-          }).catch(function(error) {
-            console.log(error);
-          });
+             method: 'PATCH',
+              endpoint: {
+                url: 'http://192.168.1.184/silex-test-app/web/index.php/handle-post-put-delete-data',
+              },
+              body:{
+                 id: "14",
+                 firstName: "JaneTEST2"
+              }
+            }).then(function(resp) {
+              console.log(resp);
+            }).catch(function(error) {
+              console.log(error);
+            });
+        },
+
+        get_WithNoCache: function() {
+            this.sendRequest({
+              endpoint: {
+                url: 'http://192.168.1.184/silex-test-app/web/index.php/countries-data',
+              }
+            }).then(function(resp) {
+              console.log(resp);
+            }).catch(function(error) {
+              console.log(error);
+            });
+        },
+
+        get_WithCacheToDefaultTable: function() {
+          this.sendRequest({
+              endpoint: {
+                url: 'http://192.168.1.184/silex-test-app/web/index.php/countries-data',
+                exp: 5*60*1000, // cache set for 5m
+                cachingKey: 'countries',
+              }
+            }).then(function(resp) {
+              console.log(resp);
+            }).catch(function(error) {
+              console.log(error);
+            });
+        },
+
+        get_WithCacheToSpecifiedTable: function(){
+           this.sendRequest({
+              endpoint: {
+                url: 'http://192.168.1.184/silex-test-app/web/index.php/countries-data',
+                exp: 5*60*1000, // cache set for 5m
+                cacheTableName: 'countries'
+              }
+            }).then(function(resp) {
+              console.log(resp);
+            }).catch(function(error) {
+              console.log(error);
+            });
         },
 
         _setCookie: function() {
