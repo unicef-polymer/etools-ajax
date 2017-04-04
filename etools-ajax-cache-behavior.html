@@ -89,7 +89,6 @@
           return this.etoolsAjaxCacheDb[this.etoolsAjaxCacheDefaultTableName].put(dataToCache)
             .then(function(result) {
               // data added in dexie db in default table, return existing data
-              console.log('data cached into default table... yey');
               return dataToCache.data;
             }).catch(function(error) {
               // something happened and inserting data in dexie table failed;
@@ -124,7 +123,6 @@
           }).then(function(result) {
             // request response saved into specified table
             // transaction succeeded
-            console.log('transaction succedded...');
             return responseData;
           }).catch(function(error) {
             // transaction failed
@@ -147,11 +145,9 @@
             };
             // cache data into default dexie table
             // single object added into default dexie db table
-            console.log('data cached into default table started');
             return this._cacheEndpointDataUsingDefaultTable(dataToCache);
           } else {
             // cache data into specified dexie table, array of objects bulk added into a specified table
-            console.log('data cached into specified table started');
             return this._cacheEndpointDataUsingSpecifiedTable(responseData, cachingInfo);
           }
         },
@@ -193,11 +189,9 @@
           var self = this;
           return listsExpireMapTable.where('name').equals(cacheTableName).toArray()
             .then(function(result) {
-              console.log('result from expire map', result);
               if (result.length > 0) {
                 if (!self._isExpiredCachedData(result[0].expire)) {
                   // return table content as array
-                  console.log('returned from cache');
                   return specifiedTable.toArray();
                 }
               }

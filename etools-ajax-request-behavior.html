@@ -1,4 +1,5 @@
 <link rel="import" href="es6-obj-assign-polyfil.html">
+<link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-ajax/iron-request.html">
 <link rel="import" href="../etools-behaviors/etools-logs-behavior.html">
 <link rel="import" href="etools-ajax-data-behavior.html">
@@ -10,9 +11,9 @@
 
     function EtoolsRequestError(error, statusCode, statusText, response) {
       this.error = error,
-      this.status = statusCode,
-      this.statusText = statusText,
-      this.response = response
+        this.status = statusCode,
+        this.statusText = statusText,
+        this.response = response
     }
 
     function defineEtoolsRequest() {
@@ -40,17 +41,15 @@
          */
         sendRequest: function(reqConfig) {
           // prepare request config options
-          var preparedConfigOptions =  this._prepareConfigOptions(reqConfig);
+          var preparedConfigOptions = this._prepareConfigOptions(reqConfig);
           var reqConfigOptions = preparedConfigOptions.ironRequestOptions;
           var cachingInfo = preparedConfigOptions.cachingInfo;
-          // console.log(reqConfigOptions, cachingInfo);
 
           var self = this;
           if (this._isViableForCaching(cachingInfo)) {
             // we might have data cached; if cached data is available and not expired
             // return it without making the request
             return this.getEndpointDataFromCache(cachingInfo).then(function(response) {
-              console.log('cached data', response);
               if (!response) {
                 return self._doRequest(reqConfigOptions, cachingInfo, reqConfig.checkProgress);
               }
@@ -70,7 +69,6 @@
           var self = this;
           request.send(reqConfigOptions);
           return request.completes.then(function(request) {
-            console.log('have response...');
             var responseData = request.response;
 
             if (reqConfigOptions.handleAs === 'json' && typeof responseData === 'string') {
@@ -96,54 +94,54 @@
 
         _prepareConfigOptions: function(reqConfig) {
           return {
-                  ironRequestOptions : {
-                      url: this._getRequestUrl(reqConfig),
-                      method: reqConfig.method || 'GET',
-                      headers: this._getRequestHeaders(reqConfig),
-                      body: this._getRequestBody(reqConfig),
-                      async: !reqConfig.sync,
-                      handleAs: this._getHandleAs(reqConfig),
-                      jsonPrefix: reqConfig.jsonPrefix || '',
-                      withCredentials: !!reqConfig.withCredentials,
-                      timeout: reqConfig.timeout || 0
-                   },
-                   cachingInfo : this.getCachingInfo(reqConfig)
-                 };
+            ironRequestOptions: {
+              url: this._getRequestUrl(reqConfig),
+              method: reqConfig.method || 'GET',
+              headers: this._getRequestHeaders(reqConfig),
+              body: this._getRequestBody(reqConfig),
+              async: !reqConfig.sync,
+              handleAs: this._getHandleAs(reqConfig),
+              jsonPrefix: reqConfig.jsonPrefix || '',
+              withCredentials: !!reqConfig.withCredentials,
+              timeout: reqConfig.timeout || 0
+            },
+            cachingInfo: this.getCachingInfo(reqConfig)
+          };
         },
 
         _getHandleAs: function(reqConfig) {
-          var handleAs =  reqConfig.handleAs || 'json';
-          if(reqConfig.downloadCsv)
+          var handleAs = reqConfig.handleAs || 'json';
+          if (reqConfig.downloadCsv)
             handleAs = 'blob';
           return handleAs;
         },
 
-        _getRequestUrl: function(reqConfig){
+        _getRequestUrl: function(reqConfig) {
           var url = '';
-          if(reqConfig.endpoint && reqConfig.endpoint.url) {
-             url = reqConfig.endpoint.url;
-             url += this._buildQueryString(url, reqConfig.params);
+          if (reqConfig.endpoint && reqConfig.endpoint.url) {
+            url = reqConfig.endpoint.url;
+            url += this._buildQueryString(url, reqConfig.params);
           }
           return url;
         },
 
         _buildQueryString: function(url, params) {
-           var queryStr ='';
-           if (!params || !this._isNonEmptyObject(params)) {
-             return '';
-           }
-           if (url.indexOf("?") < 0) {
-              queryStr = '?';
-            } else {
-              queryStr = '&';
-            }
-           for (var key in params) {
-             queryStr += key + '=' + params[key] +'&';
-           };
+          var queryStr = '';
+          if (!params || !this._isNonEmptyObject(params)) {
+            return '';
+          }
+          if (url.indexOf("?") < 0) {
+            queryStr = '?';
+          } else {
+            queryStr = '&';
+          }
+          for (var key in params) {
+            queryStr += key + '=' + params[key] + '&';
+          }
 
-           queryStr = queryStr.substring(0, queryStr.length - 1);//remove trailing &
-
-           return queryStr;
+          //remove trailing &
+          queryStr = queryStr.substring(0, queryStr.length - 1);
+          return queryStr;
         },
 
         _getRequestBody: function(reqConfig) {
@@ -157,28 +155,34 @@
         _getRequestHeaders: function(reqConfig) {
           var headers = {};
 
-          headers['content-type'] = this._determineContentType(reqConfig.body);
+          headers['content-type'] = this._determineContentType(reqConfig.body, reqConfig.multiPart);
 
           if (reqConfig.downloadCsv) {
-            headers['Accept'] ='text/csv';
-            headers['Content-Type'] = 'text';
+            headers['accept'] = 'text/csv';
+            headers['content-type'] = 'text';
           }
 
           var clientConfiguredHeaders = this._getClientConfiguredHeaders(reqConfig.headers);
           var csrfHeaders = {};
           if (!this._csrfSafeMethod(reqConfig.method)) {
-            csrfHeaders = this._getCsrfHeader(reqConfig.csrfCheck)
+            csrfHeaders = this._getCsrfHeader(reqConfig.csrfCheck);
           }
           headers = Object.assign({}, headers, clientConfiguredHeaders, csrfHeaders);
+
+          if (reqConfig.multiPart) {
+            // content type will be automatically set in this case
+            delete headers['content-type'];
+          }
+
           return headers;
         },
 
-        _getClientConfiguredHeaders: function(aditionalHeaders) {
+        _getClientConfiguredHeaders: function(additionalHeaders) {
           var header;
           var clientHeaders = {};
-          if (aditionalHeaders && aditionalHeaders instanceof Object) {
-            for (header in aditionalHeaders) {
-              clientHeaders[header] = aditionalHeaders[header].toString();
+          if (additionalHeaders && additionalHeaders instanceof Object) {
+            for (header in additionalHeaders) {
+              clientHeaders[header] = additionalHeaders[header].toString();
             }
           }
           return clientHeaders;
@@ -191,18 +195,17 @@
 
             if (csrfToken) {
               csrfHeaders['x-csrftoken'] = csrfToken;
-              this._log('log', 'CSRF ' + this.csrfCheck + ', token: ' + csrfToken + ' ', this.method, this.url, this.body);
             }
           }
           return csrfHeaders;
         },
 
-        _csrfSafeMethod: function (method) {
+        _csrfSafeMethod: function(method) {
           // these HTTP methods do not require CSRF protection
           return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
         },
 
-        _getCSRFCookie: function () {
+        _getCSRFCookie: function() {
           // check for a csrftoken cookie and return its value
           var csrfCookieName = 'csrftoken';
           var csrfToken = null;
@@ -227,8 +230,8 @@
         _determineContentType: function(body) {
           var contentType = 'application/json';
 
-          if(typeof body === 'string') {
-             contentType = 'application/x-www-form-urlencoded';
+          if (typeof body === 'string') {
+            contentType = 'application/x-www-form-urlencoded';
           }
 
           return contentType;
@@ -257,8 +260,8 @@
       return etoolsRequest;
     }
 
-    /** @polymerBehavior EtoolsRequest */
-    window.EtoolsRequest = window.EtoolsRequest ||
+    /** @polymerBehavior EtoolsAjaxRequestBehavior */
+    window.EtoolsAjaxRequestBehavior = window.EtoolsAjaxRequestBehavior ||
       [EtoolsLogsBehavior, EtoolsAjaxDataBehavior, EtoolsAjaxCacheBehavior, defineEtoolsRequest()];
   })(window);
 </script>

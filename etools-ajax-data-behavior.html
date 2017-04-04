@@ -6,13 +6,16 @@
       var etoolsAjaxDataBehavior = {
 
         _prepareMultiPartFormData: function(inputBody, prepareMultipartData) {
+          if (inputBody instanceof FormData) {
+            return inputBody; // body is already a FromData object
+          }
           var formBody = new FormData();
           var keys = Object.keys(inputBody);
 
           var self = this;
           keys.forEach(function(key) {
             if (prepareMultipartData) {
-              formBody = self._prepareFormData(self, body, inputBody[key], key);
+              formBody = self._prepareFormData(self, formBody, inputBody[key], key);
             } else {
               formBody.append(key, inputBody[key]);
             }
