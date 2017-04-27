@@ -441,7 +441,7 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
               logMsg += ') for ';
               this._log('log', logMsg, this.method, newEndpoint.url, this.params);
             }
-            this.fire('success', rsp.detail, {bubbles: false});
+            this.fire('success', rsp.detail);
           } else {
             // If expired shoot a new request
             this._log('log', 'Fire new request to get data from ' + newEndpoint.url);
@@ -691,7 +691,7 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           }
         },
         _fireHandleResponseSuccess: function(data) {
-          this.fire('success', data, {bubbles: false});
+          this.fire('success', data);
           this._stopLoading();
         },
 
@@ -700,12 +700,12 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           this._stopLoading();
 
           if (error.request.status === 401) {
-            this.fire('unauthorized', {error: error}, {bubbles: false});
+            this.fire('unauthorized', {error: error});
             return;
           }
 
           if (error.request.status === 403) {
-            this.fire('forbidden', {error: error}, {bubbles: false});
+            this.fire('forbidden', {error: error});
             return;
           }
           this._log('error', error.error + ' while loading ' + event.srcElement.url);
@@ -713,7 +713,7 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           this.fire('fail', {
             request: event,
             error: error.error
-          }, {bubbles: false});
+          });
         },
         _sendUnsafeRequest: function () {
           if (this.body === null || typeof this.body === 'undefined') {
