@@ -24,7 +24,7 @@
         },
 
         _requestIsViableForCaching: function(reqConfig) {
-          return (reqConfig.method || 'GET') === 'GET' &&  this._expireTimeWasProvided(reqConfig.endpoint)
+          return (reqConfig.method || 'GET') === 'GET' && this._expireTimeWasProvided(reqConfig.endpoint);
         },
 
         _expireTimeWasProvided: function(endpoint) {
@@ -56,7 +56,7 @@
         getCachingInfo: function(reqConfig) {
           if (this._requestIsViableForCaching(reqConfig)) {
             return {
-              requestIsViableForCaching : true,
+              requestIsViableForCaching: true,
               url: reqConfig.endpoint.url,
               exp: parseInt(reqConfig.endpoint.exp, 10), // ensure this value is integer
               cacheKey: this._getEndpointCacheKey(reqConfig.endpoint, reqConfig.params),
@@ -72,7 +72,7 @@
          * cacheTableName and listsExpireMapTable tables should be defined
          */
         cachingCanBeMade: function(cacheTableName) {
-          return this.etoolsAjaxCacheDb instanceof Dexie &&
+          return this.etoolsAjaxCacheDb instanceof Dexie && // eslint-disable-line
             this.etoolsAjaxCacheDb[this.etoolsAjaxCacheListsExpireMapTable] &&
             this.etoolsAjaxCacheDb[cacheTableName];
         },
@@ -221,6 +221,6 @@
 
     /** @polymerBehavior EtoolsAjaxCacheBehavior */
     window.EtoolsAjaxCacheBehavior = window.EtoolsAjaxCacheBehavior ||
-      [EtoolsLogsBehavior, defineEtoolsAjaxCacheBehavior()];
+      [EtoolsLogsBehavior, defineEtoolsAjaxCacheBehavior()]; // eslint-disable-line
   })(window);
 </script>

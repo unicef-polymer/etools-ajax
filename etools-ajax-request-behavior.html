@@ -13,7 +13,7 @@
       this.error = error,
         this.status = statusCode,
         this.statusText = statusText,
-        this.response = response
+        this.response = response;
     }
 
     function defineEtoolsRequest() {
@@ -130,7 +130,7 @@
           if (!params || !this._isNonEmptyObject(params)) {
             return '';
           }
-          if (url.indexOf("?") < 0) {
+          if (url.indexOf('?') < 0) {
             queryStr = '?';
           } else {
             queryStr = '&';
@@ -139,7 +139,7 @@
             queryStr += key + '=' + params[key] + '&';
           }
 
-          //remove trailing &
+          // remove trailing &
           queryStr = queryStr.substring(0, queryStr.length - 1);
           return queryStr;
         },
@@ -262,6 +262,6 @@
 
     /** @polymerBehavior EtoolsAjaxRequestBehavior */
     window.EtoolsAjaxRequestBehavior = window.EtoolsAjaxRequestBehavior ||
-      [EtoolsLogsBehavior, EtoolsAjaxDataBehavior, EtoolsAjaxCacheBehavior, defineEtoolsRequest()];
+      [EtoolsLogsBehavior, EtoolsAjaxDataBehavior, EtoolsAjaxCacheBehavior, defineEtoolsRequest()]; // eslint-disable-line
   })(window);
 </script>

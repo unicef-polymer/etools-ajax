@@ -95,7 +95,7 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
   </template>
 
   <script>
-    (function () {
+    (function() {
       'use strict';
 
       Polymer({
@@ -103,7 +103,7 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
         properties: {
           auth: {
             type: Object,
-            value: function () {
+            value: function() {
               return null;
             }
           },
@@ -199,14 +199,16 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
            */
 
           var prefix = '';
-          if (typeof etoolsAjaxDefaultDexieDbPrefix !== 'undefined' && etoolsAjaxDefaultDexieDbPrefix !== '') {
-            prefix = etoolsAjaxDefaultDexieDbPrefix + '_';
+          if (typeof etoolsAjaxDefaultDexieDbPrefix !== 'undefined'
+               && etoolsAjaxDefaultDexieDbPrefix !== '') { // eslint-disable-line
+            prefix = etoolsAjaxDefaultDexieDbPrefix + '_'; // eslint-disable-line
           }
           this.etoolsAjaxCacheDb = prefix + 'etoolsAjaxCacheDb';
 
           if (this.cachingStorage === 'custom') {
-            if (typeof etoolsCustomDexieDb !== 'undefined' && etoolsCustomDexieDb instanceof Dexie) {
-              this.alternateDexieDb = etoolsCustomDexieDb;
+            if (typeof etoolsCustomDexieDb !== 'undefined' // eslint-disable-line
+                && etoolsCustomDexieDb instanceof Dexie) { // eslint-disable-line
+              this.alternateDexieDb = etoolsCustomDexieDb; // eslint-disable-line
             } else {
               this._log('error',
                 'cachingStorage set to "custom" but etoolsCustomDexieDb is undefined or not instance of Dexie',
@@ -218,7 +220,6 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
         _log: function(type, message, method, url, params, forceDisplay, aditionalData) {
           var logMsg = '[etools-ajax] ';
           if (this.logs || forceDisplay) {
-            var logMsg = '[etools-ajax] ';
             if (message) {
               logMsg += message;
             }
@@ -226,26 +227,26 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
               logMsg += method + ' ' + url + ' , params: ' + JSON.stringify(params);
             }
             if (type === 'error') {
-              console.error(logMsg);
+              console.error(logMsg); // eslint-disable-line
             } else {
-              console.log(logMsg);
+              console.log(logMsg); // eslint-disable-line
             }
           }
           if (type === 'warn') {
-            console.warn(logMsg + ' ' + message, aditionalData);
+            console.warn(logMsg + ' ' + message, aditionalData); // eslint-disable-line
           }
         },
-        _startLoading: function () {
+        _startLoading: function() {
           this.loading = true;
         },
-        _stopLoading: function () {
+        _stopLoading: function() {
           this.loading = false;
         },
-        _csrfSafeMethod: function (method) {
+        _csrfSafeMethod: function(method) {
           // these HTTP methods do not require CSRF protection
           return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
         },
-        _getCSRFCookie: function () {
+        _getCSRFCookie: function() {
           // check for a csrftoken cookie and return its value
           var csrfCookieName = 'csrftoken';
           var csrfToken = null;
@@ -384,15 +385,15 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           self.$.customAjax.headers['Content-Type'] = 'text';
           self.$.customAjax.handleAs = 'blob';
         },
-        _prepareRequest: function (newUrl) {
+        _prepareRequest: function(newUrl) {
           if (typeof newUrl === 'undefined' || newUrl === null || newUrl === '') {
             return;
           }
           // add debounce
           if (this.debounceTime > 0) {
-            this.debounce('prepareAndFireRequest', function () {
+            this.debounce('prepareAndFireRequest', function() {
               this._setRequestDataAndFire(newUrl);
-            }, this.debounceTime);
+            }.bind(this), this.debounceTime);
           } else {
             this._setRequestDataAndFire(newUrl);
           }
@@ -426,7 +427,8 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
               if (this._useCustomDexieDb()) {
                 logMsg += 'custom DexieDb, collection: ' + this.dexieDbCollection;
               } else {
-                logMsg += (this.cachingStorage === 'custom' ? 'localstorage' : this.cachingStorage) + ', key: ' + (cacheKey);
+                logMsg += this.cachingStorage === 'custom' ? 'localstorage' : this.cachingStorage;
+                logMsg += ', key: ' + (cacheKey);
               }
               logMsg += ') for ';
               this._log('log', logMsg, this.method, newEndpoint.url, this.params);
@@ -438,7 +440,7 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
             this.url = newEndpoint.url;
           }
         },
-        _endpointChanged: function (newEndpoint) {
+        _endpointChanged: function(newEndpoint) {
           if (!this._validateEndpointObject(newEndpoint)) {
             return;
           }
@@ -465,9 +467,9 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
         },
         _cacheEndpointData: function() {
           // check if the request data should be cached
-          if (this.method === 'GET' && this.url !== null
-            && this._validateEndpointObject(this.endpoint, false)
-            && this.url === this.endpoint.url) {
+          if (this.method === 'GET' && this.url !== null &&
+               this._validateEndpointObject(this.endpoint, false) &&
+               this.url === this.endpoint.url) {
             if (this.endpoint.hasOwnProperty('exp') && this.endpoint.exp > 0) {
               return true;
             }
@@ -478,11 +480,14 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           return cacheStorage === 'dexie';
         },
         _useCustomDexieDb: function() {
-          if (this.alternateDexieDb instanceof Dexie && this.dexieDbCollection !== "" && this.alternateDexieDb[this.dexieDbCollection]) {
+          if (this.alternateDexieDb instanceof Dexie && // eslint-disable-line
+              this.dexieDbCollection !== '' &&
+              this.alternateDexieDb[this.dexieDbCollection]) {
             if (this.alternateDexieDb.collectionsList) {
               return true;
             } else {
-              this._log('error', 'Invalid dexie version store for provided db. Missing "collectionsList : \"&name,expire\""');
+              this._log('error',
+                'Invalid dexie version store for provided db. Missing "collectionsList : \"&name,expire\""');
             }
           }
           return false;
@@ -494,11 +499,11 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           this.async(function() {
             this.ajaxCacheDb = this.$$('#etoolsAjaxCacheDb').getDb();
             this.ajaxCacheDb.version(1).stores({
-              ajaxCachedData: "cacheKey,data,expire"
+              ajaxCachedData: 'cacheKey,data,expire'
             });
             this.ajaxCacheDb.open().catch(function(err) {
               this._log('error', 'Failed to open db: ' + (err.stack || err), null, null, null, true);
-            });
+            }.bind(this));
             // clean expired data
             this._cleanDexieExpiredData();
 
@@ -506,7 +511,6 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
               this._getDexieData(this.getDexieCacheKey, this.endpoint);
               this.getDexieCacheKey = null;
             }
-
           }.bind(this));
         },
         _cleanDexieExpiredData: function() {
@@ -529,31 +533,31 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
                 rsp = {
                   detail: result[0].data,
                   exp: result[0].expire
-                }
+                };
               }
               this._checkEndpointCachedData(rsp, key, endpoint);
             }.bind(this)).catch(function(err) {
               this._log('warn', 'Failed to get data from etools-ajax dexie db.', null, null, null, false, err);
-              this._checkEndpointCachedData(null, cacheKey, newEndpoint);
+              this._checkEndpointCachedData(null, key, endpoint);
             }.bind(this));
-
           } else {
             this.getDexieCacheKey = key;
           }
-
         },
         _getDexieDataFromCustomDb: function(cacheKey, newEndpoint) {
-          this.alternateDexieDb.collectionsList.where('name').equals(this.dexieDbCollection).toArray().then(function(result) {
+          var collectionsList = this.alternateDexieDb.collectionsList;
+          collectionsList.where('name').equals(this.dexieDbCollection).toArray().then(function(result) {
             if (result.length > 0) {
               // collection already exists, get it's data
               this.alternateDexieDb[this.dexieDbCollection].toArray().then(function(collectionData) {
                 var rsp = {
                   detail: collectionData,
                   exp: result[0].expire
-                }
+                };
                 this._checkEndpointCachedData(rsp, cacheKey, newEndpoint);
               }.bind(this)).catch(function(err) {
-                this._log('warn', 'Failed to get data from etools-ajax custom dexie db.', null, null, null, false, err);
+                this._log('warn',
+                  'Failed to get data from etools-ajax custom dexie db.', null, null, null, false, err);
                 this._checkEndpointCachedData(null, cacheKey, newEndpoint);
               }.bind(this));
             } else {
@@ -585,8 +589,8 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
             if (this._enableDexie(this.cachingStorage) && !this._useCustomDexieDb()) {
               // dexiejs database storage based on IndexedDB
               if (this.ajaxCacheDb) {
-                this.ajaxCacheDb.ajaxCachedData.where('cacheKey').equals(cacheKey).delete().then(function(result) {
-
+                this.ajaxCacheDb.ajaxCachedData.where('cacheKey').equals(cacheKey).delete()
+                .then(function(result) {
                   this.ajaxCacheDb.ajaxCachedData.add({cacheKey: cacheKey, data: requestData.detail,
                     expire: requestData.exp}).then(function(result) {
                     // data added in dexie db, fire success
@@ -595,14 +599,13 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
                     this._log('warn', 'Failed to add data in etools-ajax dexie db.', null, null, null, false, err);
                     this._fireHandleResponseSuccess(requestData.detail);
                   }.bind(this));
-
                 }.bind(this)).catch(function(err) {
                   this._log('warn', 'Failed to delete data from etools-ajax dexie db.', null, null, null, false, err);
                   this._fireHandleResponseSuccess(requestData.detail);
                 }.bind(this));
               } else {
                 // etools-ajax dexie db not found => return request data without caching
-                this._log('warn', 'No etools-ajax dexie db found.', null, null, null, false, err);
+                this._log('warn', 'No etools-ajax dexie db found.');
                 this._fireHandleResponseSuccess(requestData.detail);
               }
             } else if (this._useCustomDexieDb()) {
@@ -617,7 +620,6 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
                   expire: requestData.exp}).then(function() {
                   // clear old data and add new data to collection
                   this.alternateDexieDb[this.dexieDbCollection].clear().then(function() {
-
                     this.alternateDexieDb[this.dexieDbCollection].bulkAdd(requestData.detail).then(function() {
                       // bulkAdd completed, fire success
                       this._fireHandleResponseSuccess(requestData.detail);
@@ -626,13 +628,11 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
                           null, null, null, false, err);
                       this._fireHandleResponseSuccess(requestData.detail);
                     }.bind(this));
-
                   }.bind(this)).catch(function(err) {
                     this._log('warn', 'Failed to clear ' + this.dexieDbCollection + ' collection.',
                         null, null, null, false, err);
                     this._fireHandleResponseSuccess(requestData.detail);
                   }.bind(this));
-
                 }.bind(this)).catch(function(err) {
                   this._log('warn', 'Failed to update etools-ajax collectionsList(collections expire list).',
                       null, null, null, false, err);
@@ -658,7 +658,7 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           this._stopLoading();
         },
 
-        handleError: function (event, error) {
+        handleError: function(event, error) {
           event.stopImmediatePropagation();
           this._stopLoading();
 
@@ -678,7 +678,7 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
             error: error.error
           }, {bubbles: false});
         },
-        _sendUnsafeRequest: function () {
+        _sendUnsafeRequest: function() {
           if (this.body === null || typeof this.body === 'undefined') {
             return;
           }
