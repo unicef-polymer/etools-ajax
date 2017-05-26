@@ -20,6 +20,7 @@
     "guard-for-in": 0,
     "comma-dangle": 0,
     "prefer-spread": 0,
+    "linebreak-style": 0,
     "require-jsdoc": "off",
     "max-len": ["error", 120, 4]
   },

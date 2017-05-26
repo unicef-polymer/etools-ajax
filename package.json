@@ -6,7 +6,7 @@
     "eslint-plugin-html": "^2.0.0"
   },
   "scripts": {
-    "lint": "npm run lint:javascript; exit 0",
-    "lint:javascript": "eslint . --ext js,html; exit 0"
+    "lint": "npm run lint:javascript && exit 0",
+    "lint:javascript": "eslint . --ext js,html && exit 0"
   }
 }
