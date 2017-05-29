@@ -1,10 +1,10 @@
 # Etools Ajax Request Behavior
 
-Polymer Behavior for handling ajax requests in any Polymer element. 
+Polymer Behavior for handling ajax requests in any Polymer element.
 For GET requests it can cache the data using Dexie db.
 
 For `<etools-ajax>` element check documentation
-[here](https://github.com/unicef-polymer/etools-ajax/blob/master/README_ETOOLS_AJAX_V1.md). 
+[here](https://github.com/unicef-polymer/etools-ajax/blob/master/README_ETOOLS_AJAX_V1.md).
 In the future it might be removed from etools ajax version 2.
 
 ### Data caching requirements
@@ -23,7 +23,7 @@ set it on `window.EtoolsRequestCacheDb` global variable. EtoolsAjaxRequestBehavi
   // configure app dexie db to be used for caching by EtoolsAjaxRequestBehavior.
   window.EtoolsRequestCacheDb = etoolsCustomDexieDb;
 ```
-Only `GET` requests response data can be cached. 
+Only `GET` requests response data can be cached.
 For example, if your endpoint object looks like this:
 ```javascript
 var endpoint = {
@@ -32,7 +32,7 @@ var endpoint = {
   cachingKey: 'dataSetIdentifierString'
 };
 ```
-then when the request response is received it will be cached into dexie db, default table: `ajaxDefaultDataTable` 
+then when the request response is received it will be cached into dexie db, default table: `ajaxDefaultDataTable`
 as an object like this:
 ```javascript
 {
@@ -45,10 +45,10 @@ as an object like this:
 }
 ```
 
-Next time this request will be made, the data from cache will be returned if it did not expired. If cached data is 
+Next time this request will be made, the data from cache will be returned if it did not expired. If cached data is
 expired or not found a new request will be sent.
 
-To cache a list of objects (returned by request) in a specified table from Dexie db that you need later to make 
+To cache a list of objects (returned by request) in a specified table from Dexie db that you need later to make
 queries on it you have to use an endpoint like this:
 
 ```javascript
@@ -59,12 +59,12 @@ var endpoint = {
 };
 ```
 
-In this case `countries` table should be defined in Dexie db schema. The request response objects will be saved in 
-this Dexie table. On next same request the data from this table will be returned if is not expired. 
+In this case `countries` table should be defined in Dexie db schema. The request response objects will be saved in
+this Dexie table. On next same request the data from this table will be returned if is not expired.
 In case data from this table(`countries` in our case) is expired a new request will be fired.
 
-`cacheTableName` should be used only if you want to use Dexie functionality for making queries, 
-like showing a list with pagination and filtering only on frontend side. 
+`cacheTableName` should be used only if you want to use Dexie functionality for making queries,
+like showing a list with pagination and filtering only on frontend side.
 
 For more info about Dexie.js databases check the [documentation](http://dexie.org/).
 
@@ -96,23 +96,23 @@ Polymer({
 #### `sendRequest` options:
 An object that must have this properties
 * `method` - any HTTP method, defaults to 'GET' if is not defined
-* `endpoint` - an object that must contain the `url` property. For caching this object can 
-have `exp`(time to cache data in milliseconds), `cachingKey`(any string) or `cacheTableName`(the Dexie table name, 
+* `endpoint` - an object that must contain the `url` property. For caching this object can
+have `exp`(time to cache data in milliseconds), `cachingKey`(any string) or `cacheTableName`(the Dexie table name,
 where you can store a list of objects from server response);
 * `params` - request params, will be used to build url query string
 * `body` - request body for POST | PUT | PATCH | DELETE methods
 * `csrfCheck` - if `true` then `x-csrftoken` header will be set with value of `csrftoken` cookie
 * `headers` - object of additional headers that can be set on request
 * `multiPart` - if `true` it will take the `body` and convert it in `FormData`
-* `prepareMultipartData` - used by etools apps to convert request complex json `body` to `FromData` and prefix objects 
+* `prepareMultipartData` - used by etools apps to convert request complex json `body` to `FromData` and prefix objects
 properties with `_obj`
-* `checkProgress` - experimental flag to have ajax request progress (progress available data stored in `reqProgress` 
-property) 
+* `checkProgress` - experimental flag to have ajax request progress (progress available data stored in `reqProgress`
+property)
 
 #### Ajax response handling:
 
 `sendRequest` will return a `Promise`:
-- if request succeeded it will contain response data 
+- if request succeeded it will contain response data
 - in case of error it will contain an object like this with this properties:
 `error`, `statusCode`, `statusText`, `response`
 
@@ -125,13 +125,29 @@ $ bower install --save etools-ajax
 Install needed dependencies by running: `$ bower install`.
 Make sure you have the [Polymer CLI](https://www.npmjs.com/package/polymer-cli) installed. Then run `$ polymer serve` to serve your element application locally.
 
+## Linting the code
+
+Innstall local npm packages (run `npm install`)
+Then just run the linting task
+
+```bash
+$ npm run lint
+```
+You should also use polylint. If you don't have Polylint installed run `npm install -g polylint`.
+Then just run the linter on each file you wish to check like so
+
+```bash
+$ polylint -i filename.html
+```
+At the moment polylint crashes if it encounters a missing import. If that happens, temporarily comment out such imports and run the command again.
+
 ## Running Tests
 
 You need to have `web-component-tester` installed (if not run `npm install -g web-component-tester`)
 ```bash
 $ wct
 ```
-or 
+or
 ```bash
 $ wct -p
 ```
