@@ -19,6 +19,8 @@ each property of this object will become a header with it's corresponding value
 
 * dexieDbCollection - String, default '', a valid alternateDexieDb collection name
 
+* renewDataOnExpiry - Boolean, default: false - If true, data is automatically renewed on expiry. Only works if endpoint is used and the endpoint has the exp property defined
+
 * endpoint - Object, default: null
 
 * downloadCsv - Boolean, default: false - if true then the ajax response data will be downloaded as CSV file

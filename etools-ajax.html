@@ -186,6 +186,14 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           customMultipartData: {
             type: Boolean,
             value: false
+          },
+          renewDataOnExpiry: {
+            type: Boolean,
+            value: false
+          },
+          _refreshInterval: {
+            type: Object,
+            value: null
           }
         },
 
@@ -216,7 +224,9 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
             }
           }
         },
-
+        detached: function() {
+          this._removeAutomaticDataRefreshLoop();
+        },
         _log: function(type, message, method, url, params, forceDisplay, aditionalData) {
           var logMsg = '[etools-ajax] ';
           if (this.logs || forceDisplay) {
@@ -460,10 +470,34 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
               var rsp = JSON.parse(window.localStorage.getItem(cacheKey) || null);
               this._checkEndpointCachedData(rsp, cacheKey, newEndpoint);
             }
+
+            this._removeAutomaticDataRefreshLoop();
+            this._setAutomaticDataRefreshLoop();
           } else {
             // no caching set, fire a new request
             this.url = newEndpoint.url;
           }
+        },
+        _removeAutomaticDataRefreshLoop: function() {
+          if(this._refreshInterval !== null) {
+            clearInterval(this._refreshInterval);
+            this.set('_refreshInterval', null);
+          }
+        },
+        _setAutomaticDataRefreshLoop: function() {
+          if (!this.renewDataOnExpiry) {
+            return;
+          }
+          if (!this.endpoint || !this.endpoint.exp) {
+            return;
+          }
+
+          var refreshInterval = setInterval(function() {
+            this.set('url', null);
+            this.set('url', this.endpoint.url);
+          }.bind(this), this.endpoint.exp);
+
+          this.set('_refreshInterval', refreshInterval);
         },
         _cacheEndpointData: function() {
           // check if the request data should be cached
@@ -574,7 +608,11 @@ If you do not want to use etools-ajax default dexie db you can provide your own 
           var data = event.detail.xhr.response;
 
           if (typeof data === 'string') {
-            data = JSON.parse(data);
+            if(data.length) {
+              data = JSON.parse(data);
+            } else {
+              data = null;
+            }
           }
 
           if (this._cacheEndpointData()) {
