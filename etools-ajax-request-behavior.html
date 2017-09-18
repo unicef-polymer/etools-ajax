@@ -262,6 +262,6 @@
 
     /** @polymerBehavior EtoolsAjaxRequestBehavior */
     window.EtoolsAjaxRequestBehavior = window.EtoolsAjaxRequestBehavior ||
-      [EtoolsLogsBehavior, EtoolsAjaxDataBehavior, EtoolsAjaxCacheBehavior, defineEtoolsRequest()]; // eslint-disable-line
+      [EtoolsLogsBehavior, EtoolsAjaxDataBehavior, EtoolsAjaxCacheBehavior, defineEtoolsRequest()] || {};
   })(window);
 </script>
