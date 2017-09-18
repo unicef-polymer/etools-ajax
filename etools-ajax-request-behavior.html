@@ -262,6 +262,7 @@
 
     /** @polymerBehavior EtoolsAjaxRequestBehavior */
     window.EtoolsAjaxRequestBehavior = window.EtoolsAjaxRequestBehavior ||
-      [EtoolsLogsBehavior, EtoolsAjaxDataBehavior, EtoolsAjaxCacheBehavior, defineEtoolsRequest()]; // eslint-disable-line
+      [EtoolsLogsBehavior, EtoolsAjaxDataBehavior, EtoolsAjaxCacheBehavior, defineEtoolsRequest()] || {};
+      // the || {} at the end is there to make the linter happy
   })(window);
 </script>
