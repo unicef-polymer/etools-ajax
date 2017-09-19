@@ -34,8 +34,11 @@
 
         _optionsChanged: function(options) {
           this.debounce('etools-ajax-options-changed', function() {
+            if (!this.options.endpoint && !this.options.url) {
+              return;
+            }
             this.send();
-          }.bind(this), 300)
+          }.bind(this), 50)
         },
 
         handleError: function (error) {
