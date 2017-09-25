@@ -14,6 +14,18 @@
       this.status = statusCode;
       this.statusText = statusText;
       this.response = response;
+      if (_isObjDisguisedAsString(this.response)) {
+        try {
+           this.response = JSON.parse(this.response);
+        } catch(e){
+
+        }
+      }
+    }
+
+    function _isObjDisguisedAsString(response) {
+      return (typeof response === 'string' && response.indexOf('{') > -1
+        && response.indexOf('}') > -1 && response.indexOf(':') > -1);
     }
 
     function defineEtoolsRequest() {
@@ -71,7 +83,7 @@
           return request.completes.then(function(request) {
             var responseData = request.response;
 
-            if (reqConfigOptions.handleAs === 'json' && typeof responseData === 'string') {
+            if (reqConfigOptions.handleAs === 'json' && _isObjDisguisedAsString(responseData)) {
               responseData = JSON.parse(responseData);
             }
 
