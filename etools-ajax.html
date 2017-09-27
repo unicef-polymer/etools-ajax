@@ -23,13 +23,13 @@
           var opt = options || this.options;
 
           return this.sendRequest(opt)
-          .then(function(data){
-            this.fire('success', data);
-            return data;
-          }.bind(this))
-          .catch(function (error) {
-            this.handleError(error);
-          }.bind(this));
+              .then(function(data) {
+                this.fire('success', data);
+                return data;
+              }.bind(this))
+              .catch(function(error) {
+                this.handleError(error);
+              }.bind(this));
         },
 
         _optionsChanged: function(options) {
@@ -41,7 +41,7 @@
           }.bind(this), 50)
         },
 
-        handleError: function (error) {
+        handleError: function(error) {
           if (error.status === 401) {
             this.fire('unauthorized', {error: error});
             return;
