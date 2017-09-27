@@ -13,7 +13,15 @@
       this.error = error;
       this.status = statusCode;
       this.statusText = statusText;
-      this.response = response;
+      this.response = _prepareResponse(response);
+    }
+
+    function _prepareResponse(response) {
+      try {
+         return JSON.parse(response);
+      } catch (e) {
+         return response;
+      }
     }
 
     function defineEtoolsRequest() {
@@ -72,7 +80,7 @@
             var responseData = request.response;
 
             if (reqConfigOptions.handleAs === 'json' && typeof responseData === 'string') {
-              responseData = JSON.parse(responseData);
+              responseData = _prepareResponse(responseData);
             }
 
             if (self._isViableForCaching(cachingInfo)) {
