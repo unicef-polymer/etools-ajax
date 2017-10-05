@@ -1,229 +1,118 @@
-# \<etools-ajax\>
+# Etools Ajax Request Behavior
 
-Polymer element for handling ajax requests.
+Polymer Behavior for handling ajax requests in any Polymer element.
+For GET requests it can cache the data using Dexie db.
 
-### Element properties
+The `<etools-ajax>` is a complete new element based on the `EtoolsAjaxRequestBehavior`.
 
-* alternateDexieDb - Object, default null, it should be a valid dexie db instance
+### Data caching requirements
 
-* auth - Object, default: null - useful to set request authorization data;
-each property of this object will become a header with it's corresponding value
-
-* body - Object, default: null - used for unsafe request payload data (POST, PUT, DELETE)
-
-* cachingStorage - String, default: 'localstorage' - set caching storage type: localstorage, dexie, custom
-
-* csrfCheck - String, default: 'enabled' - if set to 'disabled' will remove x-csrftoken header from request
-
-* debounceTime - Number, default: 300 (milliseconds); if is set to 0, debounce is disabled
-
-* dexieDbCollection - String, default '', a valid alternateDexieDb collection name
-
-* renewDataOnExpiry - Boolean, default: false - If true, data is automatically renewed on expiry. Only works
-if endpoint is used and the endpoint has the exp property defined
-
-* endpoint - Object, default: null
-
-* downloadCsv - Boolean, default: false - if true then the ajax response data will be downloaded as CSV file
-
-* handleAs - String, default: json
-
-* loading - Boolean, default: false - notifies if request is in progress
-
-* logs - Boolean, default: false
-
-* method - String, default: GET
-
-* params - Object, default: null
-
-* url - String, default: null
-
-* withCredentials - Boolean, default: false - set the withCredentials flag on the request.
-
-### Usage
-
-You can chose to use directly the URL to make the request, no caching will be made in this case.
-
-```html
-<etools-ajax url="http://silex-test-app.local/countries-data"></etools-ajax>
-```
-
-Also you can use an endpoint object that contains url, exp (cache kept for x milliseconds) and cachingKey properties.
-CachingKey property is optional and it's recommended if you use Dexie.js as local database for caching.
-If is not set then the url will be the main caching key part. Final cache key is created using this private method
-(url/cacheKey + JSON string of params):
+If you want to be able to cache the request data you must define your app Dexie db schema and then
+set it on `window.EtoolsRequestCacheDb` global variable. EtoolsAjaxRequestBehavior behavior depends on it.
 
 ```javascript
-_getEndpointCacheKey: function(endpoint) {
-  var cacheKey = endpoint.url;
-  if (typeof endpoint.cachingKey === 'string' && endpoint.cachingKey !== '') {
-    cacheKey = endpoint.cachingKey;
-  }
-  if (this.params !== null && typeof this.params === 'object' && Object.keys(this.params).length > 0) {
-    cacheKey += '_' + JSON.stringify(this.params);
-  }
-  return cacheKey;
+  // custom dexie db that will be used by EtoolsAjaxRequestBehavior
+  var appDexieDb = new Dexie('yourAppDexieDbName');
+  appDexieDb.version(1).stores({
+    listsExpireMapTable: "&name, expire",
+    ajaxDefaultDataTable: "&cacheKey, data, expire"
+  });
+
+  // configure app dexie db to be used for caching by EtoolsAjaxRequestBehavior.
+  window.EtoolsRequestCacheDb = etoolsCustomDexieDb;
+```
+Only `GET` requests response data can be cached.
+For example, if your endpoint object looks like this:
+```javascript
+var endpoint = {
+  url: 'your/api/route',
+  exp: 300000, // if exp = 0 no caching will be made
+  cachingKey: 'dataSetIdentifierString'
+};
+```
+then when the request response is received it will be cached into dexie db, default table: `ajaxDefaultDataTable`
+as an object like this:
+```javascript
+{
+  // cacheKey can have request params stringified in the end if params were provided in sendRequest options
+  cacheKey: 'dataSetIdentifierString',
+  // Date.now() + endpoint.exp
+  expire: 1491306589975,
+  // request response data
+  data: response
 }
 ```
 
-If exp property is not set then no caching will be made for this endpoint.
-Only GET requests can be cached.
+Next time this request will be made, the data from cache will be returned if it did not expired. If cached data is
+expired or not found a new request will be sent.
+
+To cache a list of objects (returned by request) in a specified table from Dexie db that you need later to make
+queries on it you have to use an endpoint like this:
 
 ```javascript
 var endpoint = {
   url: 'your/api/route',
-  exp: 1473931993881,
-  cachingKey: 'dataSetIdentifierString'
-);
-var testParams = {
-  id: 1,
-  name: 'Global'
+  exp: 300000, // if exp = 0 no caching will be made
+  cacheTableName: 'countries'
 };
 ```
-```html
-<etools-ajax endpoint="[[endpoint]]" params="[[testParams]]"></etools-ajax>
-```
 
-If any of the url, params or endpoint properties changes, the ajax requests automatically fires. In endpoint case, before triggering
-the new request we search to see if we already have this data in local cache storage. If data is found and did not expired,
-automatically fire/return response with found data. If data for the new endpoint is not found or is expired then make the request.
+In this case `countries` table should be defined in Dexie db schema. The request response objects will be saved in
+this Dexie table. On next same request the data from this table will be returned if is not expired.
+In case data from this table(`countries` in our case) is expired a new request will be fired.
 
-You can set `debounceTime` to ensure you won't fire multiple request when the url, endpoint, params or body are changed.
-```html
-<etools-ajax endpoint="[[endpoint]]" params="[[testParams]]" debounce-time="300"></etools-ajax>
-```
+`cacheTableName` should be used only if you want to use Dexie functionality for making queries,
+like showing a list with pagination and filtering only on frontend side.
 
-#### Using Dexie.js instead of localstorage for caching
+For more info about Dexie.js databases check the [documentation](http://dexie.org/).
 
- For a better browser storage use property: `cachingStorage="dexie"` and etools-ajax will not cache data in localstorage,
- it will use a dexie db (based on IndexedDb) called `etoolsAjaxCacheDb` to store request data.
-
- Since etools-ajax can be used in multiple apps running on the same domain(like eTools apps) you might want to set a prefix
- for element's default dexie db name. In this way you will avoid conflicts with other apps that are using etools-ajax.
- For example you can have 2 identical caching keys that will override each other's data. We do not want that, so make sure
- you set somewhere in your app a global variable, named `etoolsAjaxDefaultDexieDbPrefix`, a string prefix that identifies your app.
-
- ```html
- <!-- request data will be stored in  etoolsAjaxCacheDb dexie database, collection ajaxCachedData with the generated cache key -->
- <etools-ajax endpoint="[[endpoint]]" caching-storage="dexie"></etools-ajax>
- ```
-
- If you do not want to use etools-ajax default dexie db you can provide your own database.
-
- Case 1:
-   - property `alternateDexieDb` should be your dexie db instance
-   - property `dexieDbCollection` should be the collection where the request is gonna put the return data (Important: it has to be an array of objects)
-   - your dexie db schema should contain a collection called `collectionsList` with indexes: '&name,expire' (unique name field index and expire field index)
-
- ```html
- <!--
- // this.$.customDb = etools-dexiejs element
-var db = this.$.customDb.getDb();
-db.version(1).stores({
- collectionsList: "&name,expire",
- countries: 'id, name'
-});
-this.customDb = db;
- -->
-<etools-ajax endpoint="[[endpoints.countries]]" alternate-dexie-db="{{customDb}}" dexie-db-collection="countries"></etools-ajax>
- ```
-
-Case 2:
-   - you can init `etoolsCustomDexieDb` variable with your custom dexie db somewhere in your config app and make sure is global
-   - on your etools-ajax set `cachingStorage` property to `custom`
-   - do not forget to provide the custom db collection where the data will be cached (`dexieDbCollection`)
+### Usage
 
 ```javascript
-// in your app config (global)
-var etoolsCustomDexieDb = new Dexie('etoolsCustomDexieDb');
-etoolsCustomDexieDb.version(1).stores({
-  collectionsList: "&name,expire",
-  countries: 'id, name'
+Polymer({
+    is: 'custom-element',
+    behaviors: [EtoolsAjaxRequestBehavior],
+    ready: function() {
+      this.sendRequest({
+        method: 'GET',
+        endpoint: {
+          url: '/countries-data',
+        },
+        params: {
+          id: 10,
+          country_name: 'USA'
+        }
+      }).then(function(resp) {
+        console.log(resp);
+      }).catch(function(error) {
+        console.log(error);
+      });
+    }
 });
 ```
 
-```html
-<!-- in your polymer element -->
-<etools-ajax endpoint="[[endpoints.caountries]]" caching-storage="custom" dexie-db-collection="countries"></etools-ajax>
-```
-
-For more info about Dexie.js databases check the [documentation](https://github.com/dfahlander/Dexie.js/wiki).
+#### `sendRequest` options:
+An object that must have this properties
+* `method` - any HTTP method, defaults to 'GET' if is not defined
+* `endpoint` - an object that must contain the `url` property. For caching this object can
+have `exp`(time to cache data in milliseconds), `cachingKey`(any string) or `cacheTableName`(the Dexie table name,
+where you can store a list of objects from server response);
+* `params` - request params, will be used to build url query string
+* `body` - request body for POST | PUT | PATCH | DELETE methods
+* `csrfCheck` - if `true` then `x-csrftoken` header will be set with value of `csrftoken` cookie
+* `headers` - object of additional headers that can be set on request
+* `multiPart` - if `true` it will take the `body` and convert it in `FormData`
+* `prepareMultipartData` - used by etools apps to convert request complex json `body` to `FromData` and prefix objects
+properties with `_obj`
+* `checkProgress` - experimental flag to have ajax request progress (progress available data stored in `reqProgress`
+property)
 
 #### Ajax response handling:
 
-- success: check if the request data should be cached, add data to caching storage, fire a success response with
-returned data to be used in parent element (where you can have on-success action (page specific) that manages received data)
-
-- error: fire an error event to be handled in parent element (on-fail handling, page specific)
-
-```html
-<etools-ajax url="http://silex-test-app.local/countries-data"
-  on-success="handleResponse"
-  on-fail="handleError"></etools-ajax>
-```
-```javascript
-function handleResponse(response) {
-  // your custom response handling in case of success
-}
-function handleError(response) {
-  // your custom response handling in case of error
-}
-```
-
-- unauthorized: event fired if the response status code is 401
-
-- forbidden: event fired if the response status code is 403
-
-#### Unsafe requests
-
-Submitting data using unsafe requests with methods such as POST, PUT or DELETE will require a CSRF Token that has to be stored
-in a cookie with the name: 'csrftoken'. When the request is prepared this token is added as a header (x-csrftoken).
-You can disable this behaviour by setting the csrfCheck to 'disabled'.
-
-All requests that are made with other methods than GET, HEAD, OPTIONS or TRACE are considered unsafe and are triggered by
-_sendUnsafeRequest private method. Body property is used to set the request payload data and the request is automatically
-triggered when url or body properties are changing.
-
-```html
-<etools-ajax method="POST" url="http://silex-test-app.local/handle-post-request" body="{{postTestData}}"></etools-ajax>
-<etools-ajax method="PUT" url="http://silex-test-app.local/handle-put-request" body="{{putTestData}}"></etools-ajax>
-<etools-ajax method="DELETE" url="http://silex-test-app.local/handle-delete-request" body="{{deleteTestData}}"></etools-ajax>
-```
-
-#### Multipart Form Data
-If the attribute multi-part is set in the element the body is converted to a FormData object, this allow to send attachment through a POST call.
-
-```html
-<!--
-body is an object that contains data blobs
-body = {
-    id: "13",
-    firstName: "John",
-    lastName: "Doe",
-    someFile: function () {
-      var content = '<a id="a"><b id="b">hey!</b></a>';
-      return new Blob([content], { type: "text/xml"});
-  }(),
-  bigImage: imgBlob
-}
--->
-<etools-ajax url="http://silex-test-app.local/handle-post-put-delete-data" method="POST" multi-part body="{{body}}" logs="true"></etools-ajax>
-```
-
-#### Authorization
-
-In many cases we need to set authorization data for each request. For example the requests from an application that uses OAuth.
-This authorization data can be set on the request using auth property, which is an object with keys and values that will become
-headers names (each key name) and headers values (key value). Ex:
-
-```javascript
-var auth = {
-    authorization: 'Bearer lt8fnG9CNmLmsmRX8LTp0pVeJqkccEceXfNM8s_f624'
-}
-```
-```html
-<etools-ajax endpoint="[[endpoints.getData]]" params="[[testParams]]" auth="[[auth]]"></etools-ajax>
-```
+`sendRequest` will return a `Promise`:
+- if request succeeded it will contain response data
+- in case of error it will contain an object like this with this properties:
+`error`, `statusCode`, `statusText`, `response`
 
 ## Install
 ```bash
@@ -234,13 +123,29 @@ $ bower install --save etools-ajax
 Install needed dependencies by running: `$ bower install`.
 Make sure you have the [Polymer CLI](https://www.npmjs.com/package/polymer-cli) installed. Then run `$ polymer serve` to serve your element application locally.
 
+## Linting the code
+
+Innstall local npm packages (run `npm install`)
+Then just run the linting task
+
+```bash
+$ npm run lint
+```
+You should also use polylint. If you don't have Polylint installed run `npm install -g polylint`.
+Then just run the linter on each file you wish to check like so
+
+```bash
+$ polylint -i filename.html
+```
+At the moment polylint crashes if it encounters a missing import. If that happens, temporarily comment out such imports and run the command again.
+
 ## Running Tests
 
 You need to have `web-component-tester` installed (if not run `npm install -g web-component-tester`)
 ```bash
-$ wtc
+$ wct
 ```
 or
 ```bash
-$ wtc -p
+$ wct -p
 ```
