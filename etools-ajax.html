@@ -12,13 +12,20 @@
         behaviors: [EtoolsAjaxRequestBehavior],
 
         properties: {
-          options: Object,
+          url: String,
+          endpoint: Object,
+          params: Object
         },
         observers: [
-          '_optionsChanged(options.*)'
+          '_optionsChanged(url)',
+          '_optionsChanged(endpoint)',
+          '_optionsChanged(params)',
         ],
-        send: function(options) {
-          var opt = options || this.options;
+        send: function() {
+          var opt = {
+            endpoint: this.endpoint || {url: this.url},
+            params: this.params
+          }
 
           return this.sendRequest(opt)
               .then(function(data) {
@@ -30,29 +37,29 @@
               }.bind(this));
         },
 
-        _optionsChanged: function(options) {
+        _optionsChanged: function() {
           this.debounce('etools-ajax-options-changed', function() {
-            if (!this.options.endpoint && !this.options.url) {
+            if (!this.endpoint && !this.url) {
               return;
             }
             this.send();
-          }.bind(this), 50)
+          }.bind(this), 300)
         },
 
         handleError: function(error) {
           if (error.status === 401) {
-            this.fire('unauthorized', {error: error});
+            this.fire('unauthorized', error.error);
             return;
           }
 
           if (error.status === 403) {
-            this.fire('forbidden', {error: error});
+            this.fire('forbidden', error.error);
             return;
           }
           this._log('error', error.error);
 
           this.fire('fail', {
-            error: error.error
+            detail: error.error
           });
         },
 
