@@ -6,16 +6,13 @@
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
-
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
 
     <link rel="import" href="dexie-conf.html">
     <link rel="import" href="../etools-ajax.html">
-    <link rel="import" href="get-demo-data.html">
-    <link rel="import" href="unsafe-ajax-demo-data.html">
-    <link rel="import" href="multipart-demo-data.html">
-    <link rel="import" href="demo-unauthorized-and-forbidden.html">
+
+    <link rel="import" href="direct-etools-ajax-requests.html">
 
     <style is="custom-style" include="demo-pages-shared-styles">
       .vertical-section-container {
@@ -27,115 +24,24 @@
   <body>
 
     <div class="vertical-section-container centered">
+      <h1>EtoolsAjaxBehavior demo</h1>
+      <demo-snippet>
+        <template>
+          <direct-ajax-calls></direct-ajax-calls>
+        </template>
+      </demo-snippet>
 
       <h1>etools-ajax demo</h1>
 
-      <h3>Getting data (safe requests, methods: GET|HEAD|OPTIONS|TRACE)</h3>
+      <h3>Getting data uning `etools-ajax` element</h3>
       <p>
         No caching:
       </p>
       <demo-snippet>
         <template>
-          <etools-ajax url="http://silex-test-app.local/countries-data" logs="true"></etools-ajax>
+          <etools-ajax url="http://silex-test-app.local/countries-data"></etools-ajax>
         </template>
       </demo-snippet>
-
-      <p>Cache request. By default the element will use localstorage.</p>
-      <demo-snippet>
-        <template is="dom-bind">
-          <get-demo-data endpoints="{{endpoints}}" test-params="{{testParams}}" auth="{{auth}}" response-handlers="{{responseHandlers}}" custom-db="{{customDb}}"></get-demo-data>
-
-          <!--
-          getData = {
-              url: 'http://silex-test-app.local/countries-data',
-              exp: 1*60*60*1000, // cache set for 1h
-              cachingKey: 'testingAjaxGetData'
-          }
-          -->
-          <!-- data will be cached in localstorage-->
-          <etools-ajax endpoint="[[endpoints.getData]]" logs="true"></etools-ajax>
-
-          <!-- data will be cached in etools-ajax element's dexie db  -->
-          <etools-ajax endpoint="[[endpoints.caountriesDataEndpOne]]" logs="true" caching-storage="dexie"></etools-ajax>
-
-          <!-- data will be cached in a dexie db defined by you, your d schema must contain a collectin named
-          'collectionsList' with name and expire fields and the collection you will store the data returned by ajax request(array of objects) -->
-          <etools-ajax endpoint="[[endpoints.caountriesDataEndpThree]]" logs="true" alternate-dexie-db="{{customDb}}" dexie-db-collection="countries"></etools-ajax>
-
-          <!--
-            use custom dexie db defined somewhere in a app config file
-
-            var etoolsCustomDexieDb = new Dexie('etoolsCustomDexieDb');
-            etoolsCustomDexieDb.version(1).stores({
-              collectionsList: "&name,expire",
-              countries: 'id, name'
-            });
-           -->
-          <etools-ajax endpoint="[[endpoints.caountriesDataEndpThree]]" logs="true" caching-storage="custom" dexie-db-collection="countries"></etools-ajax>
-
-          <!--
-          testParams = {
-              id: 1,
-              name: 'Global'
-          }
-
-          auth = {
-              authorization: 'Bearer lt8fnG9CNmLmsmRX8LTp0pVeJqkccEceXfNM8s_f624'
-          }
-          -->
-
-          <etools-ajax endpoint="[[endpoints.getData]]" params="{{testParams}}" auth="{{auth}}" logs="true"></etools-ajax>
-
-        </template>
-      </demo-snippet>
-
-      <h3>Submitting data (unsafe requests, methods such as: POST|PUT|DELETE)</h3>
-      <p>
-        No caching is made for this requests.
-      </p>
-      <demo-snippet>
-        <template is="dom-bind">
-          <unsafe-ajax-demo-data body-post="{{postTestData}}" body-put="{{putTestData}}" body-delete="{{deleteTestData}}"></unsafe-ajax-demo-data>
-
-          <etools-ajax url="http://silex-test-app.local/handle-post-put-delete-data" method="POST" body="{{postTestData}}" logs="true"></etools-ajax>
-          <etools-ajax url="http://silex-test-app.local/handle-post-put-delete-data" method="PUT" body="{{putTestData}}" csrf-check="disabled" logs="true"></etools-ajax>-->
-          <etools-ajax url="http://silex-test-app.local/handle-post-put-delete-data" method="DELETE" body="{{deleteTestData}}" logs="true"></etools-ajax>
-        </template>
-      </demo-snippet>
-
-      <demo-snippet>
-        <template is="dom-bind">
-          <multipart-demo-data custom-body="{{customBody}}" ></multipart-demo-data>
-
-          <etools-ajax url="http://silex-test-app.local/handle-post-put-delete-data" 
-            method="POST" multi-part custom-multipart-data
-            body="[[customBody]]" logs="true"></etools-ajax>
-        </template>
-      </demo-snippet>
-
-
-      <demo-snippet>
-        <template>
-          <!--
-          <etools-ajax url="http://silex-test-app.local/respond-with-status-code/401" method="GET" on-forbidden="_handleForbidden" logs="true"></etools-ajax>
-          <etools-ajax url="http://silex-test-app.local/respond-with-status-code/403" method="GET" on-unauthorized="_handleUnauthorized" logs="true"></etools-ajax>
-          -->
-          <demo-unauthorized-and-forbidden></demo-unauthorized-and-forbidden>
-        </template>
-      </demo-snippet>
-
-      <p>
-        <strong>Demo notes:</strong>
-        For this demo to work you need a local server setup with 3 API routes enabled:
-      </p>
-      <ul>
-        <li>GET /countries-data</li>
-        <li>GET /get-csrf-token</li>
-        <li>POST|PUT|DELETE|PATCH /handle-post-put-delete-data</li>
-      </ul>
-      <p>
-        The response of these routes is up to you to decide.
-      </p>
 
     </div>
 

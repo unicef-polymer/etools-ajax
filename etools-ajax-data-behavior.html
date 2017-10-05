@@ -1,0 +1,79 @@
+<script>
+  (function(window) {
+    'use strict';
+
+    function defineEtoolsAjaxDataBehavior() {
+      var etoolsAjaxDataBehavior = {
+
+        _prepareMultiPartFormData: function(inputBody, prepareMultipartData) {
+          if (inputBody instanceof FormData) {
+            return inputBody; // body is already a FromData object
+          }
+          var formBody = new FormData();
+          var keys = Object.keys(inputBody);
+
+          var self = this;
+          keys.forEach(function(key) {
+            if (prepareMultipartData) {
+              formBody = self._prepareFormData(self, formBody, inputBody[key], key);
+            } else {
+              formBody.append(key, inputBody[key]);
+            }
+          });
+
+          return formBody;
+        },
+
+        _prepareFormData: function(self, body, data, key) {
+          if (Array.isArray(data)) {
+            if (data.length === 0) {
+              // empty array
+              body.append(key, []);
+            } else {
+              // not empty array
+              data.forEach(function(arrData, mainIndex) {
+                var k = key + '[' + mainIndex + ']';
+                if (self._isSimpleObject(arrData)) {
+                  // Object, not null
+                  Object.keys(arrData).forEach(function(keyArrData) {
+                    body = self._prepareFormData(self, body, arrData[keyArrData], k + '[_obj][' + keyArrData + ']');
+                  });
+                } else if (self._isFile(arrData)) {
+                  // File or Blobs
+                  body.append(k, arrData);
+                } else if (Array.isArray(arrData)) {
+                  // Array
+                  body = self._prepareFormData(self, body, arrData, k);
+                } else {
+                  // strings, null, numbers
+                  body.append(k, arrData);
+                }
+              });
+            }
+          } else if (self._isSimpleObject(data)) {
+              // Object, not null
+              Object.keys(data).forEach(function(keyArrData) {
+                body = self._prepareFormData(self, body, data[keyArrData], key + '[_obj][' + keyArrData + ']');
+              });
+          } else {
+            // for Blob, File, strings, null vals
+            body.append(key, data);
+          }
+          return body;
+        },
+
+       _isFile: function(data) {
+          return data instanceof File || data instanceof Blob;
+        },
+
+       _isSimpleObject: function(data) {
+          return data !== null && typeof data === 'object' && !Array.isArray(data) && !this._isFile(data);
+        },
+      };
+      return etoolsAjaxDataBehavior;
+    }
+
+    /** @polymerBehavior EtoolsAjaxDataBehavior */
+    window.EtoolsAjaxDataBehavior = window.EtoolsAjaxDataBehavior || defineEtoolsAjaxDataBehavior();
+  })(window);
+</script>
