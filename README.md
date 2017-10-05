@@ -3,9 +3,7 @@
 Polymer Behavior for handling ajax requests in any Polymer element.
 For GET requests it can cache the data using Dexie db.
 
-For `<etools-ajax>` element check documentation
-[here](https://github.com/unicef-polymer/etools-ajax/blob/master/README_ETOOLS_AJAX_V1.md).
-In the future it might be removed from etools ajax version 2.
+The `<etools-ajax>` is a complete new element based on the `EtoolsAjaxRequestBehavior`.
 
 ### Data caching requirements
 
