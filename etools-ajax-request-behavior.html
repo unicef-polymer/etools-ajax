@@ -18,15 +18,27 @@
 
     function _prepareResponse(response) {
       try {
-         return JSON.parse(response);
+        return JSON.parse(response);
       } catch (e) {
-         return response;
+        return response;
       }
     }
 
     function defineEtoolsRequest() {
       var etoolsRequest = {
         properties: {
+          lastAjaxRequest: {
+            type: Object,
+            notify: true,
+            readOnly: true
+          },
+          activeAjaxRequests: {
+            type: Array,
+            readOnly: true,
+            value: function() {
+              return [];
+            }
+          },
           reqProgress: {
             type: Object,
             notify: true,
@@ -47,7 +59,7 @@
          * Check for cached data if needed, if no cached data then fire new request
          * returns Promise
          */
-        sendRequest: function(reqConfig) {
+        sendRequest: function(reqConfig, activeReqKey) {
           // prepare request config options
           var preparedConfigOptions = this._prepareConfigOptions(reqConfig);
           var reqConfigOptions = preparedConfigOptions.ironRequestOptions;
@@ -65,17 +77,20 @@
             });
           }
           // make request
-          return this._doRequest(reqConfigOptions, cachingInfo, reqConfig.checkProgress);
+          return this._doRequest(reqConfigOptions, cachingInfo, reqConfig.checkProgress, activeReqKey);
         },
 
         /**
          * Fire new request
          */
-        _doRequest: function(reqConfigOptions, cachingInfo, checkProgress) {
+        _doRequest: function(reqConfigOptions, cachingInfo, checkProgress, activeReqKey) {
           var request = /** @type {!IronRequestElement} */ (document.createElement('iron-request'));
           this._checkRequestProgress(request, checkProgress);
           var self = this;
           request.send(reqConfigOptions);
+          this._setLastAjaxRequest(request);
+          this._addToActiveAjaxRequests(activeReqKey, request);
+
           return request.completes.then(function(request) {
             var responseData = request.response;
 
@@ -87,17 +102,58 @@
               // add/cache response data into dexie db
               return self.cacheEndpointData(responseData, cachingInfo);
             }
+
+            self._removeActiveRequestFromList(activeReqKey);
+
             return responseData;
           }).catch(function(request, error) {
+            self._removeActiveRequestFromList(activeReqKey);
             // request failed
-            self.logError('Request failed', 'etools-ajax', error);
-            throw new EtoolsRequestError(error, request.xhr.status, request.xhr.statusText, request.xhr.response);
+            // check request aborted, no error handling in this case
+            if (!request.aborted) {
+              throw new EtoolsRequestError(error, request.xhr.status, request.xhr.statusText, request.xhr.response);
+            }
           }.bind(this, request));
+        },
+
+        _addToActiveAjaxRequests: function(key, request) {
+          if (key) {
+            this.push('activeAjaxRequests', {key: key, request: request});
+          }
+        },
+
+        _removeActiveRequestFromList: function(key) {
+          if (key) {
+            var req = this._getActiveRequestByKey(key);
+            if (req) {
+              var requestIndex = this.activeAjaxRequests.indexOf(req);
+              if (requestIndex > -1) {
+                this.splice('activeAjaxRequests', requestIndex, 1);
+              }
+            }
+          }
+        },
+
+        _getActiveRequestByKey: function(key) {
+          return this.activeAjaxRequests.find(function(activeReqMapObj) {
+            return activeReqMapObj.key === key;
+          });
+        },
+
+        abortRequest: function(key) {
+          // abort last request if key is not provided
+          var req = this.lastAjaxRequest;
+          if (key) {
+            req = this._getActiveRequestByKey(key);
+          }
+          if (req) {
+            req.abort();
+          }
         },
 
         _isViableForCaching: function(cachingInfo) {
           return cachingInfo && cachingInfo.requestIsViableForCaching &&
-            this.cachingCanBeMade(cachingInfo.cacheTableName);
+              this.cachingCanBeMade(cachingInfo.cacheTableName);
         },
 
         _prepareConfigOptions: function(reqConfig) {
@@ -270,7 +326,7 @@
 
     /** @polymerBehavior EtoolsAjaxRequestBehavior */
     window.EtoolsAjaxRequestBehavior = window.EtoolsAjaxRequestBehavior ||
-      [EtoolsLogsBehavior, EtoolsAjaxDataBehavior, EtoolsAjaxCacheBehavior, defineEtoolsRequest()] || {};
-      // the || {} at the end is there to make the linter happy
+        [EtoolsLogsBehavior, EtoolsAjaxDataBehavior, EtoolsAjaxCacheBehavior, defineEtoolsRequest()] || {};
+    // the || {} at the end is there to make the linter happy
   })(window);
 </script>
