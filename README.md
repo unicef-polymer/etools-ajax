@@ -114,6 +114,16 @@ property)
 - in case of error it will contain an object like this with this properties:
 `error`, `statusCode`, `statusText`, `response`
 
+#### Abort requests
+
+There are 2 properties used to track active and last requests:
+* `activeAjaxRequests` - active ajax requests mapping, a list of objects like `{key: 'someAjaxReqkey', request: activeRequest}`
+used to manage all active requests.
+* `lastAjaxRequest` - last request fired.
+
+To abort any of the active requests you can use `abortRequest(key)`, if `key` is not defined then `lastAjaxRequest` will be aborted.
+You can also use `this.lastAjaxRequest.abort()` to abort last request.
+
 ## Install
 ```bash
 $ bower install --save etools-ajax
