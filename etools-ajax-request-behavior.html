@@ -152,6 +152,9 @@
         },
 
         _isViableForCaching: function(cachingInfo) {
+          if (window.EtoolsRequestCacheDisabled) {
+            return false;
+          }
           return cachingInfo && cachingInfo.requestIsViableForCaching &&
               this.cachingCanBeMade(cachingInfo.cacheTableName);
         },
