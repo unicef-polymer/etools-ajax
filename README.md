@@ -66,6 +66,10 @@ like showing a list with pagination and filtering only on frontend side.
 
 For more info about Dexie.js databases check the [documentation](http://dexie.org/).
 
+### Disable caching
+
+Just set this in your app: `window.EtoolsRequestCacheDisabled = true`
+
 ### Usage
 
 ```javascript
