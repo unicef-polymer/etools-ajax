@@ -112,6 +112,8 @@
             // check request aborted, no error handling in this case
             if (!request.aborted) {
               throw new EtoolsRequestError(error, request.xhr.status, request.xhr.statusText, request.xhr.response);
+            } else {
+              throw new EtoolsRequestError(error, 0, 'Request aborted', null);
             }
           }.bind(this, request));
         },
@@ -152,6 +154,9 @@
         },
 
         _isViableForCaching: function(cachingInfo) {
+          if (window.EtoolsRequestCacheDisabled) {
+            return false;
+          }
           return cachingInfo && cachingInfo.requestIsViableForCaching &&
               this.cachingCanBeMade(cachingInfo.cacheTableName);
         },
