@@ -71,7 +71,7 @@
             // return it without making the request
             return this.getEndpointDataFromCache(cachingInfo).then(function(response) {
               if (!response) {
-                return self._doRequest(reqConfigOptions, cachingInfo, reqConfig.checkProgress);
+                return self._doRequest(reqConfigOptions, cachingInfo, reqConfig.checkProgress, activeReqKey);
               }
               return response;
             });
