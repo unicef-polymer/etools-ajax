@@ -143,13 +143,16 @@
         },
 
         abortRequest: function(key) {
-          // abort last request if key is not provided
-          var req = this.lastAjaxRequest;
+          // abort request by key
           if (key) {
-            req = this._getActiveRequestByKey(key);
-          }
-          if (req) {
-            req.abort();
+            var activeReq = this._getActiveRequestByKey(key);
+            if (activeReq && activeReq.request) {
+              activeReq.request.abort();
+            } else {
+              this.logWarn('No active request found by this key: ' + key , 'EtoolsAjaxRequestBehavior:abortRequest');
+            }
+          } else {
+            this.logWarn('Aborting request by key requires a key', 'EtoolsAjaxRequestBehavior:abortRequest');
           }
         },
 
