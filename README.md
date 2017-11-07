@@ -125,7 +125,7 @@ There are 2 properties used to track active and last requests:
 used to manage all active requests.
 * `lastAjaxRequest` - last request fired.
 
-To abort any of the active requests you can use `abortRequest(key)`, if `key` is not defined then `lastAjaxRequest` will be aborted.
+To abort any of the active requests you can use `abortRequestByKey(key)`.
 You can also use `this.lastAjaxRequest.abort()` to abort last request.
 
 ## Install
