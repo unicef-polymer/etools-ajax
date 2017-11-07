@@ -71,7 +71,7 @@
             // return it without making the request
             return this.getEndpointDataFromCache(cachingInfo).then(function(response) {
               if (!response) {
-                return self._doRequest(reqConfigOptions, cachingInfo, reqConfig.checkProgress);
+                return self._doRequest(reqConfigOptions, cachingInfo, reqConfig.checkProgress, activeReqKey);
               }
               return response;
             });
@@ -126,7 +126,7 @@
 
         _removeActiveRequestFromList: function(key) {
           if (key) {
-            var req = this._getActiveRequestByKey(key);
+            var req = this.getActiveRequestByKey(key);
             if (req) {
               var requestIndex = this.activeAjaxRequests.indexOf(req);
               if (requestIndex > -1) {
@@ -136,20 +136,32 @@
           }
         },
 
-        _getActiveRequestByKey: function(key) {
+        getActiveRequestByKey: function(key) {
           return this.activeAjaxRequests.find(function(activeReqMapObj) {
             return activeReqMapObj.key === key;
           });
         },
 
-        abortRequest: function(key) {
-          // abort last request if key is not provided
-          var req = this.lastAjaxRequest;
+        abortRequestByKey: function(key) {
+          // abort request by key
           if (key) {
-            req = this._getActiveRequestByKey(key);
+            var activeReq = this.getActiveRequestByKey(key);
+            if (activeReq) {
+              this.abortActiveRequest(activeReq);
+            } else {
+              this.logWarn('No active request found by this key: ' + key + '.',
+                  'EtoolsAjaxRequestBehavior:abortRequest');
+            }
+          } else {
+            this.logWarn('Aborting request by key requires a key.', 'EtoolsAjaxRequestBehavior:abortRequestByKey');
           }
-          if (req) {
-            req.abort();
+        },
+
+        abortActiveRequest: function(activeReqMapObj) {
+          if (activeReqMapObj && activeReqMapObj.request) {
+            activeReqMapObj.request.abort();
+          } else {
+            this.logWarn('There is no request to abort.' , 'EtoolsAjaxRequestBehavior:abortActiveRequest');
           }
         },
 
