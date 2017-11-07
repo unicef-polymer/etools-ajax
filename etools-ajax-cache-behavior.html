@@ -119,7 +119,9 @@
             // add list expire mapping details
             listsExpireMapTable.put(listExpireDetails);
             // save bulk data
-            specifiedTable.bulkPut(responseData);
+            specifiedTable.clear().then(function() {
+              specifiedTable.bulkAdd(responseData);
+            });
           }).then(function(result) {
             // request response saved into specified table
             // transaction succeeded
