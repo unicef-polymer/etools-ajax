@@ -107,6 +107,11 @@
 
             return responseData;
           }).catch(function(request, error) {
+            if (!request.aborted && request.xhr.status === 0) {
+              // not an error, this is an asynchronous request that is not completed yet
+              return;
+            }
+
             self._removeActiveRequestFromList(activeReqKey);
             // request failed
             // check request aborted, no error handling in this case
