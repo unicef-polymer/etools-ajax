@@ -70,7 +70,8 @@ For more info about Dexie.js databases check the [documentation](http://dexie.or
 
 Just set this in your app: `window.EtoolsRequestCacheDisabled = true`
 
-### Usage
+### Usage in version above 2.0.4  => Use it as a mixin instead of behavior
+### Usage in version 2.0.4 and below
 
 ```javascript
 Polymer({
