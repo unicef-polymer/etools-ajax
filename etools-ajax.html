@@ -1,4 +1,4 @@
-<link rel="import" href="etools-ajax-request-behavior.html">
+<link rel="import" href="etools-ajax-request-mixin.html">
 <link rel="import" href="../polymer/lib/utils/debounce.html">
 <link rel="import" href="../polymer/polymer-element.html">
 
@@ -9,7 +9,7 @@
     /*
     * @element
     */
-    class EtoolsAjax extends EtoolsAjaxRequestBehavior(Polymer.Element) {
+    class EtoolsAjax extends EtoolsAjaxRequestMixin(Polymer.Element) {
       static get is() { return 'etools-ajax'; }
 
       static get properties() {

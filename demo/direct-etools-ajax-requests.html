@@ -2,7 +2,7 @@
 <link rel="import" href="../../polymer/polymer-element.html">
 <link rel="import" href="../scripts/dexie.html">
 
-<link rel="import" href="../etools-ajax-request-behavior.html">
+<link rel="import" href="../etools-ajax-request-mixin.html">
 
 <script>
   // set logging level
@@ -25,7 +25,7 @@
   <script>
 
       'use strict';
-      class DirectAjaxCalls extends EtoolsAjaxRequestBehavior(Polymer.Element) {
+      class DirectAjaxCalls extends EtoolsAjaxRequestMixin(Polymer.Element) {
         static get is() { return 'direct-ajax-calls'; }
 
         ready() {
@@ -187,7 +187,7 @@
           document.cookie = "csrftoken=" + cookieVal + "; " + expires + "; path=/";
         }
 
-        // just a body object that will be used by EtoolsAjaxRequestBehavior to prepare multipart body data of request
+        // just a body object that will be used by EtoolsAjaxRequestMixin to prepare multipart body data of request
         // to fit etools app needs, on backend there must be a custom parser for this data
         _getBodyWithBlobsOrFilesData() {
           return {

@@ -3,22 +3,22 @@
 Polymer Behavior for handling ajax requests in any Polymer element.
 For GET requests it can cache the data using Dexie db.
 
-The `<etools-ajax>` is a complete new element based on the `EtoolsAjaxRequestBehavior`.
+The `<etools-ajax>` is a complete new element based on the `EtoolsAjaxRequestMixin`.
 
 ### Data caching requirements
 
 If you want to be able to cache the request data you must define your app Dexie db schema and then
-set it on `window.EtoolsRequestCacheDb` global variable. EtoolsAjaxRequestBehavior behavior depends on it.
+set it on `window.EtoolsRequestCacheDb` global variable. EtoolsAjaxRequestMixin behavior depends on it.
 
 ```javascript
-  // custom dexie db that will be used by EtoolsAjaxRequestBehavior
+  // custom dexie db that will be used by EtoolsAjaxRequestMixin
   var appDexieDb = new Dexie('yourAppDexieDbName');
   appDexieDb.version(1).stores({
     listsExpireMapTable: "&name, expire",
     ajaxDefaultDataTable: "&cacheKey, data, expire"
   });
 
-  // configure app dexie db to be used for caching by EtoolsAjaxRequestBehavior.
+  // configure app dexie db to be used for caching by EtoolsAjaxRequestMixin.
   window.EtoolsRequestCacheDb = etoolsCustomDexieDb;
 ```
 Only `GET` requests response data can be cached.
