@@ -1,0 +1,351 @@
+<link rel="import" href="es6-obj-assign-polyfil.html">
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-request.html">
+<link rel="import" href="../etools-behaviors/etools-logs-mixin.html">
+<link rel="import" href="etools-ajax-data-mixin.html">
+<link rel="import" href="etools-ajax-cache-mixin.html">
+
+<script>
+    'use strict';
+
+    function EtoolsRequestError(error, statusCode, statusText, response) {
+      this.error = error;
+      this.status = statusCode;
+      this.statusText = statusText;
+      this.response = _prepareResponse(response);
+    }
+
+    function _prepareResponse(response) {
+      try {
+        return JSON.parse(response);
+      } catch (e) {
+        return response;
+      }
+    }
+    /*A behavior that will allow you to make a request in any Polymer element you need.
+    * @polymer
+    * @mixinFunction
+    * @demo demo/index.html
+    */
+    const EtoolsAjaxRequestMixin = (baseClass) => class extends EtoolsLogsMixin(EtoolsAjaxDataMixin(EtoolsAjaxCacheMixin(baseClass))) {
+
+      static get properties() {
+        return {
+          lastAjaxRequest: {
+            type: Object,
+            notify: true,
+            readOnly: true
+          },
+          activeAjaxRequests: {
+            type: Array,
+            readOnly: true,
+            value: function() {
+              return [];
+            }
+          },
+          reqProgress: {
+            type: Object,
+            notify: true,
+            readOnly: true,
+            value: function() {
+              return null;
+            }
+          },
+          checkReqProgress: {
+            type: Object,
+            value: function() {
+              return null;
+            }
+          }
+        };
+      }
+
+      /**
+        * Check for cached data if needed, if no cached data then fire new request
+        * returns Promise
+        */
+      sendRequest(reqConfig, activeReqKey) {
+        // prepare request config options
+        var preparedConfigOptions = this._prepareConfigOptions(reqConfig);
+        var reqConfigOptions = preparedConfigOptions.ironRequestOptions;
+        var cachingInfo = preparedConfigOptions.cachingInfo;
+
+        var self = this;
+        if (this._isViableForCaching(cachingInfo)) {
+          // we might have data cached; if cached data is available and not expired
+          // return it without making the request
+          return this.getEndpointDataFromCache(cachingInfo).then(function(response) {
+            if (!response) {
+              return self._doRequest(reqConfigOptions, cachingInfo, reqConfig.checkProgress, activeReqKey);
+            }
+            return response;
+          });
+        }
+        // make request
+        return this._doRequest(reqConfigOptions, cachingInfo, reqConfig.checkProgress, activeReqKey);
+      }
+
+      /**
+        * Fire new request
+        */
+      _doRequest(reqConfigOptions, cachingInfo, checkProgress, activeReqKey) {
+        var request = /** @type {!IronRequestElement} */ (document.createElement('iron-request'));
+        this._checkRequestProgress(request, checkProgress);
+        var self = this;
+        request.send(reqConfigOptions);
+        this._setLastAjaxRequest(request);
+        this._addToActiveAjaxRequests(activeReqKey, request);
+
+        return request.completes.then(function(request) {
+          var responseData = request.response;
+
+          if (reqConfigOptions.handleAs === 'json' && typeof responseData === 'string') {
+            responseData = _prepareResponse(responseData);
+          }
+
+          if (self._isViableForCaching(cachingInfo)) {
+            // add/cache response data into dexie db
+            return self.cacheEndpointData(responseData, cachingInfo);
+          }
+
+          self._removeActiveRequestFromList(activeReqKey);
+
+          return responseData;
+        }).catch(function(request, error) {
+          if (!request.aborted && request.xhr.status === 0) {
+            // not an error, this is an asynchronous request that is not completed yet
+            return;
+          }
+
+          self._removeActiveRequestFromList(activeReqKey);
+          // request failed
+          // check request aborted, no error handling in this case
+          if (!request.aborted) {
+            throw new EtoolsRequestError(error, request.xhr.status, request.xhr.statusText, request.xhr.response);
+          } else {
+            throw new EtoolsRequestError(error, 0, 'Request aborted', null);
+          }
+        }.bind(this, request));
+      }
+
+      _addToActiveAjaxRequests(key, request) {
+        if (key) {
+          this.push('activeAjaxRequests', {key: key, request: request});
+        }
+      }
+
+      _removeActiveRequestFromList(key) {
+        if (key) {
+          var req = this.getActiveRequestByKey(key);
+          if (req) {
+            var requestIndex = this.activeAjaxRequests.indexOf(req);
+            if (requestIndex > -1) {
+              this.splice('activeAjaxRequests', requestIndex, 1);
+            }
+          }
+        }
+      }
+
+      getActiveRequestByKey(key) {
+        return this.activeAjaxRequests.find(function(activeReqMapObj) {
+          return activeReqMapObj.key === key;
+        });
+      }
+
+      abortRequestByKey(key) {
+        // abort request by key
+        if (key) {
+          var activeReq = this.getActiveRequestByKey(key);
+          if (activeReq) {
+            this.abortActiveRequest(activeReq);
+          } else {
+            this.logWarn('No active request found by this key: ' + key + '.',
+                'EtoolsAjaxRequestMixin:abortRequest');
+          }
+        } else {
+          this.logWarn('Aborting request by key requires a key.', 'EtoolsAjaxRequestMixin:abortRequestByKey');
+        }
+      }
+
+      abortActiveRequest(activeReqMapObj) {
+        if (activeReqMapObj && activeReqMapObj.request) {
+          activeReqMapObj.request.abort();
+        } else {
+          this.logWarn('There is no request to abort.' , 'EtoolsAjaxRequestMixin:abortActiveRequest');
+        }
+      }
+
+      _isViableForCaching(cachingInfo) {
+        if (window.EtoolsRequestCacheDisabled) {
+          return false;
+        }
+        return cachingInfo && cachingInfo.requestIsViableForCaching &&
+            this.cachingCanBeMade(cachingInfo.cacheTableName);
+      }
+
+      _prepareConfigOptions(reqConfig) {
+        return {
+          ironRequestOptions: {
+            url: this._getRequestUrl(reqConfig),
+            method: reqConfig.method || 'GET',
+            headers: this._getRequestHeaders(reqConfig),
+            body: this._getRequestBody(reqConfig),
+            async: !reqConfig.sync,
+            handleAs: this._getHandleAs(reqConfig),
+            jsonPrefix: reqConfig.jsonPrefix || '',
+            withCredentials: !!reqConfig.withCredentials,
+            timeout: reqConfig.timeout || 0
+          },
+          cachingInfo: this.getCachingInfo(reqConfig)
+        };
+      }
+
+      _getHandleAs(reqConfig) {
+        var handleAs = reqConfig.handleAs || 'json';
+        if (reqConfig.downloadCsv)
+          handleAs = 'blob';
+        return handleAs;
+      }
+
+      _getRequestUrl(reqConfig) {
+        var url = '';
+        if (reqConfig.endpoint && reqConfig.endpoint.url) {
+          url = reqConfig.endpoint.url;
+          url += this._buildQueryString(url, reqConfig.params);
+        }
+        return url;
+      }
+
+      _buildQueryString(url, params) {
+        var queryStr = '';
+        if (!params || !this._isNonEmptyObject(params)) {
+          return '';
+        }
+        if (url.indexOf('?') < 0) {
+          queryStr = '?';
+        } else {
+          queryStr = '&';
+        }
+        for (var key in params) {
+          queryStr += key + '=' + params[key] + '&';
+        }
+
+        // remove trailing &
+        queryStr = queryStr.substring(0, queryStr.length - 1);
+        return queryStr;
+      }
+
+      _getRequestBody(reqConfig) {
+        var body = reqConfig.body || {};
+        if (reqConfig.multiPart) {
+          body = this._prepareMultiPartFormData(body, reqConfig.prepareMultipartData);
+        }
+        return body;
+      }
+
+      _getRequestHeaders(reqConfig) {
+        var headers = {};
+
+        headers['content-type'] = this._determineContentType(reqConfig.body, reqConfig.multiPart);
+
+        if (reqConfig.downloadCsv) {
+          headers['accept'] = 'text/csv';
+          headers['content-type'] = 'text';
+        }
+
+        var clientConfiguredHeaders = this._getClientConfiguredHeaders(reqConfig.headers);
+        var csrfHeaders = {};
+        if (!this._csrfSafeMethod(reqConfig.method)) {
+          csrfHeaders = this._getCsrfHeader(reqConfig.csrfCheck);
+        }
+        headers = Object.assign({}, headers, clientConfiguredHeaders, csrfHeaders);
+
+        if (reqConfig.multiPart) {
+          // content type will be automatically set in this case
+          delete headers['content-type'];
+        }
+
+        return headers;
+      }
+
+      _getClientConfiguredHeaders(additionalHeaders) {
+        var header;
+        var clientHeaders = {};
+        if (additionalHeaders && additionalHeaders instanceof Object) {
+          for (header in additionalHeaders) {
+            clientHeaders[header] = additionalHeaders[header].toString();
+          }
+        }
+        return clientHeaders;
+      }
+
+      _getCsrfHeader(csrfCheck) {
+        var csrfHeaders = {};
+        if (csrfCheck !== 'disabled') {
+          var csrfToken = this._getCSRFCookie();
+
+          if (csrfToken) {
+            csrfHeaders['x-csrftoken'] = csrfToken;
+          }
+        }
+        return csrfHeaders;
+      }
+
+      _csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+      }
+
+      _getCSRFCookie() {
+        // check for a csrftoken cookie and return its value
+        var csrfCookieName = 'csrftoken';
+        var csrfToken = null;
+        if (document.cookie && document.cookie !== '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, csrfCookieName.length + 1) === (csrfCookieName + '=')) {
+              csrfToken = decodeURIComponent(cookie.substring(csrfCookieName.length + 1));
+              break;
+            }
+          }
+        }
+        return csrfToken;
+      }
+
+      /**
+        * Content-Type set here can be overridden later
+        * by headers sent from the client
+        */
+      _determineContentType(body) {
+        var contentType = 'application/json';
+
+        if (typeof body === 'string') {
+          contentType = 'application/x-www-form-urlencoded';
+        }
+
+        return contentType;
+      }
+
+      _checkRequestProgress(request, checkProgress) {
+        if (!checkProgress || !request || !request.progress) {
+          return;
+        }
+        this.checkReqProgress = setInterval(function() {
+          if (request.progress.constructor === Object && Object.keys(request.progress).length > 0) {
+            this._setReqProgress(request.progress);
+            if (!request.progress.lengthComputable || request.progress.loaded === request.progress.total) {
+              this._stopReqProgressCheck();
+            }
+          }
+        }.bind(this), 0);
+      }
+      _stopReqProgressCheck() {
+        if (this.checkReqProgress) {
+          clearInterval(this.checkReqProgress);
+        }
+      }
+    }
+
+</script>
