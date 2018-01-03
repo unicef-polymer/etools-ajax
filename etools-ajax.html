@@ -14,7 +14,8 @@
         properties: {
           url: String,
           endpoint: Object,
-          params: Object
+          params: Object,
+          method: String
         },
         observers: [
           '_optionsChanged(url)',
@@ -24,7 +25,9 @@
         send: function() {
           var opt = {
             endpoint: this.endpoint || {url: this.url},
-            params: this.params
+            params: this.params,
+            method: this.method,
+            body: this.body
           };
 
           return this.sendRequest(opt)
