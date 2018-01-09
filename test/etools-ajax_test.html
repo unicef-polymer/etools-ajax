@@ -23,7 +23,7 @@
 
         test('instantiating the element works', function() {
           var element = fixture('basic');
-          assert.equal(element.is, 'etools-ajax');
+          expect(element).to.not.equal(undefined);
         });
 
       });
