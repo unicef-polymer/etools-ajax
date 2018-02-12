@@ -7,7 +7,7 @@
   "dependencies": {
     "polymer": "Polymer/polymer#^2.0.0",
     "iron-ajax": "PolymerElements/iron-ajax#^2.0.0",
-    "dexie": "^1.5.1",
+    "dexie": "^2.0.0",
     "etools-behaviors": "28ab227"
   },
   "devDependencies": {
