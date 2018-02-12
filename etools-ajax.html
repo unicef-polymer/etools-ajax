@@ -15,8 +15,10 @@
       static get properties() {
         return {
           url: String,
+          method: String,
           endpoint: Object,
-          params: Object
+          params: Object,
+          body: Object
         };
       }
 
@@ -24,12 +26,15 @@
         '_optionsChanged(url)',
         '_optionsChanged(endpoint)',
         '_optionsChanged(params)',
+        '_optionsChanged(method)'
       ]}
 
       send() {
         var opt = {
           endpoint: this.endpoint || {url: this.url},
-          params: this.params
+          params: this.params,
+          method: this.method,
+          body: this.body
         };
 
         return this.sendRequest(opt)
