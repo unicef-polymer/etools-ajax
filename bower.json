@@ -8,7 +8,7 @@
     "polymer": "Polymer/polymer#^2.0.0",
     "iron-ajax": "PolymerElements/iron-ajax#^2.0.0",
     "dexie": "^2.0.0",
-    "etools-behaviors": "a0c6852"
+    "etools-behaviors": "89f132c"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^3.0.0",
