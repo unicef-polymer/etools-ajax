@@ -27,7 +27,7 @@
     }
 
     ready() {
-      if(!typeof Dexie === 'undefined') {
+      if(typeof Dexie === 'undefined') {
         this.logError('Dexie import missing.', 'etools-ajax');
       }
     }
