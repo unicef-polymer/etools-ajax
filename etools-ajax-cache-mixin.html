@@ -26,6 +26,12 @@
       };
     }
 
+    ready() {
+      if(typeof Dexie === 'undefined') {
+        this.logError('Dexie import missing.', 'etools-ajax');
+      }
+    }
+
     _requestIsViableForCaching(reqConfig) {
       return (reqConfig.method || 'GET') === 'GET' && this._expireTimeWasProvided(reqConfig.endpoint);
     }
