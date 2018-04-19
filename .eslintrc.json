@@ -10,21 +10,21 @@
     "html"
   ],
   "rules": {
+    "padded-blocks": "off",
     "brace-style": "off",
-    "new-cap": ["error", { "capIsNewExceptions": ["Polymer"] }],
+    "new-cap": ["error", { "capIsNewExceptions": ["Polymer"], "capIsNewExceptionPattern": "^Etools.." }],
     "no-var": "off",
-    "operator-linebreak": 1,
-    "no-trailing-spaces": 1,
-    "valid-jsdoc": 0,
-    "camelcase": 1,
-    "guard-for-in": 0,
-    "comma-dangle": 0,
-    "prefer-spread": 0,
-    "linebreak-style": 0,
     "require-jsdoc": "off",
-    "max-len": ["error", 120, 4]
+    "valid-jsdoc": "off",
+    "comma-dangle": ["error", "never"],
+    "max-len": ["error", { "code": 120 }],
+    "camelcase": ["error", {"properties": "never"}],
+    "arrow-parens": [2, "as-needed", { "requireForBlockBody": true }]
   },
   "globals": {
-    "Polymer": true
+    "moment": true,
+    "Promise": true,
+    "Polymer": true,
+    "EtoolsLogsMixin": true
   }
 }
