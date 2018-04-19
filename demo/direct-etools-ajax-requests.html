@@ -1,7 +1,8 @@
 <link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../polymer/polymer-element.html">
 <link rel="import" href="../scripts/dexie.html">
 
-<link rel="import" href="../etools-ajax-request-behavior.html">
+<link rel="import" href="../etools-ajax-request-mixin.html">
 
 <script>
   // set logging level
@@ -22,38 +23,34 @@
 <dom-module id="direct-ajax-calls">
 
   <script>
-    (function() {
+
       'use strict';
+      class DirectAjaxCalls extends EtoolsAjaxRequestMixin(Polymer.Element) {
+        static get is() { return 'direct-ajax-calls'; }
 
-      Polymer({
-        is: 'direct-ajax-calls',
-
-        behaviors: [EtoolsAjaxRequestBehavior],
-
-        properties: {},
-
-        ready: function() {
-
-//          console.log(this.etoolsAjaxCacheDb);
+        ready() {
+          super.ready();
+         // console.log(this.etoolsAjaxCacheDb);
 
           this._setCookie();
 
           this.get_WithNoCache();
-//          this.get_WithCacheToDefaultTable();
-//          this.get_WithCacheToSpecifiedTable();
+          // this.get_WithCacheToDefaultTable();
+          // this.get_WithCacheToSpecifiedTable();
 
-//          this.post_Json();
-//          this.patch_WithJsonContent();
-//          this.patch_WithCsrfCheck();
-//          this.patch_WithAdditionalHeaders();
-//          this.post_WithMultipartData();
+          this.post_Json();
+          this.patch_WithJsonContent();
+          this.patch_WithCsrfCheck();
+          this.patch_WithAdditionalHeaders();
+        //  this.post_WithMultipartData();
 
-        },
-        post_Json: function() {
+        }
+
+        post_Json() {
           this.sendRequest({
             method: 'DELETE',
             endpoint: {
-              url: 'http://192.168.1.184/silex-test-app/web/index.php/handle-post-put-delete-data',
+              url: 'http://httpbin.org/delete',
             },
             body: {
               id: "14",
@@ -65,12 +62,12 @@
           }).catch(function(error) {
             console.log(error);
           });
-        },
-        patch_WithJsonContent: function() {
+        }
+        patch_WithJsonContent() {
           this.sendRequest({
             method: 'PATCH',
             endpoint: {
-              url: 'http://192.168.1.184/silex-test-app/web/index.php/handle-post-put-delete-data',
+              url: 'http://httpbin.org/patch',
             },
             body: {
               id: "14",
@@ -81,12 +78,12 @@
           }).catch(function(error) {
             console.log(error);
           });
-        },
+        }
 
-        get_WithNoCache: function() {
+        get_WithNoCache() {
           this.sendRequest({
             endpoint: {
-              url: 'http://192.168.1.184/silex-test-app/web/index.php/countries-data',
+              url: 'http://httpbin.org/get',
             },
             params: {
               id: 10,
@@ -97,9 +94,9 @@
           }).catch(function(error) {
             console.log(error);
           });
-        },
+        }
 
-        get_WithCacheToDefaultTable: function() {
+        get_WithCacheToDefaultTable() {
           this.sendRequest({
             endpoint: {
               url: 'http://192.168.1.184/silex-test-app/web/index.php/countries-data',
@@ -111,9 +108,9 @@
           }).catch(function(error) {
             console.log(error);
           });
-        },
+        }
 
-        get_WithCacheToSpecifiedTable: function() {
+        get_WithCacheToSpecifiedTable() {
           this.sendRequest({
             endpoint: {
               url: 'http://192.168.1.184/silex-test-app/web/index.php/countries-data',
@@ -125,13 +122,13 @@
           }).catch(function(error) {
             console.log(error);
           });
-        },
+        }
 
-        patch_WithCsrfCheck: function() {
+        patch_WithCsrfCheck() {
           this.sendRequest({
             method: 'PATCH',
             endpoint: {
-              url: 'http://192.168.1.184/silex-test-app/web/index.php/handle-post-put-delete-data',
+              url: 'http://httpbin.org/patch',
             },
             body: {
               id: "14",
@@ -143,13 +140,13 @@
           }).catch(function(error) {
             console.log(error);
           });
-        },
+        }
 
-        patch_WithAdditionalHeaders: function() {
+        patch_WithAdditionalHeaders() {
           this.sendRequest({
             method: 'PATCH',
             endpoint: {
-              url: 'http://192.168.1.184/silex-test-app/web/index.php/handle-post-put-delete-data',
+              url: 'http://httpbin.org/patch',
             },
             body: {
               id: "14",
@@ -163,9 +160,9 @@
           }).catch(function(error) {
             console.log(error);
           });
-        },
+        }
 
-        post_WithMultipartData: function() {
+        post_WithMultipartData() {
           this.sendRequest({
             method: 'POST',
             endpoint: {
@@ -179,20 +176,20 @@
           }).catch(function(error) {
             console.log(error);
           });
-        },
+        }
 
-        _setCookie: function() {
+        _setCookie() {
           // set cookie
           var cookieVal = 'someCookieValue123';
           var d = new Date();
           d.setTime(d.getTime() + (1 * 60 * 60 * 1000));
           var expires = "expires=" + d.toUTCString(); // cookie will expire in 1 hour
           document.cookie = "csrftoken=" + cookieVal + "; " + expires + "; path=/";
-        },
+        }
 
-        // just a body object that will be used by EtoolsAjaxRequestBehavior to prepare multipart body data of request
+        // just a body object that will be used by EtoolsAjaxRequestMixin to prepare multipart body data of request
         // to fit etools app needs, on backend there must be a custom parser for this data
-        _getBodyWithBlobsOrFilesData: function() {
+        _getBodyWithBlobsOrFilesData() {
           return {
             id: "13",
             firstName: "John",
@@ -245,9 +242,8 @@
             }()
           };
         }
+      }
 
-      });
-
-    })();
+      customElements.define(DirectAjaxCalls.is, DirectAjaxCalls);
   </script>
 </dom-module>

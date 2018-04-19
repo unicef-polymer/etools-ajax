@@ -1,0 +1,1651 @@
+{
+  "schema_version": "1.0.0",
+  "elements": [
+    {
+      "description": "",
+      "summary": "",
+      "path": "etools-ajax.html",
+      "properties": [
+        {
+          "name": "url",
+          "type": "string",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 16,
+              "column": 10
+            },
+            "end": {
+              "line": 16,
+              "column": 21
+            }
+          },
+          "metadata": {
+            "polymer": {}
+          }
+        },
+        {
+          "name": "endpoint",
+          "type": "Object",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 17,
+              "column": 10
+            },
+            "end": {
+              "line": 17,
+              "column": 26
+            }
+          },
+          "metadata": {
+            "polymer": {}
+          }
+        },
+        {
+          "name": "params",
+          "type": "Object",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 18,
+              "column": 10
+            },
+            "end": {
+              "line": 18,
+              "column": 24
+            }
+          },
+          "metadata": {
+            "polymer": {}
+          }
+        }
+      ],
+      "methods": [
+        {
+          "name": "send",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 28,
+              "column": 6
+            },
+            "end": {
+              "line": 42,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "_optionsChanged",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 44,
+              "column": 6
+            },
+            "end": {
+              "line": 53,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "handleError",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 55,
+              "column": 6
+            },
+            "end": {
+              "line": 67,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "error"
+            }
+          ]
+        }
+      ],
+      "staticMethods": [],
+      "demos": [],
+      "metadata": {},
+      "sourceRange": {
+        "start": {
+          "line": 11,
+          "column": 4
+        },
+        "end": {
+          "line": 68,
+          "column": 5
+        }
+      },
+      "privacy": "public",
+      "superclass": "HTMLElement",
+      "name": "EtoolsAjax",
+      "attributes": [
+        {
+          "name": "url",
+          "description": "",
+          "sourceRange": {
+            "start": {
+              "line": 16,
+              "column": 10
+            },
+            "end": {
+              "line": 16,
+              "column": 21
+            }
+          },
+          "metadata": {},
+          "type": "string"
+        },
+        {
+          "name": "endpoint",
+          "description": "",
+          "sourceRange": {
+            "start": {
+              "line": 17,
+              "column": 10
+            },
+            "end": {
+              "line": 17,
+              "column": 26
+            }
+          },
+          "metadata": {},
+          "type": "Object"
+        },
+        {
+          "name": "params",
+          "description": "",
+          "sourceRange": {
+            "start": {
+              "line": 18,
+              "column": 10
+            },
+            "end": {
+              "line": 18,
+              "column": 24
+            }
+          },
+          "metadata": {},
+          "type": "Object"
+        }
+      ],
+      "events": [],
+      "styling": {
+        "cssVariables": [],
+        "selectors": []
+      },
+      "slots": [],
+      "tagname": "etools-ajax"
+    },
+    {
+      "description": "",
+      "summary": "",
+      "path": "demo\\direct-etools-ajax-requests.html",
+      "properties": [],
+      "methods": [
+        {
+          "name": "ready",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 30,
+              "column": 8
+            },
+            "end": {
+              "line": 46,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "post_Json",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 48,
+              "column": 8
+            },
+            "end": {
+              "line": 64,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "patch_WithJsonContent",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 65,
+              "column": 8
+            },
+            "end": {
+              "line": 80,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "get_WithNoCache",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 82,
+              "column": 8
+            },
+            "end": {
+              "line": 96,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "get_WithCacheToDefaultTable",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 98,
+              "column": 8
+            },
+            "end": {
+              "line": 110,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "get_WithCacheToSpecifiedTable",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 112,
+              "column": 8
+            },
+            "end": {
+              "line": 124,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "patch_WithCsrfCheck",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 126,
+              "column": 8
+            },
+            "end": {
+              "line": 142,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "patch_WithAdditionalHeaders",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 144,
+              "column": 8
+            },
+            "end": {
+              "line": 162,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "post_WithMultipartData",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 164,
+              "column": 8
+            },
+            "end": {
+              "line": 178,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "_setCookie",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 180,
+              "column": 8
+            },
+            "end": {
+              "line": 187,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "_getBodyWithBlobsOrFilesData",
+          "description": "to fit etools app needs, on backend there must be a custom parser for this data",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 191,
+              "column": 8
+            },
+            "end": {
+              "line": 243,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "params": []
+        }
+      ],
+      "staticMethods": [],
+      "demos": [],
+      "metadata": {},
+      "sourceRange": {
+        "start": {
+          "line": 27,
+          "column": 6
+        },
+        "end": {
+          "line": 244,
+          "column": 7
+        }
+      },
+      "privacy": "public",
+      "superclass": "HTMLElement",
+      "name": "DirectAjaxCalls",
+      "attributes": [],
+      "events": [],
+      "styling": {
+        "cssVariables": [],
+        "selectors": []
+      },
+      "slots": [],
+      "tagname": "direct-ajax-calls"
+    }
+  ],
+  "mixins": [
+    {
+      "description": "",
+      "summary": "",
+      "path": "etools-ajax-data-mixin.html",
+      "properties": [],
+      "methods": [
+        {
+          "name": "_prepareMultiPartFormData",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 8,
+              "column": 6
+            },
+            "end": {
+              "line": 25,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "inputBody"
+            },
+            {
+              "name": "prepareMultipartData"
+            }
+          ]
+        },
+        {
+          "name": "_prepareFormData",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 27,
+              "column": 6
+            },
+            "end": {
+              "line": 63,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "self"
+            },
+            {
+              "name": "body"
+            },
+            {
+              "name": "data"
+            },
+            {
+              "name": "key"
+            }
+          ]
+        },
+        {
+          "name": "_isFile",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 65,
+              "column": 6
+            },
+            "end": {
+              "line": 67,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "data"
+            }
+          ]
+        },
+        {
+          "name": "_isSimpleObject",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 69,
+              "column": 6
+            },
+            "end": {
+              "line": 71,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "data"
+            }
+          ]
+        }
+      ],
+      "staticMethods": [],
+      "demos": [],
+      "metadata": {},
+      "sourceRange": {
+        "start": {
+          "line": 6,
+          "column": 4
+        },
+        "end": {
+          "line": 72,
+          "column": 5
+        }
+      },
+      "privacy": "public",
+      "name": "EtoolsAjaxDataMixin",
+      "attributes": [],
+      "events": [],
+      "styling": {
+        "cssVariables": [],
+        "selectors": []
+      },
+      "slots": []
+    },
+    {
+      "description": "",
+      "summary": "",
+      "path": "etools-ajax-cache-mixin.html",
+      "properties": [
+        {
+          "name": "etoolsAjaxCacheDb",
+          "type": "Object",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 10,
+              "column": 10
+            },
+            "end": {
+              "line": 15,
+              "column": 11
+            }
+          },
+          "metadata": {
+            "polymer": {}
+          }
+        },
+        {
+          "name": "etoolsAjaxCacheDefaultTableName",
+          "type": "string",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 16,
+              "column": 10
+            },
+            "end": {
+              "line": 19,
+              "column": 11
+            }
+          },
+          "metadata": {
+            "polymer": {}
+          },
+          "defaultValue": "\"ajaxDefaultDataTable\""
+        },
+        {
+          "name": "etoolsAjaxCacheListsExpireMapTable",
+          "type": "string",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 20,
+              "column": 10
+            },
+            "end": {
+              "line": 23,
+              "column": 11
+            }
+          },
+          "metadata": {
+            "polymer": {}
+          },
+          "defaultValue": "\"listsExpireMapTable\""
+        }
+      ],
+      "methods": [
+        {
+          "name": "_requestIsViableForCaching",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 27,
+              "column": 6
+            },
+            "end": {
+              "line": 29,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "reqConfig"
+            }
+          ]
+        },
+        {
+          "name": "_expireTimeWasProvided",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 31,
+              "column": 6
+            },
+            "end": {
+              "line": 33,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "endpoint"
+            }
+          ]
+        },
+        {
+          "name": "_getEndpointCacheKey",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 35,
+              "column": 6
+            },
+            "end": {
+              "line": 44,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "endpoint"
+            },
+            {
+              "name": "params"
+            }
+          ]
+        },
+        {
+          "name": "_isNonEmptyString",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 46,
+              "column": 6
+            },
+            "end": {
+              "line": 48,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "str"
+            }
+          ]
+        },
+        {
+          "name": "_isNonEmptyObject",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 50,
+              "column": 6
+            },
+            "end": {
+              "line": 52,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "obj"
+            }
+          ]
+        },
+        {
+          "name": "getCachingInfo",
+          "description": "Get caching info for the current request",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 57,
+              "column": 6
+            },
+            "end": {
+              "line": 69,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "reqConfig"
+            }
+          ]
+        },
+        {
+          "name": "cachingCanBeMade",
+          "description": "etoolsAjaxCacheDb should be instance of Dexie\ncacheTableName and listsExpireMapTable tables should be defined",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 75,
+              "column": 6
+            },
+            "end": {
+              "line": 79,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "cacheTableName"
+            }
+          ]
+        },
+        {
+          "name": "_shouldCacheToDefaultTable",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 81,
+              "column": 6
+            },
+            "end": {
+              "line": 83,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "cacheTableName"
+            }
+          ]
+        },
+        {
+          "name": "_cacheEndpointDataUsingDefaultTable",
+          "description": "Cache data into dexie db default table (etoolsAjaxCacheDefaultTableName)",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 88,
+              "column": 6
+            },
+            "end": {
+              "line": 100,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "dataToCache"
+            }
+          ]
+        },
+        {
+          "name": "_cacheEndpointDataUsingSpecifiedTable",
+          "description": "Cache date into specified dexie db table (reqConfig.endpoint.cacheTableName)",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 105,
+              "column": 6
+            },
+            "end": {
+              "line": 137,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "responseData"
+            },
+            {
+              "name": "cachingInfo"
+            }
+          ]
+        },
+        {
+          "name": "cacheEndpointData",
+          "description": "Cache endpoint received data",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 142,
+              "column": 6
+            },
+            "end": {
+              "line": 156,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "responseData"
+            },
+            {
+              "name": "cachingInfo"
+            }
+          ]
+        },
+        {
+          "name": "_isExpiredCachedData",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 158,
+              "column": 6
+            },
+            "end": {
+              "line": 167,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "dataExp"
+            }
+          ]
+        },
+        {
+          "name": "_getDataFromDefaultCacheTable",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 169,
+              "column": 6
+            },
+            "end": {
+              "line": 187,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "cacheKey"
+            }
+          ]
+        },
+        {
+          "name": "_getDataFromSpecifiedCacheTable",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 189,
+              "column": 6
+            },
+            "end": {
+              "line": 209,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "cacheTableName"
+            }
+          ]
+        },
+        {
+          "name": "getEndpointDataFromCache",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 211,
+              "column": 6
+            },
+            "end": {
+              "line": 217,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "cachingInfo"
+            }
+          ]
+        }
+      ],
+      "staticMethods": [],
+      "demos": [],
+      "metadata": {},
+      "sourceRange": {
+        "start": {
+          "line": 7,
+          "column": 4
+        },
+        "end": {
+          "line": 218,
+          "column": 5
+        }
+      },
+      "privacy": "public",
+      "name": "EtoolsAjaxCacheMixin",
+      "attributes": [
+        {
+          "name": "etools-ajax-cache-db",
+          "description": "",
+          "sourceRange": {
+            "start": {
+              "line": 10,
+              "column": 10
+            },
+            "end": {
+              "line": 15,
+              "column": 11
+            }
+          },
+          "metadata": {},
+          "type": "Object"
+        },
+        {
+          "name": "etools-ajax-cache-default-table-name",
+          "description": "",
+          "sourceRange": {
+            "start": {
+              "line": 16,
+              "column": 10
+            },
+            "end": {
+              "line": 19,
+              "column": 11
+            }
+          },
+          "metadata": {},
+          "type": "string"
+        },
+        {
+          "name": "etools-ajax-cache-lists-expire-map-table",
+          "description": "",
+          "sourceRange": {
+            "start": {
+              "line": 20,
+              "column": 10
+            },
+            "end": {
+              "line": 23,
+              "column": 11
+            }
+          },
+          "metadata": {},
+          "type": "string"
+        }
+      ],
+      "events": [],
+      "styling": {
+        "cssVariables": [],
+        "selectors": []
+      },
+      "slots": []
+    },
+    {
+      "description": "A behavior that will allow you to make a request in any Polymer element you need.",
+      "summary": "",
+      "path": "etools-ajax-request-mixin.html",
+      "properties": [
+        {
+          "name": "lastAjaxRequest",
+          "type": "Object",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 33,
+              "column": 10
+            },
+            "end": {
+              "line": 37,
+              "column": 11
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "notify": true,
+              "readOnly": true
+            }
+          }
+        },
+        {
+          "name": "activeAjaxRequests",
+          "type": "Array",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 38,
+              "column": 10
+            },
+            "end": {
+              "line": 44,
+              "column": 11
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "readOnly": true
+            }
+          },
+          "defaultValue": "[]"
+        },
+        {
+          "name": "reqProgress",
+          "type": "Object",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 45,
+              "column": 10
+            },
+            "end": {
+              "line": 52,
+              "column": 11
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "notify": true,
+              "readOnly": true
+            }
+          },
+          "defaultValue": "null"
+        },
+        {
+          "name": "checkReqProgress",
+          "type": "Object",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 53,
+              "column": 10
+            },
+            "end": {
+              "line": 58,
+              "column": 11
+            }
+          },
+          "metadata": {
+            "polymer": {}
+          },
+          "defaultValue": "null"
+        }
+      ],
+      "methods": [
+        {
+          "name": "sendRequest",
+          "description": "Check for cached data if needed, if no cached data then fire new request\nreturns Promise",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 66,
+              "column": 6
+            },
+            "end": {
+              "line": 85,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "reqConfig"
+            },
+            {
+              "name": "activeReqKey"
+            }
+          ]
+        },
+        {
+          "name": "_doRequest",
+          "description": "Fire new request",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 90,
+              "column": 6
+            },
+            "end": {
+              "line": 128,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "reqConfigOptions"
+            },
+            {
+              "name": "cachingInfo"
+            },
+            {
+              "name": "checkProgress"
+            },
+            {
+              "name": "activeReqKey"
+            }
+          ]
+        },
+        {
+          "name": "_addToActiveAjaxRequests",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 130,
+              "column": 6
+            },
+            "end": {
+              "line": 134,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "key"
+            },
+            {
+              "name": "request"
+            }
+          ]
+        },
+        {
+          "name": "_removeActiveRequestFromList",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 136,
+              "column": 6
+            },
+            "end": {
+              "line": 146,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "key"
+            }
+          ]
+        },
+        {
+          "name": "getActiveRequestByKey",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 148,
+              "column": 6
+            },
+            "end": {
+              "line": 152,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "key"
+            }
+          ]
+        },
+        {
+          "name": "abortRequestByKey",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 154,
+              "column": 6
+            },
+            "end": {
+              "line": 167,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "key"
+            }
+          ]
+        },
+        {
+          "name": "abortActiveRequest",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 169,
+              "column": 6
+            },
+            "end": {
+              "line": 175,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "activeReqMapObj"
+            }
+          ]
+        },
+        {
+          "name": "_isViableForCaching",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 177,
+              "column": 6
+            },
+            "end": {
+              "line": 183,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "cachingInfo"
+            }
+          ]
+        },
+        {
+          "name": "_prepareConfigOptions",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 185,
+              "column": 6
+            },
+            "end": {
+              "line": 200,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "reqConfig"
+            }
+          ]
+        },
+        {
+          "name": "_getHandleAs",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 202,
+              "column": 6
+            },
+            "end": {
+              "line": 207,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "reqConfig"
+            }
+          ]
+        },
+        {
+          "name": "_getRequestUrl",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 209,
+              "column": 6
+            },
+            "end": {
+              "line": 216,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "reqConfig"
+            }
+          ]
+        },
+        {
+          "name": "_buildQueryString",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 218,
+              "column": 6
+            },
+            "end": {
+              "line": 235,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "url"
+            },
+            {
+              "name": "params"
+            }
+          ]
+        },
+        {
+          "name": "_getRequestBody",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 237,
+              "column": 6
+            },
+            "end": {
+              "line": 243,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "reqConfig"
+            }
+          ]
+        },
+        {
+          "name": "_getRequestHeaders",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 245,
+              "column": 6
+            },
+            "end": {
+              "line": 268,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "reqConfig"
+            }
+          ]
+        },
+        {
+          "name": "_getClientConfiguredHeaders",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 270,
+              "column": 6
+            },
+            "end": {
+              "line": 279,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "additionalHeaders"
+            }
+          ]
+        },
+        {
+          "name": "_getCsrfHeader",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 281,
+              "column": 6
+            },
+            "end": {
+              "line": 291,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "csrfCheck"
+            }
+          ]
+        },
+        {
+          "name": "_csrfSafeMethod",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 293,
+              "column": 6
+            },
+            "end": {
+              "line": 296,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "method"
+            }
+          ]
+        },
+        {
+          "name": "_getCSRFCookie",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 298,
+              "column": 6
+            },
+            "end": {
+              "line": 314,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": []
+        },
+        {
+          "name": "_determineContentType",
+          "description": "Content-Type set here can be overridden later\nby headers sent from the client",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 320,
+              "column": 6
+            },
+            "end": {
+              "line": 328,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "body"
+            }
+          ]
+        },
+        {
+          "name": "_checkRequestProgress",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 330,
+              "column": 6
+            },
+            "end": {
+              "line": 342,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "request"
+            },
+            {
+              "name": "checkProgress"
+            }
+          ]
+        },
+        {
+          "name": "_stopReqProgressCheck",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 343,
+              "column": 6
+            },
+            "end": {
+              "line": 347,
+              "column": 7
+            }
+          },
+          "metadata": {},
+          "params": []
+        }
+      ],
+      "staticMethods": [],
+      "demos": [
+        {
+          "url": "demo/index.html",
+          "description": ""
+        }
+      ],
+      "metadata": {},
+      "sourceRange": {
+        "start": {
+          "line": 29,
+          "column": 4
+        },
+        "end": {
+          "line": 348,
+          "column": 5
+        }
+      },
+      "privacy": "public",
+      "name": "EtoolsAjaxRequestMixin",
+      "attributes": [
+        {
+          "name": "last-ajax-request",
+          "description": "",
+          "sourceRange": {
+            "start": {
+              "line": 33,
+              "column": 10
+            },
+            "end": {
+              "line": 37,
+              "column": 11
+            }
+          },
+          "metadata": {},
+          "type": "Object"
+        },
+        {
+          "name": "active-ajax-requests",
+          "description": "",
+          "sourceRange": {
+            "start": {
+              "line": 38,
+              "column": 10
+            },
+            "end": {
+              "line": 44,
+              "column": 11
+            }
+          },
+          "metadata": {},
+          "type": "Array"
+        },
+        {
+          "name": "req-progress",
+          "description": "",
+          "sourceRange": {
+            "start": {
+              "line": 45,
+              "column": 10
+            },
+            "end": {
+              "line": 52,
+              "column": 11
+            }
+          },
+          "metadata": {},
+          "type": "Object"
+        },
+        {
+          "name": "check-req-progress",
+          "description": "",
+          "sourceRange": {
+            "start": {
+              "line": 53,
+              "column": 10
+            },
+            "end": {
+              "line": 58,
+              "column": 11
+            }
+          },
+          "metadata": {},
+          "type": "Object"
+        }
+      ],
+      "events": [],
+      "styling": {
+        "cssVariables": [],
+        "selectors": []
+      },
+      "slots": []
+    }
+  ]
+}
