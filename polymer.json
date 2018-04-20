@@ -1,0 +1,11 @@
+{
+  "lint": {
+    "rules": [
+      "polymer-2"
+    ],
+    "filesToIgnore": [
+      "demo/*",
+      "test/*"
+    ]
+  }
+}
