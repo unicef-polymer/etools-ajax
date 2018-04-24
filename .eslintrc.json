@@ -25,6 +25,9 @@
     "moment": true,
     "Promise": true,
     "Polymer": true,
-    "EtoolsLogsMixin": true
+    "EtoolsLogsMixin": true,
+    "EtoolsAjaxDataMixin": true,
+    "EtoolsAjaxCacheMixin": true,
+    "EtoolsAjaxRequestMixin": true
   }
 }

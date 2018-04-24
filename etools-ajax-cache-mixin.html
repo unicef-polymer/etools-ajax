@@ -1,12 +1,16 @@
 <link rel="import" href="../etools-behaviors/etools-logs-mixin.html">
 <script>
   'use strict';
+  /* eslint-disable no-unused-vars */
+
   /**
    * @polymer
    * @mixinFunction
    * @appliesMixin EtoolsLogsMixin
    */
-  const EtoolsAjaxCacheMixin = Polymer.dedupingMixin((baseClass) => class extends EtoolsLogsMixin(baseClass) {
+  const EtoolsAjaxCacheMixin = Polymer.dedupingMixin(baseClass => class extends EtoolsLogsMixin(baseClass) {
+    /* eslint-enable no-unused-vars */
+
     static get properties() {
       return {
         etoolsAjaxCacheDb: {
@@ -28,7 +32,7 @@
 
     ready() {
       super.ready();
-      if(typeof Dexie === 'undefined') {
+      if (typeof Dexie === 'undefined') {
         this.logError('Dexie import missing.', 'etools-ajax');
       }
     }

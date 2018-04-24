@@ -1,10 +1,13 @@
 <script>
   'use strict';
-  /*
-  * @polymer
-  * @mixinFunction
-  */
-  const EtoolsAjaxDataMixin = Polymer.dedupingMixin((baseClass) => class extends baseClass {
+  /* eslint-disable no-unused-vars */
+
+  /**
+   * @polymer
+   * @mixinFunction
+   */
+  const EtoolsAjaxDataMixin = Polymer.dedupingMixin(baseClass => class extends baseClass {
+    /* eslint-enable no-unused-vars */
 
     _prepareMultiPartFormData(inputBody, prepareMultipartData) {
       if (inputBody instanceof FormData) {
