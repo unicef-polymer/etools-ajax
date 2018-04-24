@@ -1,14 +1,17 @@
-<link rel="import" href="etools-ajax-request-mixin.html">
-<link rel="import" href="../polymer/lib/utils/debounce.html">
 <link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../polymer/lib/utils/debounce.html">
+<link rel="import" href="etools-ajax-request-mixin.html">
 
 <dom-module id="etools-ajax">
 
   <script>
     'use strict';
-    /*
-    * @element
-    */
+
+    /**
+     * @polymer
+     * @customElement
+     * @appliesMixin EtoolsAjaxRequestMixin
+     */
     class EtoolsAjax extends EtoolsAjaxRequestMixin(Polymer.Element) {
       static get is() {
         return 'etools-ajax';
@@ -34,7 +37,7 @@
       }
 
       send() {
-        var opt = {
+        let opt = {
           endpoint: this.endpoint || {url: this.url},
           params: this.params,
           method: this.method,
@@ -42,24 +45,24 @@
         };
 
         return this.sendRequest(opt)
-          .then((data) => {
-            this.dispatchEvent(new CustomEvent('success', {detail: data, bubbles: true, composed: true}));
-            return data;
-          })
-          .catch((error) => {
-            this.handleError(error);
-          });
+            .then((data) => {
+              this.dispatchEvent(new CustomEvent('success', {detail: data, bubbles: true, composed: true}));
+              return data;
+            })
+            .catch((error) => {
+              this.handleError(error);
+            });
       }
 
       _optionsChanged() {
         this._debouncer = Polymer.Debouncer.debounce(this._debouncer,
-          Polymer.Async.timeOut.after(300),
-          () => {
-            if (!this.endpoint && !this.url) {
-              return;
-            }
-            this.send();
-          });
+            Polymer.Async.timeOut.after(300),
+            () => {
+              if (!this.endpoint && !this.url) {
+                return;
+              }
+              this.send();
+            });
       }
 
       handleError(error) {
