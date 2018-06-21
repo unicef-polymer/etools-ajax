@@ -1,7 +1,7 @@
-import { PolymerElement } from '@polymer/polymer/polymer-element.js';
-import { Debouncer } from '@polymer/polymer/lib/utils/debounce.js';
+import {PolymerElement} from '@polymer/polymer/polymer-element.js';
+import {Debouncer} from '@polymer/polymer/lib/utils/debounce.js';
 import EtoolsAjaxRequestMixin from './etools-ajax-request-mixin.js';
-import { timeOut } from '@polymer/polymer/lib/utils/async.js';
+import {timeOut} from '@polymer/polymer/lib/utils/async.js';
 
 
 /**

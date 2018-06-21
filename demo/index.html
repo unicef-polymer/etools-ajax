@@ -1,45 +1,45 @@
 <!doctype html>
 <html>
 <head>
-    <title>etools-ajax demo</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
-    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
-    <script type="module" src="../node_modules/@polymer/iron-demo-helpers/demo-pages-shared-styles.js"></script>
-    <script type="module" src="../node_modules/@polymer/iron-demo-helpers/demo-snippet.js"></script>
-    <script type="module" src="./dexie-conf.js"></script>
-    <script type="module" src="../etools-ajax.js"></script>
-    <script type="module" src="./direct-etools-ajax-requests.js"></script>
+  <title>etools-ajax demo</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+  <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+  <script type="module" src="../node_modules/@polymer/iron-demo-helpers/demo-pages-shared-styles.js"></script>
+  <script type="module" src="../node_modules/@polymer/iron-demo-helpers/demo-snippet.js"></script>
+  <script type="module" src="./dexie-conf.js"></script>
+  <script type="module" src="../etools-ajax.js"></script>
+  <script type="module" src="./direct-etools-ajax-requests.js"></script>
 
-    <style is="custom-style" include="demo-pages-shared-styles">
-      .vertical-section-container {
-        max-width: 900px;
-        line-height: 1.456;
-        margin: 0 auto;
-      }
-    </style>
+  <style is="custom-style" include="demo-pages-shared-styles">
+    .vertical-section-container {
+      max-width: 900px;
+      line-height: 1.456;
+      margin: 0 auto;
+    }
+  </style>
 </head>
 <body>
 
 <div class="vertical-section-container centered">
-      <h1>EtoolsAjaxBehavior demo</h1>
-      <demo-snippet>
-        <template>
-          <direct-ajax-calls></direct-ajax-calls>
-        </template>
-      </demo-snippet>
+  <h1>EtoolsAjaxBehavior demo</h1>
+  <demo-snippet>
+    <template>
+      <direct-ajax-calls></direct-ajax-calls>
+    </template>
+  </demo-snippet>
 
-      <h1>etools-ajax demo</h1>
+  <h1>etools-ajax demo</h1>
 
-      <h3>Getting data uing \`etools-ajax\` element</h3>
-      <p>
-        No caching:
-      </p>
-      <demo-snippet>
-        <template>
-          <etools-ajax url="http://httpbin.org/get"></etools-ajax>
-        </template>
-      </demo-snippet>
+  <h3>Getting data uing \`etools-ajax\` element</h3>
+  <p>
+    No caching:
+  </p>
+  <demo-snippet>
+    <template>
+      <etools-ajax url="http://httpbin.org/get"></etools-ajax>
+    </template>
+  </demo-snippet>
 
 </div>
 

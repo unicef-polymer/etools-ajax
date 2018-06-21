@@ -1,5 +1,5 @@
 import '@polymer/polymer/polymer-legacy.js';
-import { PolymerElement } from '@polymer/polymer/polymer-element.js';
+import {PolymerElement} from '@polymer/polymer/polymer-element.js';
 import Dexie from 'dexie';
 import EtoolsAjaxRequestMixin from '../etools-ajax-request-mixin.js';
 // set logging level
@@ -16,11 +16,13 @@ etoolsCustomDexieDb.version(1).stores({
 window.EtoolsRequestCacheDb = etoolsCustomDexieDb;
 
 class DirectAjaxCalls extends EtoolsAjaxRequestMixin(PolymerElement) {
-  static get is() { return 'direct-ajax-calls'; }
+  static get is() {
+    return 'direct-ajax-calls';
+  }
 
   ready() {
     super.ready();
-   // console.log(this.etoolsAjaxCacheDb);
+    // console.log(this.etoolsAjaxCacheDb);
 
     this._setCookie();
 
@@ -32,7 +34,7 @@ class DirectAjaxCalls extends EtoolsAjaxRequestMixin(PolymerElement) {
     this.patch_WithJsonContent();
     this.patch_WithCsrfCheck();
     this.patch_WithAdditionalHeaders();
-  //  this.post_WithMultipartData();
+    //  this.post_WithMultipartData();
 
   }
 
@@ -47,12 +49,13 @@ class DirectAjaxCalls extends EtoolsAjaxRequestMixin(PolymerElement) {
         firstName: "JaneTEST",
         lastName: "DoeTest"
       }
-    }).then(function(resp) {
+    }).then(function (resp) {
       console.log(resp);
-    }).catch(function(error) {
+    }).catch(function (error) {
       console.log(error);
     });
   }
+
   patch_WithJsonContent() {
     this.sendRequest({
       method: 'PATCH',
@@ -63,9 +66,9 @@ class DirectAjaxCalls extends EtoolsAjaxRequestMixin(PolymerElement) {
         id: "14",
         firstName: "JaneTEST2"
       }
-    }).then(function(resp) {
+    }).then(function (resp) {
       console.log(resp);
-    }).catch(function(error) {
+    }).catch(function (error) {
       console.log(error);
     });
   }
@@ -79,9 +82,9 @@ class DirectAjaxCalls extends EtoolsAjaxRequestMixin(PolymerElement) {
         id: 10,
         name: 'Georgia'
       }
-    }).then(function(resp) {
+    }).then(function (resp) {
       console.log(resp);
-    }).catch(function(error) {
+    }).catch(function (error) {
       console.log(error);
     });
   }
@@ -93,9 +96,9 @@ class DirectAjaxCalls extends EtoolsAjaxRequestMixin(PolymerElement) {
         exp: 5 * 60 * 1000, // cache set for 5m
         cachingKey: 'countries',
       }
-    }).then(function(resp) {
+    }).then(function (resp) {
       console.log(resp);
-    }).catch(function(error) {
+    }).catch(function (error) {
       console.log(error);
     });
   }
@@ -107,9 +110,9 @@ class DirectAjaxCalls extends EtoolsAjaxRequestMixin(PolymerElement) {
         exp: 5 * 60 * 1000, // cache set for 5m
         cacheTableName: 'countries'
       }
-    }).then(function(resp) {
+    }).then(function (resp) {
       console.log(resp);
-    }).catch(function(error) {
+    }).catch(function (error) {
       console.log(error);
     });
   }
@@ -125,9 +128,9 @@ class DirectAjaxCalls extends EtoolsAjaxRequestMixin(PolymerElement) {
         firstName: "JaneTEST2"
       },
       csrfCheck: true
-    }).then(function(resp) {
+    }).then(function (resp) {
       console.log(resp);
-    }).catch(function(error) {
+    }).catch(function (error) {
       console.log(error);
     });
   }
@@ -145,9 +148,9 @@ class DirectAjaxCalls extends EtoolsAjaxRequestMixin(PolymerElement) {
       headers: {
         'Authorization': 'Bearer lt8fnG9CNmLmsmRX8LTp0pVeJqkccEceXfNM8s_f624'
       }
-    }).then(function(resp) {
+    }).then(function (resp) {
       console.log(resp);
-    }).catch(function(error) {
+    }).catch(function (error) {
       console.log(error);
     });
   }
@@ -161,9 +164,9 @@ class DirectAjaxCalls extends EtoolsAjaxRequestMixin(PolymerElement) {
       body: this._getBodyWithBlobsOrFilesData(),
       multiPart: true,
       prepareMultipartData: true
-    }).then(function(resp) {
+    }).then(function (resp) {
       console.log(resp);
-    }).catch(function(error) {
+    }).catch(function (error) {
       console.log(error);
     });
   }
@@ -194,7 +197,7 @@ class DirectAjaxCalls extends EtoolsAjaxRequestMixin(PolymerElement) {
           name: 'testing 2',
           someArray: [1, 3],
           dummyData: {
-            test: [1, 2, 3, function() {
+            test: [1, 2, 3, function () {
               var content = '<a id="id1"><b id="b">hey you 1!</b></a>';
               return new Blob([content], {type: "text/xml"});
             }()],
@@ -202,7 +205,7 @@ class DirectAjaxCalls extends EtoolsAjaxRequestMixin(PolymerElement) {
               id: 1,
               id_2: [
                 {
-                  file: function() {
+                  file: function () {
                     var content = '<a id="id2"><b id="b">hey you 2!</b></a>';
                     return new Blob([content], {type: "text/xml"});
                   }()
@@ -211,7 +214,7 @@ class DirectAjaxCalls extends EtoolsAjaxRequestMixin(PolymerElement) {
               randomObject: {
                 partner: 1,
                 agreement: 2,
-                assessment: function() {
+                assessment: function () {
                   var content = '<a id="id3"><b id="b">hey you 3!</b></a>';
                   return new Blob([content], {type: "text/xml"});
                 }()
@@ -220,13 +223,13 @@ class DirectAjaxCalls extends EtoolsAjaxRequestMixin(PolymerElement) {
           }
         },
         1, 2, 3, 4, 5,
-        function() {
+        function () {
           var content = '<a id="someId"><b id="b">hey you!</b></a>';
           return new Blob([content], {type: "text/xml"});
         }(),
       ],
       testArr2: [],
-      someFile: function() {
+      someFile: function () {
         var content = '<a id="a"><b id="b">hey!</b></a>';
         return new Blob([content], {type: "text/xml"});
       }()
