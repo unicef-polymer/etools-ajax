@@ -1,29 +1,27 @@
 <!doctype html>
 <html>
-  <head>
+<head>
     <title>etools-ajax demo</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-
-    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
-    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
-
-    <link rel="import" href="dexie-conf.html">
-    <link rel="import" href="../etools-ajax.html">
-
-    <link rel="import" href="direct-etools-ajax-requests.html">
+    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+    <script type="module" src="../node_modules/@polymer/iron-demo-helpers/demo-pages-shared-styles.js"></script>
+    <script type="module" src="../node_modules/@polymer/iron-demo-helpers/demo-snippet.js"></script>
+    <script type="module" src="./dexie-conf.js"></script>
+    <script type="module" src="../etools-ajax.js"></script>
+    <script type="module" src="./direct-etools-ajax-requests.js"></script>
 
     <style is="custom-style" include="demo-pages-shared-styles">
       .vertical-section-container {
         max-width: 900px;
         line-height: 1.456;
+        margin: 0 auto;
       }
     </style>
-  </head>
-  <body>
+</head>
+<body>
 
-    <div class="vertical-section-container centered">
+<div class="vertical-section-container centered">
       <h1>EtoolsAjaxBehavior demo</h1>
       <demo-snippet>
         <template>
@@ -33,7 +31,7 @@
 
       <h1>etools-ajax demo</h1>
 
-      <h3>Getting data uing `etools-ajax` element</h3>
+      <h3>Getting data uing \`etools-ajax\` element</h3>
       <p>
         No caching:
       </p>
@@ -43,7 +41,7 @@
         </template>
       </demo-snippet>
 
-    </div>
+</div>
 
-  </body>
+</body>
 </html>

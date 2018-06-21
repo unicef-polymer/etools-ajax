@@ -1,12 +1,32 @@
 {
+  "description": "Polymer element and behavior for handling ajax requests",
   "name": "etools-ajax",
   "devDependencies": {
     "eslint": "^3.19.0",
     "eslint-config-google": "^0.7.0",
-    "eslint-plugin-html": "^2.0.0"
+    "eslint-plugin-html": "^2.0.0",
+    "@polymer/iron-component-page": "^3.0.0-pre.18",
+    "@polymer/iron-demo-helpers": "^3.0.0-pre.18",
+    "wct-browser-legacy": "^0.0.1-pre.11",
+    "@webcomponents/webcomponentsjs": "^2.0.0"
   },
   "scripts": {
     "lint:javascript": "eslint . --ext js,html && exit 0",
     "lint": "npm run lint:javascript && polymer lint && exit 0"
+  },
+  "version": "4.0.0",
+  "resolutions": {
+    "inherits": "2.0.3",
+    "samsam": "1.1.3",
+    "supports-color": "3.1.2",
+    "type-detect": "1.0.0",
+    "@webcomponents/webcomponentsjs": "2.0.0-beta.2"
+  },
+  "main": "etools-ajax-request.js",
+  "license": "https://github.com/unicef-polymer/etools-ajax/blob/master/LICENSE.md",
+  "dependencies": {
+    "@polymer/iron-ajax": "^3.0.0-pre.18",
+    "@polymer/polymer": "^3.0.0",
+    "dexie": "^2.0.4"
   }
 }

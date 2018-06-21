@@ -7,7 +7,7 @@
   "dependencies": {
     "polymer": "Polymer/polymer#^2.0.0",
     "iron-ajax": "PolymerElements/iron-ajax#^2.0.0",
-    "etools-behaviors": "2.0.0"
+    "etools-behaviors": "575692750251f8b592630b470a34d254fc212bd8"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^3.0.0",
