@@ -1,7 +1,7 @@
 import './scripts/es6-obj-assign-polyfil.js';
 import '@polymer/polymer/polymer-legacy.js';
 import '@polymer/iron-ajax/iron-request.js';
-import EtoolsLogsMixin from './bower_components/etools-behaviors/etools-logs-mixin.js';
+import EtoolsLogsMixin from '@bower_components/etools-behaviors/etools-logs-mixin.js';
 import EtoolsAjaxDataMixin from './etools-ajax-data-mixin.js';
 import EtoolsAjaxCacheMixin from './etools-ajax-cache-mixin.js';
 import {dedupingMixin} from '@polymer/polymer/lib/utils/mixin.js';
