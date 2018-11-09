@@ -26,7 +26,7 @@
   "main": "etools-ajax-request.js",
   "license": "https://github.com/unicef-polymer/etools-ajax/blob/master/LICENSE.md",
   "dependencies": {
-    "@bower_components/etools-behaviors": "unicef-polymer/etools-behaviors#575692750251f8b592630b470a34d254fc212bd8",
+    "etools-behaviors": "git+https://github.com/unicef-polymer/etools-behaviors.git#upgrade-to-polymer3",
     "@polymer/iron-ajax": "^3.0.0-pre.18",
     "@polymer/polymer": "^3.0.0",
     "dexie": "^2.0.4"
