@@ -1,4 +1,4 @@
-import EtoolsLogsMixin from '@bower_components/etools-behaviors/etools-logs-mixin.js';
+import EtoolsLogsMixin from 'etools-behaviors/etools-logs-mixin.js';
 import {dedupingMixin} from '@polymer/polymer/lib/utils/mixin.js';
 import Dexie from 'dexie';
 /* eslint-disable no-unused-vars */
