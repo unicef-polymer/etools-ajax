@@ -1,6 +1,6 @@
 import {PolymerElement} from '@polymer/polymer/polymer-element.js';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce.js';
-import './etools-ajax-request-mixin.js';
+import {EtoolsAjaxRequestMixin} from './etools-ajax-request-mixin.js';
 import {timeOut} from '@polymer/polymer/lib/utils/async.js';
 
 /**
@@ -8,7 +8,7 @@ import {timeOut} from '@polymer/polymer/lib/utils/async.js';
  * @customElement
  * @applies EtoolsMixins.EtoolsAjaxRequestMixin
  */
-class EtoolsAjax extends EtoolsMixins.EtoolsAjaxRequestMixin(PolymerElement) {
+class EtoolsAjax extends EtoolsAjaxRequestMixin(PolymerElement) {
 
   static get properties() {
     return {

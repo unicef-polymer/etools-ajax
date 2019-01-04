@@ -1,4 +1,4 @@
-import EtoolsLogsMixin from 'etools-behaviors/etools-logs-mixin.js';
+import {EtoolsLogsMixin} from 'etools-behaviors/etools-logs-mixin.js';
 import {dedupingMixin} from '@polymer/polymer/lib/utils/mixin.js';
 import Dexie from 'dexie';
 /* eslint-disable no-unused-vars */
@@ -9,7 +9,7 @@ import Dexie from 'dexie';
  * @appliesMixin EtoolsLogsMixin
  */
 
-const EtoolsAjaxCacheMixin = dedupingMixin(baseClass => class extends EtoolsLogsMixin(baseClass) {
+export const EtoolsAjaxCacheMixin = dedupingMixin(baseClass => class extends EtoolsLogsMixin(baseClass) {
   /* eslint-enable no-unused-vars */
 
   static get properties() {
@@ -232,7 +232,3 @@ const EtoolsAjaxCacheMixin = dedupingMixin(baseClass => class extends EtoolsLogs
 
 
 })
-
-window.EtoolsMixins = window.EtoolsMixins || {};
-
-EtoolsMixins.EtoolsAjaxCachetMixin = EtoolsAjaxCachetMixin;

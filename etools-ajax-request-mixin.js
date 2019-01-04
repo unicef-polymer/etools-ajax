@@ -1,9 +1,9 @@
 import './scripts/es6-obj-assign-polyfil.js';
 import '@polymer/polymer/polymer-legacy.js';
 import '@polymer/iron-ajax/iron-request.js';
-import 'etools-behaviors/etools-logs-mixin.js';
-import './etools-ajax-data-mixin.js';
-import './etools-ajax-cache-mixin.js';
+import {EtoolsLogsMixin} from 'etools-behaviors/etools-logs-mixin.js';
+import {EtoolsAjaxDataMixin} from './etools-ajax-data-mixin.js';
+import {EtoolsAjaxCacheMixin} from './etools-ajax-cache-mixin.js';
 import {dedupingMixin} from '@polymer/polymer/lib/utils/mixin.js';
 
 function EtoolsRequestError(error, statusCode, statusText, response) {
@@ -26,13 +26,13 @@ function _prepareResponse(response) {
  * A behavior that will allow you to make a request in any Polymer element you need.
  * @polymer
  * @mixinFunction
- * @extends EtoolsMixins.EtoolsAjaxCacheMixin
- * @extends EtoolsMixins.EtoolsAjaxDataMixin
- * @extends EtoolsMixins.EtoolsLogsMixin
+ * @extends EtoolsAjaxCacheMixin
+ * @extends EtoolsAjaxDataMixin
+ * @extends EtoolsLogsMixin
  * @demo demo/index.html
  */
-const EtoolsAjaxRequestMixin = dedupingMixin(
-  baseClass => class extends EtoolsMixins.EtoolsLogsMixin(EtoolsMixins.EtoolsAjaxDataMixin(EtoolsMixins.EtoolsAjaxCacheMixin(baseClass))) {
+export const EtoolsAjaxRequestMixin = dedupingMixin(
+  baseClass => class extends EtoolsLogsMixin(EtoolsAjaxDataMixin(EtoolsAjaxCacheMixin(baseClass))) {
     /* eslint-enable no-unused-vars */
 
     static get properties() {
@@ -360,7 +360,3 @@ const EtoolsAjaxRequestMixin = dedupingMixin(
     }
 
   });
-
-window.EtoolsMixins = window.EtoolsMixins || {};
-
-EtoolsMixins.EtoolsAjaxRequestMixin = EtoolsAjaxRequestMixin;
