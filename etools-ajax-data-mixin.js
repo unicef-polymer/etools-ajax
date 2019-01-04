@@ -77,4 +77,4 @@ const EtoolsAjaxDataMixin = dedupingMixin(baseClass => class extends baseClass {
 
 window.EtoolsMixins = window.EtoolsMixins || {};
 
-EtoolsMixins.EtoolsAjaxDataMixin = EtoolsAjaxRequestMixin;
+EtoolsMixins.EtoolsAjaxDataMixin = EtoolsAjaxDataMixin;
