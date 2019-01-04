@@ -233,4 +233,6 @@ const EtoolsAjaxCacheMixin = dedupingMixin(baseClass => class extends EtoolsLogs
 
 })
 
-export default EtoolsAjaxCacheMixin;
+window.EtoolsMixins = window.EtoolsMixins || {};
+
+EtoolsMixins.EtoolsAjaxCachetMixin = EtoolsAjaxCachetMixin;
