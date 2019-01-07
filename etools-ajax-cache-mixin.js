@@ -8,7 +8,6 @@ import Dexie from 'dexie';
  * @mixinFunction
  * @appliesMixin EtoolsLogsMixin
  */
-
 const EtoolsAjaxCacheMixin = dedupingMixin(baseClass => class extends EtoolsLogsMixin(baseClass) {
   /* eslint-enable no-unused-vars */
 
@@ -230,7 +229,6 @@ const EtoolsAjaxCacheMixin = dedupingMixin(baseClass => class extends EtoolsLogs
     }
   }
 
-
-})
+});
 
 export default EtoolsAjaxCacheMixin;
