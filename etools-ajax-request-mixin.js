@@ -45,7 +45,7 @@ export const EtoolsAjaxRequestMixin = dedupingMixin(
         activeAjaxRequests: {
           type: Array,
           readOnly: true,
-          value: function () {
+          value: () => {
             return [];
           }
         },
@@ -53,13 +53,13 @@ export const EtoolsAjaxRequestMixin = dedupingMixin(
           type: Object,
           notify: true,
           readOnly: true,
-          value: function () {
+          value: () => {
             return null;
           }
         },
         checkReqProgress: {
           type: Object,
-          value: function () {
+          value: () => {
             return null;
           }
         }
@@ -80,7 +80,7 @@ export const EtoolsAjaxRequestMixin = dedupingMixin(
       if (this._isViableForCaching(cachingInfo)) {
         // we might have data cached; if cached data is available and not expired
         // return it without making the request
-        return this.getEndpointDataFromCache(cachingInfo).then(function (response) {
+        return this.getEndpointDataFromCache(cachingInfo).then((response) => {
           if (!response) {
             return self._doRequest(reqConfigOptions, cachingInfo, reqConfig.checkProgress, activeReqKey);
           }
@@ -102,7 +102,7 @@ export const EtoolsAjaxRequestMixin = dedupingMixin(
       this._setLastAjaxRequest(request);
       this._addToActiveAjaxRequests(activeReqKey, request);
 
-      return request.completes.then(function (request) {
+      return request.completes.then((request) => {
         let responseData = request.response;
 
         if (reqConfigOptions.handleAs === 'json' && typeof responseData === 'string') {
@@ -117,7 +117,7 @@ export const EtoolsAjaxRequestMixin = dedupingMixin(
         self._removeActiveRequestFromList(activeReqKey);
 
         return responseData;
-      }).catch(function (request, error) {
+      }).catch((request, error) => {
         if (!request.aborted && request.xhr.status === 0) {
           // not an error, this is an asynchronous request that is not completed yet
           return;
@@ -131,7 +131,7 @@ export const EtoolsAjaxRequestMixin = dedupingMixin(
         } else {
           throw new EtoolsRequestError(error, 0, 'Request aborted', null);
         }
-      }.bind(this, request));
+      });
     }
 
     _addToActiveAjaxRequests(key, request) {
@@ -153,7 +153,7 @@ export const EtoolsAjaxRequestMixin = dedupingMixin(
     }
 
     getActiveRequestByKey(key) {
-      return this.activeAjaxRequests.find(function (activeReqMapObj) {
+      return this.activeAjaxRequests.find((activeReqMapObj) => {
         return activeReqMapObj.key === key;
       });
     }
@@ -343,14 +343,14 @@ export const EtoolsAjaxRequestMixin = dedupingMixin(
       if (!checkProgress || !request || !request.progress) {
         return;
       }
-      this.checkReqProgress = setInterval(function () {
+      this.checkReqProgress = setInterval(() => {
         if (request.progress.constructor === Object && Object.keys(request.progress).length > 0) {
           this._setReqProgress(request.progress);
           if (!request.progress.lengthComputable || request.progress.loaded === request.progress.total) {
             this._stopReqProgressCheck();
           }
         }
-      }.bind(this), 0);
+      });
     }
 
     _stopReqProgressCheck() {

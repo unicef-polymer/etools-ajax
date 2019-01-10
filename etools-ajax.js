@@ -6,7 +6,7 @@ import {timeOut} from '@polymer/polymer/lib/utils/async.js';
 /**
  * @polymer
  * @customElement
- * @applies EtoolsMixins.EtoolsAjaxRequestMixin
+ * @applies EtoolsAjaxRequestMixin
  */
 class EtoolsAjax extends EtoolsAjaxRequestMixin(PolymerElement) {
 

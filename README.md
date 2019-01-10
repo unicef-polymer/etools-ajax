@@ -131,11 +131,11 @@ You can also use `this.lastAjaxRequest.abort()` to abort last request.
 
 ## Install
 ```bash
-$ bower install --save etools-ajax
+$ npm install --save etools-ajax
 ```
 
 ## Preview element locally
-Install needed dependencies by running: `$ bower install`.
+Install needed dependencies by running: `$ npm install`.
 Make sure you have the [Polymer CLI](https://www.npmjs.com/package/polymer-cli) installed. Then run `$ polymer serve` to serve your element application locally.
 
 ## Running Tests

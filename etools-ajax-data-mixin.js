@@ -1,11 +1,10 @@
 import {dedupingMixin} from '@polymer/polymer/lib/utils/mixin.js';
-/* eslint-disable no-unused-vars */
 
 /**
  * @polymer
  * @mixinFunction
  */
-export const EtoolsAjaxDataMixin = dedupingMixin(baseClass => class extends baseClass {
+let internalEtolxAjaxDataMixin = baseClass => class extends baseClass {
   /* eslint-enable no-unused-vars */
 
   _prepareMultiPartFormData(inputBody, prepareMultipartData) {
@@ -16,7 +15,7 @@ export const EtoolsAjaxDataMixin = dedupingMixin(baseClass => class extends base
     let keys = Object.keys(inputBody);
 
     let self = this;
-    keys.forEach(function (key) {
+    keys.forEach((key) => {
       if (prepareMultipartData) {
         formBody = self._prepareFormData(self, formBody, inputBody[key], key);
       } else {
@@ -34,11 +33,11 @@ export const EtoolsAjaxDataMixin = dedupingMixin(baseClass => class extends base
         body.append(key, []);
       } else {
         // not empty array
-        data.forEach(function (arrData, mainIndex) {
+        data.forEach((arrData, mainIndex) => {
           let k = key + '[' + mainIndex + ']';
           if (self._isSimpleObject(arrData)) {
             // Object, not null
-            Object.keys(arrData).forEach(function (keyArrData) {
+            Object.keys(arrData).forEach((keyArrData) => {
               body = self._prepareFormData(self, body, arrData[keyArrData], k + '[_obj][' + keyArrData + ']');
             });
           } else if (self._isFile(arrData)) {
@@ -55,7 +54,7 @@ export const EtoolsAjaxDataMixin = dedupingMixin(baseClass => class extends base
       }
     } else if (self._isSimpleObject(data)) {
       // Object, not null
-      Object.keys(data).forEach(function (keyArrData) {
+      Object.keys(data).forEach((keyArrData) => {
         body = self._prepareFormData(self, body, data[keyArrData], key + '[_obj][' + keyArrData + ']');
       });
     } else {
@@ -73,4 +72,6 @@ export const EtoolsAjaxDataMixin = dedupingMixin(baseClass => class extends base
     return data !== null && typeof data === 'object' && !Array.isArray(data) && !this._isFile(data);
   }
 
-});
+};
+
+export const EtolxAjaxDataMixin = dedupingMixin(internalEtolxAjaxDataMixin);
