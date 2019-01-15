@@ -31,7 +31,7 @@ function _prepareResponse(response) {
  * @extends EtoolsLogsMixin
  * @demo demo/index.html
  */
-export const EtoolsAjaxRequestMixin = dedupingMixin(
+export default EtoolsAjaxRequestMixin = dedupingMixin(
   baseClass => class extends EtoolsLogsMixin(EtoolsAjaxDataMixin(EtoolsAjaxCacheMixin(baseClass))) {
     /* eslint-enable no-unused-vars */
 

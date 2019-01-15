@@ -4,7 +4,7 @@ import {dedupingMixin} from '@polymer/polymer/lib/utils/mixin.js';
  * @polymer
  * @mixinFunction
  */
-let internalEtolxAjaxDataMixin = baseClass => class extends baseClass {
+let internalEtoolsAjaxDataMixin = baseClass => class extends baseClass {
   /* eslint-enable no-unused-vars */
 
   _prepareMultiPartFormData(inputBody, prepareMultipartData) {
@@ -74,4 +74,4 @@ let internalEtolxAjaxDataMixin = baseClass => class extends baseClass {
 
 };
 
-export const EtolxAjaxDataMixin = dedupingMixin(internalEtolxAjaxDataMixin);
+export default EtoolsAjaxDataMixin = dedupingMixin(internalEtoolsAjaxDataMixin);
