@@ -1,7 +1,7 @@
 import './scripts/es6-obj-assign-polyfil.js';
 import '@polymer/polymer/polymer-legacy.js';
 import '@polymer/iron-ajax/iron-request.js';
-import EtoolsLogsMixin from '../etools-behaviors/etools-logs-mixin.js';
+import EtoolsLogsMixin from 'etools-behaviors/etools-logs-mixin.js';
 import EtoolsAjaxDataMixin from './etools-ajax-data-mixin.js';
 import EtoolsAjaxCacheMixin from './etools-ajax-cache-mixin.js';
 import {dedupingMixin} from '@polymer/polymer/lib/utils/mixin.js';
@@ -117,7 +117,9 @@ const EtoolsAjaxRequestMixin = dedupingMixin(
           self._removeActiveRequestFromList(activeReqKey);
 
           return responseData;
-        }).catch((request, error) => {
+        }).catch((err) => {
+          const error = err.error;
+          const request = err.request;
           if (!request.aborted && request.xhr.status === 0) {
             // not an error, this is an asynchronous request that is not completed yet
             return;
@@ -200,7 +202,8 @@ const EtoolsAjaxRequestMixin = dedupingMixin(
             handleAs: this._getHandleAs(reqConfig),
             jsonPrefix: reqConfig.jsonPrefix || '',
             withCredentials: !!reqConfig.withCredentials,
-            timeout: reqConfig.timeout || 0
+            timeout: reqConfig.timeout || 0,
+            rejectWithRequest: true
           },
           cachingInfo: this.getCachingInfo(reqConfig)
         };
