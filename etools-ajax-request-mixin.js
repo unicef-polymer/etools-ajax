@@ -6,7 +6,7 @@ import EtoolsAjaxDataMixin from './etools-ajax-data-mixin.js';
 import EtoolsAjaxCacheMixin from './etools-ajax-cache-mixin.js';
 import {dedupingMixin} from '@polymer/polymer/lib/utils/mixin.js';
 
-function EtoolsRequestError(error, statusCode, statusText, response) {
+export function EtoolsRequestError(error, statusCode, statusText, response) {
   this.error = error;
   this.status = statusCode;
   this.statusText = statusText;
