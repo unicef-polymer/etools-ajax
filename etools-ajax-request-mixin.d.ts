@@ -28,6 +28,12 @@ interface EtoolsAjaxRequestMixinConstructor {
 
 export {EtoolsAjaxRequestMixinConstructor};
 
+declare function EtoolsRequestError(error: any, statusCode: number, statusText: string, response: any): any;
+export {EtoolsRequestError};
+
+declare function _prepareResponse(response: any): any;
+export {_prepareResponse};
+
 interface EtoolsAjaxRequestMixin extends EtoolsAjaxDataMixin {
   readonly lastAjaxRequest: object|null|undefined;
   readonly activeAjaxRequests: any[]|null|undefined;
