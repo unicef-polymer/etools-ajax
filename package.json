@@ -5,6 +5,7 @@
     "@polymer/iron-component-page": "^3.0.0-pre.18",
     "@polymer/iron-demo-helpers": "^3.0.0-pre.18",
     "@webcomponents/webcomponentsjs": "^2.0.0",
+    "@polymer/gen-typescript-declarations": "^1.6.0",
     "eslint": "^3.19.0",
     "eslint-config-google": "^0.7.0",
     "eslint-plugin-html": "^2.0.0",
@@ -13,7 +14,8 @@
   "scripts": {
     "lint:javascript": "eslint . --ext js,html && exit 0",
     "lint": "npm run lint:javascript && polymer lint && exit 0",
-    "postinstall": "node -e \"try { require('fs').symlinkSync(require('path').resolve('node_modules/@bower_components'), 'bower_components', 'junction') } catch (e) { }\""
+    "postinstall": "node -e \"try { require('fs').symlinkSync(require('path').resolve('node_modules/@bower_components'), 'bower_components', 'junction') } catch (e) { }\"",
+    "gen-typings": "gen-typescript-declarations"
   },
   "version": "4.0.0",
   "resolutions": {
