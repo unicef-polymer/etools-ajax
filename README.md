@@ -74,26 +74,22 @@ Just set this in your app: `window.EtoolsRequestCacheDisabled = true`
 ### Usage in version 2.0.4 and below
 
 ```javascript
-Polymer({
-    is: 'custom-element',
-    behaviors: [EtoolsAjaxRequestBehavior],
-    ready: function() {
-      this.sendRequest({
-        method: 'GET',
-        endpoint: {
-          url: '/countries-data',
-        },
-        params: {
-          id: 10,
-          country_name: 'USA'
-        }
-      }).then(function(resp) {
-        console.log(resp);
-      }).catch(function(error) {
-        console.log(error);
-      });
+  // inside an element method (make sure ajax request mixin is included)
+  this.sendRequest({
+    method: 'GET',
+    endpoint: {
+      url: '/countries-data',
+    },
+    params: {
+      id: 10,
+      country_name: 'USA'
     }
-});
+  }).then(function(resp) {
+    console.log(resp);
+  }).catch(function(error) {
+    console.log(error);
+  });
+
 ```
 
 #### `sendRequest` options:
@@ -130,15 +126,14 @@ To abort any of the active requests you can use `abortRequestByKey(key)`.
 You can also use `this.lastAjaxRequest.abort()` to abort last request.
 
 ## Install
+TODO: create npm package
 ```bash
-$ bower install --save etools-ajax
+$ npm i --save unicef-polymer/etools-ajax#branch_name
 ```
 
-## Preview element locally
-Install needed dependencies by running: `$ bower install`.
-Make sure you have the [Polymer CLI](https://www.npmjs.com/package/polymer-cli) installed. Then run `$ polymer serve` to serve your element application locally.
-
 ## Running Tests
+
+TODO: improve tests & add more tests
 
 You need to have `web-component-tester` installed (if not run `npm install -g web-component-tester`)
 ```bash

@@ -6,9 +6,8 @@ import Dexie from 'dexie';
 /**
  * @polymer
  * @mixinFunction
- * @appliesMixin EtoolsLogsMixin
+ * @applies EtoolsLogsMixin
  */
-
 const EtoolsAjaxCacheMixin = dedupingMixin(baseClass => class extends EtoolsLogsMixin(baseClass) {
   /* eslint-enable no-unused-vars */
 
@@ -16,7 +15,7 @@ const EtoolsAjaxCacheMixin = dedupingMixin(baseClass => class extends EtoolsLogs
     return {
       etoolsAjaxCacheDb: {
         type: Object,
-        value: function () {
+        value: () => {
           return window.EtoolsRequestCacheDb;
         }
       },
@@ -102,10 +101,10 @@ const EtoolsAjaxCacheMixin = dedupingMixin(baseClass => class extends EtoolsLogs
   _cacheEndpointDataUsingDefaultTable(dataToCache) {
     let self = this;
     return this.etoolsAjaxCacheDb[this.etoolsAjaxCacheDefaultTableName].put(dataToCache)
-        .then(function (result) {
+        .then((result) => {
           // data added in dexie db in default table, return existing data
           return dataToCache.data;
-        }).catch(function (error) {
+        }).catch((error) => {
           // something happened and inserting data in dexie table failed;
           // just log the error and return the existing data(received from server)
           self.logWarn('Failed to add data in etools-ajax dexie db. Data not cached.', 'etools-ajax', error);
@@ -120,7 +119,7 @@ const EtoolsAjaxCacheMixin = dedupingMixin(baseClass => class extends EtoolsLogs
     let listsExpireMapTable = this.etoolsAjaxCacheDb[this.etoolsAjaxCacheListsExpireMapTable];
     let specifiedTable = this.etoolsAjaxCacheDb[cachingInfo.cacheTableName];
     let self = this;
-    return this.etoolsAjaxCacheDb.transaction('rw', listsExpireMapTable, specifiedTable, function () {
+    return this.etoolsAjaxCacheDb.transaction('rw', listsExpireMapTable, specifiedTable, () => {
       if (responseData instanceof Array === false) {
         throw new Error('Response data should be array or objects to be ' +
             'able to cache it into specified table.');
@@ -134,14 +133,14 @@ const EtoolsAjaxCacheMixin = dedupingMixin(baseClass => class extends EtoolsLogs
       // add list expire mapping details
       listsExpireMapTable.put(listExpireDetails);
       // save bulk data
-      specifiedTable.clear().then(function () {
+      specifiedTable.clear().then(() => {
         specifiedTable.bulkAdd(responseData);
       });
-    }).then(function (result) {
+    }).then((result) => {
       // request response saved into specified table
       // transaction succeeded
       return responseData;
-    }).catch(function (error) {
+    }).catch((error) => {
       // transaction failed
       // just log the error and return the existing data(received from server)
       self.logWarn('Failed to add data in etools-ajax dexie specified table: ' +
@@ -184,7 +183,7 @@ const EtoolsAjaxCacheMixin = dedupingMixin(baseClass => class extends EtoolsLogs
     let self = this;
     return this.etoolsAjaxCacheDb[this.etoolsAjaxCacheDefaultTableName]
         .where('cacheKey').equals(cacheKey).toArray()
-        .then(function (result) {
+        .then((result) => {
           if (result.length > 0) {
             // check expired data
             if (!self._isExpiredCachedData(result[0].expire)) {
@@ -193,7 +192,7 @@ const EtoolsAjaxCacheMixin = dedupingMixin(baseClass => class extends EtoolsLogs
           }
           // no data
           return null;
-        }).catch(function (error) {
+        }).catch((error) => {
           self.logWarn('Failed to get data from etools-ajax dexie db default caching table.',
               'etools-ajax', error);
           return null;
@@ -205,7 +204,7 @@ const EtoolsAjaxCacheMixin = dedupingMixin(baseClass => class extends EtoolsLogs
     let specifiedTable = this.etoolsAjaxCacheDb[cacheTableName];
     let self = this;
     return listsExpireMapTable.where('name').equals(cacheTableName).toArray()
-        .then(function (result) {
+        .then((result) => {
           if (result.length > 0) {
             if (!self._isExpiredCachedData(result[0].expire)) {
               // return table content as array
@@ -214,7 +213,7 @@ const EtoolsAjaxCacheMixin = dedupingMixin(baseClass => class extends EtoolsLogs
           }
           // collection data expire details missing
           return null;
-        }).catch(function (error) {
+        }).catch((error) => {
           // table not found in list expire map, data read error, other errors
           self.logWarn('Failed to get data from etools-ajax dexie db specified table: ' +
               cacheTableName + '.', 'etools-ajax', error);
@@ -230,7 +229,6 @@ const EtoolsAjaxCacheMixin = dedupingMixin(baseClass => class extends EtoolsLogs
     }
   }
 
-
-})
+});
 
 export default EtoolsAjaxCacheMixin;

@@ -87,6 +87,16 @@ class DirectAjaxCalls extends EtoolsAjaxRequestMixin(PolymerElement) {
     }).catch(function (error) {
       console.log(error);
     });
+
+    this.sendRequest({
+      endpoint: {
+        url: 'http://httpbin.org/status/403',
+      }
+    }).then(function (resp) {
+      console.log(resp);
+    }).catch(function (error) {
+      console.log(error);
+    });
   }
 
   get_WithCacheToDefaultTable() {
