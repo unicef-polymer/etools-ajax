@@ -5,6 +5,7 @@
     "@polymer/iron-component-page": "^3.0.0-pre.18",
     "@polymer/iron-demo-helpers": "^3.0.0",
     "@webcomponents/webcomponentsjs": "^2.0.0",
+    "@polymer/gen-typescript-declarations": "^1.6.0",
     "eslint": "^3.19.0",
     "eslint-config-google": "^0.7.0",
     "eslint-plugin-html": "^2.0.0",
@@ -12,7 +13,8 @@
   },
   "scripts": {
     "lint:javascript": "eslint . --ext js,html && exit 0",
-    "lint": "npm run lint:javascript && polymer lint && exit 0"
+    "lint": "npm run lint:javascript && polymer lint && exit 0",
+    "gen-typings": "gen-typescript-declarations --deleteExisting --outDir './'"
   },
   "version": "4.0.0",
   "resolutions": {
