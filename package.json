@@ -13,8 +13,8 @@
   },
   "scripts": {
     "lint:javascript": "eslint . --ext js,html && exit 0",
-    "lint": "npm run lint:javascript && polymer lint && exit 0"
-    "gen-typings": "gen-typescript-declarations"
+    "lint": "npm run lint:javascript && polymer lint && exit 0",
+    "gen-typings": "gen-typescript-declarations --deleteExisting --outDir './'"
   },
   "version": "4.0.0",
   "resolutions": {

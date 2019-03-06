@@ -10,5 +10,57 @@
 
 
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
+// tslint:disable:no-any describes the API as best we are able today
 
 import {dedupingMixin} from '@polymer/polymer/lib/utils/mixin.js';
+
+declare function EtoolsAjaxCacheMixin<T extends new (...args: any[]) => {}>(base: T): T & EtoolsAjaxCacheMixinConstructor;
+
+interface EtoolsAjaxCacheMixinConstructor {
+  new(...args: any[]): EtoolsAjaxCacheMixin;
+}
+
+export {EtoolsAjaxCacheMixinConstructor};
+
+interface EtoolsAjaxCacheMixin {
+  etoolsAjaxCacheDb: object|null|undefined;
+  etoolsAjaxCacheDefaultTableName: string|null|undefined;
+  etoolsAjaxCacheListsExpireMapTable: string|null|undefined;
+  ready(): void;
+  _requestIsViableForCaching(reqConfig: any): any;
+  _expireTimeWasProvided(endpoint: any): any;
+  _getEndpointCacheKey(endpoint: any, params: any): any;
+  _isNonEmptyString(str: any): any;
+  _isNonEmptyObject(obj: any): any;
+
+  /**
+   * Get caching info for the current request
+   */
+  getCachingInfo(reqConfig: any): any;
+
+  /**
+   * etoolsAjaxCacheDb should be instance of Dexie
+   * cacheTableName and listsExpireMapTable tables should be defined
+   */
+  cachingCanBeMade(cacheTableName: any): any;
+  _shouldCacheToDefaultTable(cacheTableName: any): any;
+
+  /**
+   * Cache data into dexie db default table (etoolsAjaxCacheDefaultTableName)
+   */
+  _cacheEndpointDataUsingDefaultTable(dataToCache: any): any;
+
+  /**
+   * Cache date into specified dexie db table (reqConfig.endpoint.cacheTableName)
+   */
+  _cacheEndpointDataUsingSpecifiedTable(responseData: any, cachingInfo: any): any;
+
+  /**
+   * Cache endpoint received data
+   */
+  cacheEndpointData(responseData: any, cachingInfo: any): any;
+  _isExpiredCachedData(dataExp: any): any;
+  _getDataFromDefaultCacheTable(cacheKey: any): any;
+  _getDataFromSpecifiedCacheTable(cacheTableName: any): any;
+  getEndpointDataFromCache(cachingInfo: any): any;
+}

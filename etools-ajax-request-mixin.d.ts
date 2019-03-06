@@ -14,13 +14,15 @@
 
 import {dedupingMixin} from '@polymer/polymer/lib/utils/mixin.js';
 
+export {EtoolsRequestError};
+
+declare function EtoolsRequestError(): void;
+
 
 /**
  * A behavior that will allow you to make a request in any Polymer element you need.
  */
-declare function EtoolsAjaxRequestMixin<T extends new (...args: any[]) => {}>(base: T): T & EtoolsAjaxRequestMixinConstructor & EtoolsAjaxDataMixinConstructor;
-
-import {EtoolsAjaxDataMixinConstructor, EtoolsAjaxDataMixin} from './etools-ajax-data-mixin.js';
+declare function EtoolsAjaxRequestMixin<T extends new (...args: any[]) => {}>(base: T): T & EtoolsAjaxRequestMixinConstructor;
 
 interface EtoolsAjaxRequestMixinConstructor {
   new(...args: any[]): EtoolsAjaxRequestMixin;
@@ -28,13 +30,7 @@ interface EtoolsAjaxRequestMixinConstructor {
 
 export {EtoolsAjaxRequestMixinConstructor};
 
-declare function EtoolsRequestError(error: any, statusCode: number, statusText: string, response: any): any;
-export {EtoolsRequestError};
-
-declare function _prepareResponse(response: any): any;
-export {_prepareResponse};
-
-interface EtoolsAjaxRequestMixin extends EtoolsAjaxDataMixin {
+interface EtoolsAjaxRequestMixin {
   readonly lastAjaxRequest: object|null|undefined;
   readonly activeAjaxRequests: any[]|null|undefined;
   readonly reqProgress: object|null|undefined;
