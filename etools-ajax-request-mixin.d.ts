@@ -4,6 +4,10 @@ export {EtoolsRequestError};
 
 declare function EtoolsRequestError(): void;
 
+interface Constructor<T> {
+  new(...args: any[]): T;
+}
+
 
 /**
  * A behavior that will allow you to make a request in any Polymer element you need.
@@ -27,7 +31,4 @@ declare function EtoolsAjaxRequestMixin<T extends Constructor<PolymerElement>>(b
   }
 } & T & Constructor<PolymerElement>;
 
-interface Constructor<T> {
-  new(...args: any[]): T;
-}
-
+export default EtoolsAjaxRequestMixin;
