@@ -23,7 +23,7 @@ declare function EtoolsAjaxRequestMixin<T extends Constructor<PolymerElement>>(b
    * Check for cached data if needed, if no cached data then fire new request
    * returns Promise
    */
-   sendRequest(reqConfig: any, activeReqKey: any): any;
+   sendRequest(reqConfig: any, activeReqKey?: any): any;
    getActiveRequestByKey(key: any): any;
    abortRequestByKey(key: any): void;
    abortActiveRequest(activeReqMapObj: any): void;
