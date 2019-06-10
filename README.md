@@ -128,7 +128,7 @@ You can also use `this.lastAjaxRequest.abort()` to abort last request.
 ## Install
 TODO: create npm package
 ```bash
-$ npm i --save unicef-polymer/etools-ajax#branch_name
+$ npm i --save @unicef-polymer/etools-ajax
 ```
 
 ## Running Tests
