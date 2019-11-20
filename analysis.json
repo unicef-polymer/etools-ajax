@@ -1366,7 +1366,7 @@
           "inheritedFrom": "EtoolsAjaxRequestMixin"
         },
         {
-          "name": "_getCsrfHeader",
+          "name": "getCsrfHeader",
           "description": "",
           "privacy": "protected",
           "sourceRange": {
@@ -1389,7 +1389,7 @@
           "inheritedFrom": "EtoolsAjaxRequestMixin"
         },
         {
-          "name": "_csrfSafeMethod",
+          "name": "csrfSafeMethod",
           "description": "",
           "privacy": "protected",
           "sourceRange": {
@@ -4154,7 +4154,7 @@
           ]
         },
         {
-          "name": "_getCsrfHeader",
+          "name": "getCsrfHeader",
           "description": "",
           "privacy": "protected",
           "sourceRange": {
@@ -4175,7 +4175,7 @@
           ]
         },
         {
-          "name": "_csrfSafeMethod",
+          "name": "csrfSafeMethod",
           "description": "",
           "privacy": "protected",
           "sourceRange": {
