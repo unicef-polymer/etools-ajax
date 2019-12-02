@@ -32,9 +32,9 @@
   "main": "etools-ajax-request.js",
   "license": "https://github.com/unicef-polymer/etools-ajax/blob/master/LICENSE.md",
   "dependencies": {
-    "@unicef-polymer/etools-behaviors": "3.0.1",
     "@polymer/iron-ajax": "^3.0.0",
     "@polymer/polymer": "^3.2.0",
-    "dexie": "^2.0.4"
+    "@unicef-polymer/etools-behaviors": "3.0.1",
+    "@unicef-polymer/etools-dexie-caching": "^1.0.0-rc.1",
   }
 }

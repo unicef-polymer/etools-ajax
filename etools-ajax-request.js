@@ -1,5 +1,5 @@
 /* eslint-disable linebreak-style */
-import {requestIsCacheable, getFromCache, cacheEndpointResponse} from './etools-dexie-caching';
+import {requestIsCacheable, getFromCache, cacheEndpointResponse} from '@unicef-polymer/etools-dexie-caching';
 import {doHttpRequest, getIronRequestConfigOptions} from './etools-iron-request';
 
 /**
@@ -29,7 +29,6 @@ import {doHttpRequest, getIronRequestConfigOptions} from './etools-iron-request'
  * @param {boolean} checkProgress
  */
 export function sendRequest(reqConfig, requestKey, checkProgress) {
-
   let ironRequestConfigOptions = getIronRequestConfigOptions(reqConfig);
 
   if (requestIsCacheable(reqConfig.method, reqConfig.endpoint)) {
