@@ -1,7 +1,7 @@
 /* eslint-disable linebreak-style */
 import {dedupingMixin} from '@polymer/polymer/lib/utils/mixin.js';
 import Dexie from 'dexie';
-import {requestIsCacheable, getFromCache, cacheEndpointResponse} from '@unicef-polymer/etools-dexie-caching';
+import {requestIsCacheable, getFromCache, cacheEndpointResponse} from '@unicef-polymer/etools-dexie-caching/etools-dexie-caching';
 /* eslint-disable no-unused-vars */
 
 /**

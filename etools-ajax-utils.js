@@ -89,3 +89,8 @@ export function determineContentType(body) {
   return contentType;
 }
 
+
+export function isNonEmptyObject(obj) {
+  return obj && typeof obj === 'object' && Object.keys(obj).length > 0;
+}
+

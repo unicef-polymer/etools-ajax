@@ -5,8 +5,14 @@ import '@polymer/iron-ajax/iron-request.js';
 import {logWarn} from '@unicef-polymer/etools-behaviors/etools-logging';
 import EtoolsAjaxDataMixin from './etools-ajax-data-mixin.js';
 import {dedupingMixin} from '@polymer/polymer/lib/utils/mixin.js';
-import {requestIsCacheable, getFromCache, cacheEndpointResponse} from './etools-dexie-caching';
-import {csrfSafeMethod, getCsrfHeader, getClientConfiguredHeaders, determineContentType} from './etools-ajax-utils';
+import {
+  requestIsCacheable, getFromCache,
+  cacheEndpointResponse
+} from '@unicef-polymer/etools-dexie-caching/etools-dexie-caching';
+import {
+  csrfSafeMethod, getCsrfHeader, getClientConfiguredHeaders,
+  determineContentType, isNonEmptyObject
+} from './etools-ajax-utils';
 
 export function EtoolsRequestError(error, statusCode, statusText, response) {
   this.error = error;
@@ -204,7 +210,7 @@ const EtoolsAjaxRequestMixin = dedupingMixin(
 
     _buildQueryString(url, params) {
       let queryStr = '';
-      if (!params || !this._isNonEmptyObject(params)) {
+      if (!params || !isNonEmptyObject(params)) {
         return '';
       }
       if (url.indexOf('?') < 0) {
