@@ -247,12 +247,9 @@ const EtoolsAjaxRequestMixin = dedupingMixin(
         headers['content-type'] = 'text';
       }
 
-      let clientConfiguredHeaders = getClientConfiguredHeaders(reqConfig.headers);
-      let csrfHeaders = {};
-      if (!csrfSafeMethod(reqConfig.method)) {
-        csrfHeaders = getCsrfHeader(reqConfig.csrfCheck);
-      }
-      headers = Object.assign({}, headers, clientConfiguredHeaders, csrfHeaders);
+      headers = Object.assign({}, headers,
+        getClientConfiguredHeaders(reqConfig.headers),
+        getCsrfHeader(reqConfig.csrfCheck, reqConfig.method));
 
       if (reqConfig.multiPart) {
         // content type will be automatically set in this case
