@@ -5,6 +5,9 @@ For GET requests it can cache the data using Dexie db.
 
 The `<etools-ajax>` is a complete new element based on the `EtoolsAjaxRequestMixin`.
 
+### Set Authorization Header
+Set `window.EtoolsAjaxConfig.JWTStorageKey` in your application.
+
 ### Data caching requirements
 
 If you want to be able to cache the request data you must define your app Dexie db schema and then

@@ -1,7 +1,10 @@
 /* eslint-disable linebreak-style */
 import './scripts/es6-obj-assign-polyfil.js';
 
-export function getCsrfHeader(csrfCheck) {
+export function getCsrfHeader(csrfCheck, method) {
+  if (!!method && csrfSafeMethod(method)) {
+    return {};
+  }
   let csrfHeaders = {};
   if (csrfCheck !== 'disabled') {
     let csrfToken = _getCSRFCookie();
@@ -60,19 +63,25 @@ export function getClientConfiguredHeaders(additionalHeaders) {
 
 export function getRequestHeaders(reqConfig) {
   let headers = {};
-
   headers['content-type'] = determineContentType(reqConfig.body);
 
-  let clientConfiguredHeaders = getClientConfiguredHeaders(reqConfig.headers);
-  let csrfHeaders = {};
-
-  if (!csrfSafeMethod(reqConfig.method)) {
-    csrfHeaders = getCsrfHeader(reqConfig.csrfCheck);
-  }
-
-  headers = Object.assign({}, headers, clientConfiguredHeaders, csrfHeaders);
+  headers = Object.assign({},
+    headers,
+    getClientConfiguredHeaders(reqConfig.headers),
+    getAuthorizationHeader(),
+    getCsrfHeader(reqConfig.csrfCheck, reqConfig.method));
 
   return headers;
+}
+
+function getAuthorizationHeader() {
+  if (window.EtoolsAjaxConfig && window.EtoolsAjaxConfig.JWTStorageKey) {
+    return {
+      'Authorization': 'JWT' + localStorage.getItem(window.EtoolsAjaxConfig.JWTStorageKey)
+    };
+  }
+
+  return {};
 }
 
 /**
