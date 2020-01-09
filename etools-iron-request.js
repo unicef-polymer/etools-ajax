@@ -95,9 +95,11 @@ export function EtoolsRequestError(error, statusCode, statusText, response) {
  * } reqConfig
  */
 export function getIronRequestConfigOptions(reqConfig) {
+  reqConfig.method = reqConfig.method || 'GET';
+
   return {
     url: reqConfig.endpoint.url,
-    method: reqConfig.method || 'GET',
+    method: reqConfig.method,
     headers: getRequestHeaders(reqConfig),
     body: reqConfig.body || {},
     async: !reqConfig.sync,
