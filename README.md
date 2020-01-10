@@ -95,9 +95,11 @@ Just set this in your app: `window.EtoolsRequestCacheDisabled = true`
 #### `sendRequest` params:
 An object that must have this properties
 * `method` - any HTTP method, defaults to 'GET' if is not defined
-* `endpoint` - an object that must contain the `url` property. For caching this object can
+* `endpoint` - an object that must contain the `url` property.
+For caching this object can
 have `exp`(time to cache data in milliseconds), `cachingKey`(any string) ,`cacheTableName`(the Dexie table name,
-where you can store a list of objects from server response) or `sharedDbCachingKey`. For more info on caching config see https://github.com/unicef-polymer/etools-dexie-caching Readme;
+where you can store a list of objects from server response) or `sharedDbCachingKey`.
+ For more info on caching configuration see https://github.com/unicef-polymer/etools-dexie-caching Readme;
 `token_key` property holds the local storage key of the token. If present, the 'Authorization' header will be set.
 
   `endpoint` format:
