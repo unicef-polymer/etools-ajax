@@ -47,5 +47,6 @@ export type EtoolsRequestEndpoint = {
   url: string,
   exp?: number,
   cacheTableName?: string,
-  cachingKey?: string
+  cachingKey?: string,
+  token_key?: string
 }
