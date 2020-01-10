@@ -5,9 +5,6 @@ For GET requests it can cache the data using Dexie db.
 
 The `<etools-ajax>` is a complete new element based on the `EtoolsAjaxRequestMixin`.
 
-### Set Authorization Header
-Set `window.JWTStorageKey` in your application.
-
 ### Data caching requirements
 
 If you want to be able to cache the request data you must define your app Dexie db schema and then
@@ -101,6 +98,18 @@ An object that must have this properties
 * `endpoint` - an object that must contain the `url` property. For caching this object can
 have `exp`(time to cache data in milliseconds), `cachingKey`(any string) ,`cacheTableName`(the Dexie table name,
 where you can store a list of objects from server response) or `sharedDbCachingKey`. For more info on caching config see https://github.com/unicef-polymer/etools-dexie-caching Readme;
+`token_key` property holds the local storage key of the token. If present, the 'Authorization' header will be set.
+
+  `endpoint` format:
+  ```javascript
+  {
+    url: string,
+    exp?: number,
+    cacheTableName?: string,
+    cachingKey?: string,
+    token_key?: string
+  }
+  ```
 * `params` - request params, will be used to build url query string
 * `body` - request body for POST | PUT | PATCH | DELETE methods
 * `csrfCheck` - if other than `disabled`, x-csrftoken header will be set with value of `csrftoken` cookie

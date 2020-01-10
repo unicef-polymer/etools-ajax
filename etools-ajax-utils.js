@@ -68,16 +68,16 @@ export function getRequestHeaders(reqConfig) {
   headers = Object.assign({},
     headers,
     getClientConfiguredHeaders(reqConfig.headers),
-    getAuthorizationHeader(),
+    getAuthorizationHeader(reqConfig.endpoint),
     getCsrfHeader(reqConfig.csrfCheck, reqConfig.method));
 
   return headers;
 }
 
-function getAuthorizationHeader() {
-  if (window.JWTStorageKey) {
+function getAuthorizationHeader(endpoint) {
+  if (endpoint.token_key) {
     return {
-      'Authorization': 'JWT ' + localStorage.getItem(window.JWTStorageKey)
+      'Authorization': 'JWT ' + localStorage.getItem(endpoint.token_key)
     };
   }
 
