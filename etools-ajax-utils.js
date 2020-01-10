@@ -75,9 +75,9 @@ export function getRequestHeaders(reqConfig) {
 }
 
 function getAuthorizationHeader() {
-  if (window.EtoolsAjaxConfig && window.EtoolsAjaxConfig.JWTStorageKey) {
+  if (window.JWTStorageKey) {
     return {
-      'Authorization': 'JWT ' + localStorage.getItem(window.EtoolsAjaxConfig.JWTStorageKey)
+      'Authorization': 'JWT ' + localStorage.getItem(window.JWTStorageKey)
     };
   }
 
