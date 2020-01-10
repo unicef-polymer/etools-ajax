@@ -95,21 +95,35 @@ Just set this in your app: `window.EtoolsRequestCacheDisabled = true`
 
 ```
 
-#### `sendRequest` options:
+#### `sendRequest` params:
 An object that must have this properties
 * `method` - any HTTP method, defaults to 'GET' if is not defined
 * `endpoint` - an object that must contain the `url` property. For caching this object can
-have `exp`(time to cache data in milliseconds), `cachingKey`(any string) or `cacheTableName`(the Dexie table name,
-where you can store a list of objects from server response);
+have `exp`(time to cache data in milliseconds), `cachingKey`(any string) ,`cacheTableName`(the Dexie table name,
+where you can store a list of objects from server response) or `sharedDbCachingKey`. For more info on caching config see https://github.com/unicef-polymer/etools-dexie-caching Readme;
 * `params` - request params, will be used to build url query string
 * `body` - request body for POST | PUT | PATCH | DELETE methods
-* `csrfCheck` - if `true` then `x-csrftoken` header will be set with value of `csrftoken` cookie
+* `csrfCheck` - if other than `disabled`, x-csrftoken header will be set with value of `csrftoken` cookie
 * `headers` - object of additional headers that can be set on request
 * `multiPart` - if `true` it will take the `body` and convert it in `FormData`
 * `prepareMultipartData` - used by etools apps to convert request complex json `body` to `FromData` and prefix objects
 properties with `_obj`
 * `checkProgress` - experimental flag to have ajax request progress (progress available data stored in `reqProgress`
 property)
+* `timeout` - Set the timeout flag on the request
+* `async` - Toggle whether XHR is synchronous or asynchronous. Don't change this to true unless You Know What You Are Doing
+* `handleAs` - Specifies what data to store in the response property,
+    and to deliver as event.detail.response in response events.
+    One of:
+    text: uses XHR.responseText.
+    xml: uses XHR.responseXML.
+    json: uses XHR.responseText parsed as JSON.
+    arraybuffer: uses XHR.response.
+    blob: uses XHR.response.
+    document: uses XHR.response.
+* `jsonPrefix` - Prefix to be stripped from a JSON response before parsing it.
+* `rejectWithRequest` - Changes the completes promise chain from generateRequest to reject with an object containing the original request, as well an error message. If false (default), the promise rejects with an error message only.
+* `withCredentials` - Whether or not to send credentials on the request. Default is false.
 
 #### Ajax response handling:
 
