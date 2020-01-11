@@ -103,3 +103,43 @@ export function isNonEmptyObject(obj) {
   return obj && typeof obj === 'object' && Object.keys(obj).length > 0;
 }
 
+/**
+ *
+ * @param {
+ * {
+  *  endpoint: {
+  *          url: string,
+  *          exp?: number,
+  *          cacheTableName?: string,
+  *          cachingKey?: string
+  *  },
+  *  body: any,
+  *  method: string,
+  *  headers: any,
+  *  csrfCheck: string // 'disabled',
+  *  timeout: number,
+  *  sync: boolean,
+  *  handleAs: string,
+  *  jsonPrefix: string,
+  *  rejectWithRequest: boolean,
+  *  withCredentials: boolean,
+  * }
+  * } reqConfig
+  */
+export function getIronRequestConfigOptions(etoolAjaxReqConfig) {
+  etoolAjaxReqConfig.method = etoolAjaxReqConfig.method || 'GET';
+
+  return {
+    url: etoolAjaxReqConfig.endpoint.url,
+    method: etoolAjaxReqConfig.method,
+    headers: getRequestHeaders(etoolAjaxReqConfig),
+    body: etoolAjaxReqConfig.body || {},
+    async: !etoolAjaxReqConfig.sync,
+    handleAs: etoolAjaxReqConfig.handleAs || 'json',
+    jsonPrefix: etoolAjaxReqConfig.jsonPrefix || '',
+    withCredentials: !!etoolAjaxReqConfig.withCredentials,
+    timeout: etoolAjaxReqConfig.timeout || 0,
+    rejectWithRequest: true
+  };
+}
+

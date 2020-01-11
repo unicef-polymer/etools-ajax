@@ -1,6 +1,7 @@
 /* eslint-disable linebreak-style */
 import {requestIsCacheable, getFromCache, cacheEndpointResponse} from '@unicef-polymer/etools-dexie-caching';
-import {doHttpRequest, getIronRequestConfigOptions} from './etools-iron-request';
+import {doHttpRequest} from './etools-iron-request';
+import {getIronRequestConfigOptions} from './etools-ajax-utils';
 
 /**
  * Check endpoint info to see if data is cacheable,

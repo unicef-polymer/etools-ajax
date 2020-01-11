@@ -1,5 +1,5 @@
 /* eslint-disable linebreak-style */
-import {tryJsonParse, getRequestHeaders} from './etools-ajax-utils';
+import {tryJsonParse} from './etools-ajax-utils';
 import {logWarn} from '@unicef-polymer/etools-behaviors/etools-logging';
 import '@polymer/iron-ajax/iron-request.js';
 
@@ -69,46 +69,6 @@ export function EtoolsRequestError(error, statusCode, statusText, response) {
   this.status = statusCode;
   this.statusText = statusText;
   this.response = tryJsonParse(response);
-}
-
-/**
- *
- * @param {
- *  {
- *  endpoint: {
- *          url: string,
- *          exp?: number,
- *          cacheTableName?: string,
- *          cachingKey?: string
- *  },
- *  body: any,
- *  method: string,
- *  headers: any,
- *  csrfCheck: string // 'disabled',
- *  timeout: number,
- *  sync: boolean,
- *  handleAs: string,
- *  jsonPrefix: string,
- *  rejectWithRequest: boolean,
- *  withCredentials: boolean,
- * }
- * } reqConfig
- */
-export function getIronRequestConfigOptions(reqConfig) {
-  reqConfig.method = reqConfig.method || 'GET';
-
-  return {
-    url: reqConfig.endpoint.url,
-    method: reqConfig.method,
-    headers: getRequestHeaders(reqConfig),
-    body: reqConfig.body || {},
-    async: !reqConfig.sync,
-    handleAs: reqConfig.handleAs || 'json',
-    jsonPrefix: reqConfig.jsonPrefix || '',
-    withCredentials: !!reqConfig.withCredentials,
-    timeout: reqConfig.timeout || 0,
-    rejectWithRequest: true
-  };
 }
 
 function _addToActiveAjaxRequests(key, request) {
