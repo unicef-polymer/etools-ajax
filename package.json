@@ -35,6 +35,6 @@
     "@polymer/iron-ajax": "^3.0.0",
     "@polymer/polymer": "^3.2.0",
     "@unicef-polymer/etools-behaviors": "3.0.1",
-    "@unicef-polymer/etools-dexie-caching": "^1.0.0-rc.5"
+    "@unicef-polymer/etools-dexie-caching": "^1.0.0-rc.6"
   }
 }
