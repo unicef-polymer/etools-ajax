@@ -1,18 +1,18 @@
 export interface EtoolsRequestConfig {
   endpoint: EtoolsRequestEndpoint,
-  body: any,
-  method: string,
-  headers: any,
-  csrfCheck: string // 'disabled',
+  body?: any,
+  method?: string,
+  headers?: any,
+  csrfCheck?: string // 'disabled',
   /**
    * Set the timeout flag on the request
    */
-  timeout: number,
+  timeout?: number,
   /**
    * Toggle whether XHR is synchronous or asynchronous.
    * Don't change this to true unless You Know What You Are Doing
    */
-  sync: boolean,
+  sync?: boolean,
   /**
    * Specifies what data to store in the response property,
    * and to deliver as event.detail.response in response events.
@@ -24,7 +24,7 @@ export interface EtoolsRequestConfig {
    * blob: uses XHR.response.
    * document: uses XHR.response.
    */
-  handleAs: string,
+  handleAs?: string,
   /**
    * Prefix to be stripped from a JSON response before parsing it.
    * In order to prevent an attack using CSRF with Array responses
@@ -32,14 +32,14 @@ export interface EtoolsRequestConfig {
    * many backends will mitigate this by prefixing all JSON response bodies with a string
    * that would be nonsensical to a JavaScript parser.
    */
-  jsonPrefix: string,
+  jsonPrefix?: string,
   /**
    * Changes the completes promise chain from generateRequest to reject with an object
    * containing the original request, as well an error message.
    * If false (default), the promise rejects with an error message only.
    */
-  rejectWithRequest: boolean,
-  withCredentials: boolean
+  rejectWithRequest?: boolean,
+  withCredentials?: boolean
 }
 
 
@@ -51,5 +51,5 @@ export type EtoolsRequestEndpoint = {
   token_key?: string
 }
 
-declare function sendRequest(etoolsReqConfig: EtoolsRequestConfig, requestKey: string,
-  checkProgress: boolean): Promise<any>;
+declare function sendRequest(etoolsReqConfig: EtoolsRequestConfig, requestKey?: string,
+  checkProgress?: boolean): Promise<any>;
