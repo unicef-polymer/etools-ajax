@@ -1,9 +1,11 @@
-# Etools Ajax Request Behavior
+# Etools Ajax Request Mixin & Module
 
-Polymer Behavior for handling ajax requests in any Polymer element.
+Element for handling ajax requests.
+It uses the `iron-request` polymer component to make the requests.
+Exposes its functionality through a mixin and also through a module. The module functionality can be used in any framework, the mixin is Polymer dependent.
 For GET requests it can cache the data using Dexie db.
 
-The `<etools-ajax>` is a complete new element based on the `EtoolsAjaxRequestMixin`.
+The `<etools-ajax>` is a Polymer element based on the `EtoolsAjaxRequestMixin`.
 
 ### Data caching requirements
 
