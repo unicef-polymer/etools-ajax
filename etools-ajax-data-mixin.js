@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 import {dedupingMixin} from '@polymer/polymer/lib/utils/mixin.js';
 /* eslint-disable no-unused-vars */
 
