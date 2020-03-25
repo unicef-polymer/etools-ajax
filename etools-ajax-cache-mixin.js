@@ -1,7 +1,11 @@
 /* eslint-disable linebreak-style */
 import {dedupingMixin} from '@polymer/polymer/lib/utils/mixin.js';
 import Dexie from 'dexie';
-import {requestIsCacheable, getFromCache, cacheEndpointResponse} from '@unicef-polymer/etools-dexie-caching/etools-dexie-caching';
+import {
+  requestIsCacheable, getFromCache,
+  cacheEndpointResponse
+} from '@unicef-polymer/etools-dexie-caching/etools-dexie-caching';
+import {logError} from '@unicef-polymer/etools-behaviors/etools-logging';
 /* eslint-disable no-unused-vars */
 
 /**
@@ -28,7 +32,7 @@ const EtoolsAjaxCacheMixin = dedupingMixin(baseClass => class extends (baseClass
   ready() {
     super.ready();
     if (typeof Dexie === 'undefined') {
-      this.logError('Dexie import missing.', 'etools-ajax');
+      logError('Dexie import missing.', 'etools-ajax');
     }
   }
 

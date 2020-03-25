@@ -29,8 +29,8 @@ import {getIronRequestConfigOptions} from './etools-ajax-utils';
  * @param {string} requestKey
  * @param {boolean} checkProgress
  */
-export function sendRequest(reqConfig, requestKey, checkProgress) {
-  let ironRequestConfigOptions = getIronRequestConfigOptions(reqConfig);
+export async function sendRequest(reqConfig, requestKey, checkProgress) {
+  let ironRequestConfigOptions = await getIronRequestConfigOptions(reqConfig);
 
   if (requestIsCacheable(reqConfig.method, reqConfig.endpoint)) {
     return getFromCache(reqConfig.endpoint)
