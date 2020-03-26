@@ -103,6 +103,7 @@ have `exp`(time to cache data in milliseconds), `cachingKey`(any string) ,`cache
 where you can store a list of objects from server response) or `sharedDbCachingKey`.
  For more info on caching configuration see https://github.com/unicef-polymer/etools-dexie-caching Readme;
 `token_key` property holds the local storage key of the token. If present, the 'Authorization' header will be set.
+When `token_key` and `window.AppMsalInstance` are set, the token is automatically added to the request. If the token is expired, a silent token refresh will be done. If the silent token refresh errors out the page is reloaded in order to be redirected to the `Sign in` page.
 
   `endpoint` format:
   ```javascript

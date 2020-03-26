@@ -78,13 +78,14 @@ export async function getRequestHeaders(reqConfig) {
 async function getAuthorizationHeader(endpoint) {
   if (endpoint.token_key) {
     let token = localStorage.getItem(endpoint.token_key);
-    if (!window.AppMsalInstance.tokenIsValid(token)) {
-      try {
-        token = await window.AppMsalInstance.acquireTokenSilent(endpoint.scopes);
-      } catch (err) {
-        window.location.reload(true);
+    if (window.AppMsalInstance) {
+      if (!window.AppMsalInstance.tokenIsValid(token)) {
+        try {
+          token = await window.AppMsalInstance.acquireTokenSilent(endpoint.scopes);
+        } catch (err) {
+          window.location.reload(true);
+        }
       }
-
     }
     return {
       'Authorization': 'JWT ' + token
