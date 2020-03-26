@@ -1,6 +1,6 @@
 /* eslint-disable linebreak-style */
 import './scripts/es6-obj-assign-polyfil.js';
-import {tokenIsValid, acquireTokenSilent} from './tokenService.js';
+import {logError} from '@unicef-polymer/etools-behaviors/etools-logging';
 
 export function getCsrfHeader(csrfCheck, method) {
   if (!!method && csrfSafeMethod(method)) {
@@ -78,8 +78,13 @@ export async function getRequestHeaders(reqConfig) {
 async function getAuthorizationHeader(endpoint) {
   if (endpoint.token_key) {
     let token = localStorage.getItem(endpoint.token_key);
-    if (!tokenIsValid(token)) {
-      token = await acquireTokenSilent(endpoint.scopes) || token;
+    if (!window.AppMsalInstance.tokenIsValid(token)) {
+      try {
+        token = await window.AppMsalInstance.acquireTokenSilent(endpoint.scopes);
+      } catch (err) {
+        window.location.reload(true);
+      }
+
     }
     return {
       'Authorization': 'JWT ' + token
