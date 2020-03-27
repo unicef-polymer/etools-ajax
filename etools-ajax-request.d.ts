@@ -48,8 +48,7 @@ export type EtoolsRequestEndpoint = {
   exp?: number,
   cacheTableName?: string,
   cachingKey?: string,
-  token_key?: string,
-  scopes?: string[]
+  token_key?: string
 }
 
 declare function sendRequest(etoolsReqConfig: EtoolsRequestConfig, requestKey?: string,
