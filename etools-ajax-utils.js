@@ -81,7 +81,7 @@ async function getAuthorizationHeader(endpoint) {
     if (window.AppMsalInstance) {
       if (!window.AppMsalInstance.tokenIsValid(token)) {
         try {
-          token = await window.AppMsalInstance.acquireTokenSilent(endpoint.scopes);
+          token = await window.AppMsalInstance.acquireTokenSilent();
         } catch (err) {
           window.location.reload(true);
         }
