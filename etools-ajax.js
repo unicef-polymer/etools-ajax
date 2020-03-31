@@ -2,6 +2,7 @@ import {PolymerElement} from '@polymer/polymer/polymer-element.js';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce.js';
 import EtoolsAjaxRequestMixin from './etools-ajax-request-mixin.js';
 import {timeOut} from '@polymer/polymer/lib/utils/async.js';
+import {logError} from '@unicef-polymer/etools-behaviors/etools-logging';
 
 /**
  * @polymer
@@ -41,24 +42,24 @@ class EtoolsAjax extends EtoolsAjaxRequestMixin(PolymerElement) {
     };
 
     return this.sendRequest(opt)
-        .then((data) => {
-          this.dispatchEvent(new CustomEvent('success', {detail: data, bubbles: true, composed: true}));
-          return data;
-        })
-        .catch((error) => {
-          this.handleError(error);
-        });
+      .then((data) => {
+        this.dispatchEvent(new CustomEvent('success', {detail: data, bubbles: true, composed: true}));
+        return data;
+      })
+      .catch((error) => {
+        this.handleError(error);
+      });
   }
 
   _optionsChanged() {
     this._debouncer = Debouncer.debounce(this._debouncer,
-        timeOut.after(300),
-        () => {
-          if (!this.endpoint && !this.url) {
-            return;
-          }
-          this.send();
-        });
+      timeOut.after(300),
+      () => {
+        if (!this.endpoint && !this.url) {
+          return;
+        }
+        this.send();
+      });
   }
 
   handleError(error) {
@@ -71,7 +72,7 @@ class EtoolsAjax extends EtoolsAjaxRequestMixin(PolymerElement) {
       this.dispatchEvent(new CustomEvent('forbidden', {detail: error.error, bubbles: true, composed: true}));
       return;
     }
-    this.logError('error', error.error);
+    logError('error', error.error);
     this.dispatchEvent(new CustomEvent('fail', {detail: error.error, bubbles: true, composed: true}));
   }
 }

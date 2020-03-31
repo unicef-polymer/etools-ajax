@@ -1,5 +1,6 @@
 /* eslint-disable linebreak-style */
 import './scripts/es6-obj-assign-polyfil.js';
+import {logError} from '@unicef-polymer/etools-behaviors/etools-logging';
 
 export function getCsrfHeader(csrfCheck, method) {
   if (!!method && csrfSafeMethod(method)) {
@@ -61,23 +62,33 @@ export function getClientConfiguredHeaders(additionalHeaders) {
 }
 
 
-export function getRequestHeaders(reqConfig) {
+export async function getRequestHeaders(reqConfig) {
   let headers = {};
   headers['content-type'] = determineContentType(reqConfig.body);
-
+  let authHeader = await getAuthorizationHeader(reqConfig.endpoint);
   headers = Object.assign({},
     headers,
     getClientConfiguredHeaders(reqConfig.headers),
-    getAuthorizationHeader(reqConfig.endpoint),
+    authHeader,
     getCsrfHeader(reqConfig.csrfCheck, reqConfig.method));
 
   return headers;
 }
 
-function getAuthorizationHeader(endpoint) {
+async function getAuthorizationHeader(endpoint) {
   if (endpoint.token_key) {
+    let token = localStorage.getItem(endpoint.token_key);
+    if (window.AppMsalInstance) {
+      if (!window.AppMsalInstance.tokenIsValid(token)) {
+        try {
+          token = await window.AppMsalInstance.acquireTokenSilent();
+        } catch (err) {
+          window.location.reload(true);
+        }
+      }
+    }
     return {
-      'Authorization': 'JWT ' + localStorage.getItem(endpoint.token_key)
+      'Authorization': 'JWT ' + token
     };
   }
 
@@ -126,13 +137,13 @@ export function isNonEmptyObject(obj) {
   * }
   * } reqConfig
   */
-export function getIronRequestConfigOptions(etoolAjaxReqConfig) {
+export async function getIronRequestConfigOptions(etoolAjaxReqConfig) {
   etoolAjaxReqConfig.method = etoolAjaxReqConfig.method || 'GET';
-
+  let headers = await getRequestHeaders(etoolAjaxReqConfig);
   return {
     url: etoolAjaxReqConfig.endpoint.url,
     method: etoolAjaxReqConfig.method,
-    headers: getRequestHeaders(etoolAjaxReqConfig),
+    headers,
     body: etoolAjaxReqConfig.body || {},
     async: !etoolAjaxReqConfig.sync,
     handleAs: etoolAjaxReqConfig.handleAs || 'json',
