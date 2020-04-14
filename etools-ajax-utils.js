@@ -79,12 +79,10 @@ async function getAuthorizationHeader(endpoint) {
   if (endpoint.token_key) {
     let token = localStorage.getItem(endpoint.token_key);
     if (window.AppMsalInstance) {
-      if (!window.AppMsalInstance.tokenIsValid(token)) {
-        try {
-          token = await window.AppMsalInstance.acquireTokenSilent();
-        } catch (err) {
-          window.location.reload(true);
-        }
+      try {
+        token = await window.AppMsalInstance.acquireTokenSilent();
+      } catch (err) {
+        window.location.reload(true);
       }
     }
     return {
