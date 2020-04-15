@@ -3,7 +3,6 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce.js';
 import EtoolsAjaxRequestMixin from './etools-ajax-request-mixin.js';
 import {timeOut} from '@polymer/polymer/lib/utils/async.js';
 import {logError} from '@unicef-polymer/etools-behaviors/etools-logging';
-import {formatServerErrorAsText} from './ajax-error-parser';
 
 /**
  * @polymer
@@ -48,8 +47,7 @@ class EtoolsAjax extends EtoolsAjaxRequestMixin(PolymerElement) {
         return data;
       })
       .catch((error) => {
-        logError('error', error.error);
-        formatServerErrorAsText(error);
+        this.handleError(error);
       });
   }
 
@@ -62,6 +60,21 @@ class EtoolsAjax extends EtoolsAjaxRequestMixin(PolymerElement) {
         }
         this.send();
       });
+  }
+
+  handleError(error) {
+    if (error.status === 401) {
+      this.dispatchEvent(new CustomEvent('unauthorized', {detail: error.error, bubbles: true, composed: true}));
+      return;
+    }
+
+    if (error.status === 403) {
+      this.dispatchEvent(new CustomEvent('forbidden', {detail: error.error, bubbles: true, composed: true}));
+      return;
+    }
+
+    logError('error', error.error);
+    this.dispatchEvent(new CustomEvent('fail', {detail: error.error, bubbles: true, composed: true}));
   }
 
 }
