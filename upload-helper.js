@@ -29,14 +29,12 @@ async function _getHeaders(jwtLocalStorageKey) {
         headers['x-csrftoken'] = csrfToken;
     }
     if (jwtToken) {
-        if (window.AppMsalInstance) {
-            if (!window.AppMsalInstance.tokenIsValid(jwtToken)) {
-                try {
-                    jwtToken = await window.AppMsalInstance.acquireTokenSilent();
-                } catch (err) {
-                    window.location.reload(true);
-                }
-            }
+        if (window.AppMsalInstance) {            
+            try {
+                jwtToken = await window.AppMsalInstance.acquireTokenSilent();
+            } catch (err) {
+                window.location.reload(true);
+            }            
         }
         headers['authorization'] = 'JWT ' + jwtToken;
     }
