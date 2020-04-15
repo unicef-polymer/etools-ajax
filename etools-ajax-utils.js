@@ -22,7 +22,7 @@ export function csrfSafeMethod(method) {
   return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 }
 
-function _getCSRFCookie() {
+export function _getCSRFCookie() {
   // check for a csrftoken cookie and return its value
   let csrfCookieName = 'csrftoken';
   let csrfToken = null;

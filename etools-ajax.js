@@ -4,7 +4,6 @@ import EtoolsAjaxRequestMixin from './etools-ajax-request-mixin.js';
 import {timeOut} from '@polymer/polymer/lib/utils/async.js';
 import {logError} from '@unicef-polymer/etools-behaviors/etools-logging';
 import {formatServerErrorAsText} from './ajax-error-parser';
-import {getRequestHeaders} from './etools-ajax-utils';
 
 /**
  * @polymer
@@ -43,9 +42,7 @@ class EtoolsAjax extends EtoolsAjaxRequestMixin(PolymerElement) {
       body: this.body
     };
 
-    let headers = getRequestHeaders(opt);
-
-    return this.sendRequest(headers)
+    return this.sendRequest(opt)
       .then((data) => {
         this.dispatchEvent(new CustomEvent('success', {detail: data, bubbles: true, composed: true}));
         return data;

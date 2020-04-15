@@ -1,3 +1,5 @@
+import {_getCSRFCookie} from './etools-ajax-utils';
+
 let activeXhrRequests = {};
 
 export async function upload(config, rawFile, filename) {
@@ -22,7 +24,7 @@ export async function upload(config, rawFile, filename) {
 }
 
 async function _getHeaders(jwtLocalStorageKey) {
-    let csrfToken = _getCSRFToken();
+    let csrfToken = _getCSRFCookie();
     let jwtToken = _getJwtToken(jwtLocalStorageKey);
     let headers = {};
     if (csrfToken) {
@@ -84,23 +86,6 @@ function _addAnyExtraInfoToBody(formData, extraInfo) {
             formData.append(prop, extraInfo[prop]);
         }
     }
-}
-
-function _getCSRFToken() {
-    // check for a csrftoken cookie and return its value
-    let csrfCookieName = 'csrftoken';
-    let csrfToken = null;
-    if (document.cookie && document.cookie !== '') {
-        let cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            let cookie = cookies[i].trim();
-            if (cookie.substring(0, csrfCookieName.length + 1) === (csrfCookieName + '=')) {
-                csrfToken = decodeURIComponent(cookie.substring(csrfCookieName.length + 1));
-                break;
-            }
-        }
-    }
-    return csrfToken;
 }
 
 function _getJwtToken(jwtLocalStorageKey) {
