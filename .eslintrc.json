@@ -1,7 +1,11 @@
 {
-  "extends": ["eslint:recommended", "google"],
+  "extends": [
+    "eslint:recommended",
+    "google"
+  ],
   "parserOptions": {
-    "ecmaVersion": 6
+    "ecmaVersion": 9,
+    "sourceType": "module"
   },
   "env": {
     "browser": true
@@ -12,14 +16,42 @@
   "rules": {
     "padded-blocks": "off",
     "brace-style": "off",
-    "new-cap": ["error", { "capIsNewExceptions": ["Polymer"], "capIsNewExceptionPattern": "^Etools.." }],
+    "new-cap": [
+      "error",
+      {
+        "capIsNewExceptions": [
+          "Polymer"
+        ],
+        "capIsNewExceptionPattern": "^Etools.."
+      }
+    ],
     "no-var": "off",
+    "linebreak-style": "off",
     "require-jsdoc": "off",
     "valid-jsdoc": "off",
-    "comma-dangle": ["error", "never"],
-    "max-len": ["error", { "code": 120 }],
-    "camelcase": ["error", {"properties": "never"}],
-    "arrow-parens": [2, "as-needed", { "requireForBlockBody": true }]
+    "comma-dangle": [
+      "error",
+      "never"
+    ],
+    "max-len": [
+      "error",
+      {
+        "code": 120
+      }
+    ],
+    "camelcase": [
+      "error",
+      {
+        "properties": "never"
+      }
+    ],
+    "arrow-parens": [
+      2,
+      "as-needed",
+      {
+        "requireForBlockBody": true
+      }
+    ]
   },
   "globals": {
     "moment": true,

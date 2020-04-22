@@ -1,9 +1,11 @@
-# Etools Ajax Request Behavior
+# Etools Ajax Request Mixin & Module
 
-Polymer Behavior for handling ajax requests in any Polymer element.
+Element for handling ajax requests.
+It uses the `iron-request` polymer component to make the requests.
+Exposes its functionality through a mixin and also through a module. The module functionality can be used in any framework, the mixin is Polymer dependent.
 For GET requests it can cache the data using Dexie db.
 
-The `<etools-ajax>` is a complete new element based on the `EtoolsAjaxRequestMixin`.
+The `<etools-ajax>` is a Polymer element based on the `EtoolsAjaxRequestMixin`.
 
 ### Data caching requirements
 
@@ -74,43 +76,68 @@ Just set this in your app: `window.EtoolsRequestCacheDisabled = true`
 ### Usage in version 2.0.4 and below
 
 ```javascript
-Polymer({
-    is: 'custom-element',
-    behaviors: [EtoolsAjaxRequestBehavior],
-    ready: function() {
-      this.sendRequest({
-        method: 'GET',
-        endpoint: {
-          url: '/countries-data',
-        },
-        params: {
-          id: 10,
-          country_name: 'USA'
-        }
-      }).then(function(resp) {
-        console.log(resp);
-      }).catch(function(error) {
-        console.log(error);
-      });
+  // inside an element method (make sure ajax request mixin is included)
+  this.sendRequest({
+    method: 'GET',
+    endpoint: {
+      url: '/countries-data',
+    },
+    params: {
+      id: 10,
+      country_name: 'USA'
     }
-});
+  }).then(function(resp) {
+    console.log(resp);
+  }).catch(function(error) {
+    console.log(error);
+  });
+
 ```
 
-#### `sendRequest` options:
+#### `sendRequest` params:
 An object that must have this properties
 * `method` - any HTTP method, defaults to 'GET' if is not defined
-* `endpoint` - an object that must contain the `url` property. For caching this object can
-have `exp`(time to cache data in milliseconds), `cachingKey`(any string) or `cacheTableName`(the Dexie table name,
-where you can store a list of objects from server response);
+* `endpoint` - an object that must contain the `url` property.
+For caching this object can
+have `exp`(time to cache data in milliseconds), `cachingKey`(any string) ,`cacheTableName`(the Dexie table name,
+where you can store a list of objects from server response) or `sharedDbCachingKey`.
+ For more info on caching configuration see https://github.com/unicef-polymer/etools-dexie-caching Readme;
+`token_key` property holds the local storage key of the token. If present, the 'Authorization' header will be set.
+When `token_key` and `window.AppMsalInstance` are set, the token is automatically added to the request. If the token is expired, a silent token refresh will be done. If the silent token refresh errors out the page is reloaded in order to be redirected to the `Sign in` page.
+
+  `endpoint` format:
+  ```javascript
+  {
+    url: string,
+    exp?: number,
+    cacheTableName?: string,
+    cachingKey?: string,
+    token_key?: string
+  }
+  ```
 * `params` - request params, will be used to build url query string
 * `body` - request body for POST | PUT | PATCH | DELETE methods
-* `csrfCheck` - if `true` then `x-csrftoken` header will be set with value of `csrftoken` cookie
+* `csrfCheck` - if other than `disabled`, x-csrftoken header will be set with value of `csrftoken` cookie
 * `headers` - object of additional headers that can be set on request
 * `multiPart` - if `true` it will take the `body` and convert it in `FormData`
 * `prepareMultipartData` - used by etools apps to convert request complex json `body` to `FromData` and prefix objects
 properties with `_obj`
 * `checkProgress` - experimental flag to have ajax request progress (progress available data stored in `reqProgress`
 property)
+* `timeout` - Set the timeout flag on the request
+* `async` - Toggle whether XHR is synchronous or asynchronous. Don't change this to true unless You Know What You Are Doing
+* `handleAs` - Specifies what data to store in the response property,
+    and to deliver as event.detail.response in response events.
+    One of:
+    text: uses XHR.responseText.
+    xml: uses XHR.responseXML.
+    json: uses XHR.responseText parsed as JSON.
+    arraybuffer: uses XHR.response.
+    blob: uses XHR.response.
+    document: uses XHR.response.
+* `jsonPrefix` - Prefix to be stripped from a JSON response before parsing it.
+* `rejectWithRequest` - Changes the completes promise chain from generateRequest to reject with an object containing the original request, as well an error message. If false (default), the promise rejects with an error message only.
+* `withCredentials` - Whether or not to send credentials on the request. Default is false.
 
 #### Ajax response handling:
 
@@ -130,15 +157,14 @@ To abort any of the active requests you can use `abortRequestByKey(key)`.
 You can also use `this.lastAjaxRequest.abort()` to abort last request.
 
 ## Install
+TODO: create npm package
 ```bash
-$ bower install --save etools-ajax
+$ npm i --save @unicef-polymer/etools-ajax
 ```
 
-## Preview element locally
-Install needed dependencies by running: `$ bower install`.
-Make sure you have the [Polymer CLI](https://www.npmjs.com/package/polymer-cli) installed. Then run `$ polymer serve` to serve your element application locally.
-
 ## Running Tests
+
+TODO: improve tests & add more tests
 
 You need to have `web-component-tester` installed (if not run `npm install -g web-component-tester`)
 ```bash
