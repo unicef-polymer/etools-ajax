@@ -1,6 +1,5 @@
 /* eslint-disable linebreak-style */
 import './scripts/es6-obj-assign-polyfil.js';
-import {logError} from '@unicef-polymer/etools-behaviors/etools-logging';
 
 export function getCsrfHeader(csrfCheck, method) {
   if (!!method && csrfSafeMethod(method)) {
