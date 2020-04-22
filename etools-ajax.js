@@ -72,9 +72,11 @@ class EtoolsAjax extends EtoolsAjaxRequestMixin(PolymerElement) {
       this.dispatchEvent(new CustomEvent('forbidden', {detail: error.error, bubbles: true, composed: true}));
       return;
     }
+
     logError('error', error.error);
     this.dispatchEvent(new CustomEvent('fail', {detail: error.error, bubbles: true, composed: true}));
   }
+
 }
 
 customElements.define(EtoolsAjax.is, EtoolsAjax);

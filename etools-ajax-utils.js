@@ -1,6 +1,5 @@
 /* eslint-disable linebreak-style */
 import './scripts/es6-obj-assign-polyfil.js';
-import {logError} from '@unicef-polymer/etools-behaviors/etools-logging';
 
 export function getCsrfHeader(csrfCheck, method) {
   if (!!method && csrfSafeMethod(method)) {
@@ -22,7 +21,7 @@ export function csrfSafeMethod(method) {
   return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 }
 
-function _getCSRFCookie() {
+export function _getCSRFCookie() {
   // check for a csrftoken cookie and return its value
   let csrfCookieName = 'csrftoken';
   let csrfToken = null;
