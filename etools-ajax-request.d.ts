@@ -39,7 +39,8 @@ export interface EtoolsRequestConfig {
    * If false (default), the promise rejects with an error message only.
    */
   rejectWithRequest?: boolean,
-  withCredentials?: boolean
+  withCredentials?: boolean,
+  params?: object
 }
 
 

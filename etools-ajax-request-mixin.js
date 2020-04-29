@@ -11,7 +11,7 @@ import {
 } from '@unicef-polymer/etools-dexie-caching/etools-dexie-caching';
 import {
   csrfSafeMethod, getCsrfHeader, getClientConfiguredHeaders,
-  determineContentType, isNonEmptyObject
+  determineContentType, isNonEmptyObject, getRequestUrl
 } from './etools-ajax-utils';
 
 export function EtoolsRequestError(error, statusCode, statusText, response) {
@@ -179,7 +179,7 @@ const EtoolsAjaxRequestMixin = dedupingMixin(
     getIronRequestConfigOptions(reqConfig) {
       reqConfig.method = reqConfig.method || 'GET';
       return {
-        url: this._getRequestUrl(reqConfig),
+        url: getRequestUrl(reqConfig),
         method: reqConfig.method,
         headers: this._getRequestHeaders(reqConfig),
         body: this._getRequestBody(reqConfig),
@@ -198,36 +198,6 @@ const EtoolsAjaxRequestMixin = dedupingMixin(
         handleAs = 'blob';
       }
       return handleAs;
-    }
-
-    _getRequestUrl(reqConfig) {
-      let url = '';
-      if (reqConfig.endpoint && reqConfig.endpoint.url) {
-        url = reqConfig.endpoint.url;
-        url += this._buildQueryString(url, reqConfig.params);
-      }
-      return url;
-    }
-
-    _buildQueryString(url, params) {
-      let queryStr = '';
-      if (!params || !isNonEmptyObject(params)) {
-        return '';
-      }
-      if (url.indexOf('?') < 0) {
-        queryStr = '?';
-      } else {
-        queryStr = '&';
-      }
-      /* eslint-disable guard-for-in */
-      for (let key in params) {
-        queryStr += key + '=' + params[key] + '&';
-      }
-      /* eslint-enable guard-for-in */
-
-      // remove trailing &
-      queryStr = queryStr.substring(0, queryStr.length - 1);
-      return queryStr;
     }
 
     _getRequestBody(reqConfig) {

@@ -151,3 +151,31 @@ export async function getIronRequestConfigOptions(etoolAjaxReqConfig) {
   };
 }
 
+export function getRequestUrl(reqConfig) {
+  let url = reqConfig.endpoint.url;
+  if (reqConfig.params) {
+    url += buildQueryString(url, reqConfig.params);
+  }
+  return url;
+}
+
+export function buildQueryString(url, params) {
+  let queryStr = '';
+  if (!params || !isNonEmptyObject(params)) {
+    return '';
+  }
+  if (url.indexOf('?') < 0) {
+    queryStr = '?';
+  } else {
+    queryStr = '&';
+  }
+  /* eslint-disable guard-for-in */
+  for (let key in params) {
+    queryStr += key + '=' + params[key] + '&';
+  }
+  /* eslint-enable guard-for-in */
+
+  // remove trailing &
+  queryStr = queryStr.substring(0, queryStr.length - 1);
+  return queryStr;
+}
