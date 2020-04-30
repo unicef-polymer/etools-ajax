@@ -25,6 +25,7 @@ import {getIronRequestConfigOptions} from './etools-ajax-utils';
  *  jsonPrefix: string,
  *  rejectWithRequest: boolean,
  *  withCredentials: boolean,
+ *  params?: object
  * } reqConfig
  * @param {string} requestKey
  * @param {boolean} checkProgress
