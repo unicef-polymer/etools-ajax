@@ -138,7 +138,7 @@ export async function getIronRequestConfigOptions(etoolAjaxReqConfig) {
   etoolAjaxReqConfig.method = etoolAjaxReqConfig.method || 'GET';
   let headers = await getRequestHeaders(etoolAjaxReqConfig);
   return {
-    url: etoolAjaxReqConfig.endpoint.url,
+    url: getRequestUrl(etoolAjaxReqConfig),
     method: etoolAjaxReqConfig.method,
     headers,
     body: etoolAjaxReqConfig.body || {},
