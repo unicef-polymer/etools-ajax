@@ -157,7 +157,7 @@ To abort any of the active requests you can use `abortRequestByKey(key)`.
 You can also use `this.lastAjaxRequest.abort()` to abort last request.
 
 ### Upload
-* `upload` method exported in the upload-helper file can be used to upload files.
+* `upload` method found in the upload-helper file can be used to upload files.
 
 ## Install
 TODO: create npm package
