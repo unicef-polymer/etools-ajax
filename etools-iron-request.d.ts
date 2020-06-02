@@ -14,5 +14,5 @@ export interface IronRequestConfig {
 declare function doHttpRequest(ironRequestConfigOptions: IronRequestConfig, requestKey: string,
   checkRequestProgress: boolean): Promise<any>
 declare function abortRequestByKey(key: string): any;
-declare function getRequestProgress(requestKey: any): Number;
+declare function getRequestProgress(requestKey: string): number;
 
