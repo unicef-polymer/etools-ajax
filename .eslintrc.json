@@ -1,27 +1,23 @@
 {
-  "extends": [
-    "eslint:recommended",
-    "google"
-  ],
+  "extends": ["eslint:recommended", "google","prettier/@typescript-eslint",
+    "plugin:prettier/recommended"],
   "parserOptions": {
     "ecmaVersion": 9,
     "sourceType": "module"
   },
   "env": {
-    "browser": true
+    "browser": true,
+    "es6": true
   },
-  "plugins": [
-    "html"
-  ],
+  "plugins": ["html", "prettier"],
   "rules": {
+    "prettier/prettier": "error",
     "padded-blocks": "off",
     "brace-style": "off",
     "new-cap": [
       "error",
       {
-        "capIsNewExceptions": [
-          "Polymer"
-        ],
+        "capIsNewExceptions": ["Polymer"],
         "capIsNewExceptionPattern": "^Etools.."
       }
     ],
@@ -29,10 +25,7 @@
     "linebreak-style": "off",
     "require-jsdoc": "off",
     "valid-jsdoc": "off",
-    "comma-dangle": [
-      "error",
-      "never"
-    ],
+    "comma-dangle": ["error", "never"],
     "max-len": [
       "error",
       {
@@ -43,13 +36,6 @@
       "error",
       {
         "properties": "never"
-      }
-    ],
-    "arrow-parens": [
-      2,
-      "as-needed",
-      {
-        "requireForBlockBody": true
       }
     ]
   },

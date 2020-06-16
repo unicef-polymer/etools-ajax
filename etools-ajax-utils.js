@@ -5,9 +5,9 @@ export function getCsrfHeader(csrfCheck, method) {
   if (!!method && csrfSafeMethod(method)) {
     return {};
   }
-  let csrfHeaders = {};
+  const csrfHeaders = {};
   if (csrfCheck !== 'disabled') {
-    let csrfToken = _getCSRFCookie();
+    const csrfToken = _getCSRFCookie();
 
     if (csrfToken) {
       csrfHeaders['x-csrftoken'] = csrfToken;
@@ -18,19 +18,19 @@ export function getCsrfHeader(csrfCheck, method) {
 
 export function csrfSafeMethod(method) {
   // these HTTP methods do not require CSRF protection
-  return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
 }
 
 export function _getCSRFCookie() {
   // check for a csrftoken cookie and return its value
-  let csrfCookieName = 'csrftoken';
+  const csrfCookieName = 'csrftoken';
   let csrfToken = null;
   if (document.cookie && document.cookie !== '') {
-    let cookies = document.cookie.split(';');
+    const cookies = document.cookie.split(';');
     for (let i = 0; i < cookies.length; i++) {
-      let cookie = cookies[i].trim();
+      const cookie = cookies[i].trim();
       // Does this cookie string begin with the name we want?
-      if (cookie.substring(0, csrfCookieName.length + 1) === (csrfCookieName + '=')) {
+      if (cookie.substring(0, csrfCookieName.length + 1) === csrfCookieName + '=') {
         csrfToken = decodeURIComponent(cookie.substring(csrfCookieName.length + 1));
         break;
       }
@@ -49,7 +49,7 @@ export function tryJsonParse(response) {
 
 export function getClientConfiguredHeaders(additionalHeaders) {
   let header;
-  let clientHeaders = {};
+  const clientHeaders = {};
   if (additionalHeaders && additionalHeaders instanceof Object) {
     /* eslint-disable guard-for-in */
     for (header in additionalHeaders) {
@@ -60,16 +60,17 @@ export function getClientConfiguredHeaders(additionalHeaders) {
   return clientHeaders;
 }
 
-
 export async function getRequestHeaders(reqConfig) {
   let headers = {};
   headers['content-type'] = determineContentType(reqConfig.body);
-  let authHeader = await getAuthorizationHeader(reqConfig.endpoint);
-  headers = Object.assign({},
+  const authHeader = await getAuthorizationHeader(reqConfig.endpoint);
+  headers = Object.assign(
+    {},
     headers,
     getClientConfiguredHeaders(reqConfig.headers),
     authHeader,
-    getCsrfHeader(reqConfig.csrfCheck, reqConfig.method));
+    getCsrfHeader(reqConfig.csrfCheck, reqConfig.method)
+  );
 
   return headers;
 }
@@ -85,7 +86,7 @@ async function getAuthorizationHeader(endpoint) {
       }
     }
     return {
-      'Authorization': 'JWT ' + token
+      Authorization: 'JWT ' + token
     };
   }
 
@@ -93,9 +94,9 @@ async function getAuthorizationHeader(endpoint) {
 }
 
 /**
-* Content-Type set here can be overridden later
-* by headers sent from the client
-*/
+ * Content-Type set here can be overridden later
+ * by headers sent from the client
+ */
 export function determineContentType(body) {
   let contentType = 'application/json';
 
@@ -106,7 +107,6 @@ export function determineContentType(body) {
   return contentType;
 }
 
-
 export function isNonEmptyObject(obj) {
   return obj && typeof obj === 'object' && Object.keys(obj).length > 0;
 }
@@ -115,28 +115,28 @@ export function isNonEmptyObject(obj) {
  *
  * @param {
  * {
-  *  endpoint: {
-  *          url: string,
-  *          exp?: number,
-  *          cacheTableName?: string,
-  *          cachingKey?: string
-  *  },
-  *  body: any,
-  *  method: string,
-  *  headers: any,
-  *  csrfCheck: string // 'disabled',
-  *  timeout: number,
-  *  sync: boolean,
-  *  handleAs: string,
-  *  jsonPrefix: string,
-  *  rejectWithRequest: boolean,
-  *  withCredentials: boolean,
-  * }
-  * } reqConfig
-  */
+ *  endpoint: {
+ *          url: string,
+ *          exp?: number,
+ *          cacheTableName?: string,
+ *          cachingKey?: string
+ *  },
+ *  body: any,
+ *  method: string,
+ *  headers: any,
+ *  csrfCheck: string // 'disabled',
+ *  timeout: number,
+ *  sync: boolean,
+ *  handleAs: string,
+ *  jsonPrefix: string,
+ *  rejectWithRequest: boolean,
+ *  withCredentials: boolean,
+ * }
+ * } reqConfig
+ */
 export async function getIronRequestConfigOptions(etoolAjaxReqConfig) {
   etoolAjaxReqConfig.method = etoolAjaxReqConfig.method || 'GET';
-  let headers = await getRequestHeaders(etoolAjaxReqConfig);
+  const headers = await getRequestHeaders(etoolAjaxReqConfig);
   return {
     url: getRequestUrl(etoolAjaxReqConfig),
     method: etoolAjaxReqConfig.method,
@@ -170,7 +170,7 @@ export function buildQueryString(url, params) {
     queryStr = '&';
   }
   /* eslint-disable guard-for-in */
-  for (let key in params) {
+  for (const key in params) {
     queryStr += key + '=' + params[key] + '&';
   }
   /* eslint-enable guard-for-in */

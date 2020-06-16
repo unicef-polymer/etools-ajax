@@ -1,14 +1,14 @@
 import {_getCSRFCookie} from './etools-ajax-utils';
 
-let activeXhrRequests = {};
+const activeXhrRequests = {};
 
 export function getActiveXhrRequests() {
   return activeXhrRequests;
 }
 
 export async function upload(config, rawFile, filename) {
-  let headers = await _getHeaders(config.jwtLocalStorageKey);
-  let options = {
+  const headers = await _getHeaders(config.jwtLocalStorageKey);
+  const options = {
     method: 'POST',
     url: _getEndpoint(config.endpointInfo, config.uploadEndpoint),
     body: _prepareBody(rawFile, filename, config.endpointInfo),
@@ -21,16 +21,17 @@ export async function upload(config, rawFile, filename) {
         response = JSON.parse(response);
       }
       return response;
-    }).catch((error) => {
+    })
+    .catch((error) => {
       delete activeXhrRequests[filename];
       throw error;
     });
 }
 
 async function _getHeaders(jwtLocalStorageKey) {
-  let csrfToken = _getCSRFCookie();
+  const csrfToken = _getCSRFCookie();
   let jwtToken = _getJwtToken(jwtLocalStorageKey);
-  let headers = {};
+  const headers = {};
   if (csrfToken) {
     headers['x-csrftoken'] = csrfToken;
   }
@@ -55,9 +56,9 @@ function _getEndpoint(endpointInfo, uploadEndpoint) {
 }
 
 function _prepareBody(rawFile, filename, endpointInfo) {
-  let fd = new FormData();
+  const fd = new FormData();
 
-  let rawFileProperty = _getRawFilePropertyName(endpointInfo);
+  const rawFileProperty = _getRawFilePropertyName(endpointInfo);
   fd.append(rawFileProperty, rawFile, filename);
 
   if (endpointInfo && endpointInfo.extraInfo) {
@@ -67,7 +68,7 @@ function _prepareBody(rawFile, filename, endpointInfo) {
 }
 
 function sendRequest(options, requestKey) {
-  let request = document.createElement('iron-request');
+  const request = document.createElement('iron-request');
   activeXhrRequests[requestKey] = request;
   request.send(options);
   return request.completes.then((request) => {
@@ -83,8 +84,8 @@ function _getRawFilePropertyName(endpointInfo) {
 }
 
 function _addAnyExtraInfoToBody(formData, extraInfo) {
-  for (let prop in extraInfo) {
-    if (extraInfo.hasOwnProperty(prop)) {
+  for (const prop in extraInfo) {
+    if (Object.prototype.hasOwnProperty.call(extraInfo, prop)) {
       formData.append(prop, extraInfo[prop]);
     }
   }
@@ -98,7 +99,7 @@ export function abortActiveRequests(activeReqKeys) {
   if (!activeXhrRequests) {
     return;
   }
-  let keys = activeReqKeys || Object.keys(activeXhrRequests);
+  const keys = activeReqKeys || Object.keys(activeXhrRequests);
   if (keys.length) {
     keys.forEach((key) => {
       try {
@@ -110,4 +111,3 @@ export function abortActiveRequests(activeReqKeys) {
     });
   }
 }
-
