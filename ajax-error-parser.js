@@ -31,11 +31,11 @@ export function getErrorsArray(errors) {
   }
 
   if (typeof errors === 'object' && errors.errors && Array.isArray(errors.errors)) {
-    errors.errors.forEach(function(err) {
+    errors.errors.forEach(function (err) {
       if (typeof err === 'object') {
         const errKeys = Object.keys(err);
         if (errKeys.length > 0) {
-          errKeys.forEach(function(k) {
+          errKeys.forEach(function (k) {
             errorsArray.push(err[k]); // will work only for strings
           });
         }
@@ -87,7 +87,6 @@ export function getErrorsArray(errors) {
           }
         }
       }
-
     }
   }
 
@@ -96,7 +95,7 @@ export function getErrorsArray(errors) {
 
 function _markNestedErrors(errs) {
   // @ts-ignore
-  return errs.map(er => ' ' + er);
+  return errs.map((er) => ' ' + er);
 }
 
 function _isArrayOfStrings(arr) {

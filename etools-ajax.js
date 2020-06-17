@@ -25,16 +25,11 @@ class EtoolsAjax extends EtoolsAjaxRequestMixin(PolymerElement) {
   }
 
   static get observers() {
-    return [
-      '_optionsChanged(url)',
-      '_optionsChanged(endpoint)',
-      '_optionsChanged(params)',
-      '_optionsChanged(method)'
-    ];
+    return ['_optionsChanged(url)', '_optionsChanged(endpoint)', '_optionsChanged(params)', '_optionsChanged(method)'];
   }
 
   send() {
-    let opt = {
+    const opt = {
       endpoint: this.endpoint || {url: this.url},
       params: this.params,
       method: this.method,
@@ -52,14 +47,12 @@ class EtoolsAjax extends EtoolsAjaxRequestMixin(PolymerElement) {
   }
 
   _optionsChanged() {
-    this._debouncer = Debouncer.debounce(this._debouncer,
-      timeOut.after(300),
-      () => {
-        if (!this.endpoint && !this.url) {
-          return;
-        }
-        this.send();
-      });
+    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(300), () => {
+      if (!this.endpoint && !this.url) {
+        return;
+      }
+      this.send();
+    });
   }
 
   handleError(error) {
@@ -76,7 +69,6 @@ class EtoolsAjax extends EtoolsAjaxRequestMixin(PolymerElement) {
     logError('error', error.error);
     this.dispatchEvent(new CustomEvent('fail', {detail: error.error, bubbles: true, composed: true}));
   }
-
 }
 
 customElements.define(EtoolsAjax.is, EtoolsAjax);
