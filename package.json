@@ -10,9 +10,9 @@
   "dependencies": {
     "@polymer/iron-ajax": "^3.0.1",
     "@polymer/polymer": "^3.4.1",
-    "@unicef-polymer/etools-behaviors": "3.0.1",
+    "@unicef-polymer/etools-behaviors": "^3.0.4",
     "@unicef-polymer/etools-dexie-caching": "^1.0.2",
-    "lodash": ">=4.17.12"
+    "lodash": ">=4.17.19"
   },
   "devDependencies": {
     "@polymer/iron-component-page": "^4.0.0",
