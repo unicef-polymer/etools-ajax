@@ -83,7 +83,7 @@ export function getErrorsArray(errors) {
         let errF;
         for (errF in errors[errField]) {
           if (errors[errField][errF]) {
-            errorsArray.push('Field ' + errField + '(' + errF + ') - ' + errors[errField][errF]);
+            errorsArray.push('Field ' + errField + '(' + errF + ') - ' + getErrorsArray(errors[errField][errF]));
           }
         }
       }
