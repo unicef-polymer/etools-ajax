@@ -12,6 +12,7 @@ export async function upload(config, rawFile, filename) {
     method: 'POST',
     url: _getEndpoint(config.endpointInfo, config.uploadEndpoint),
     body: _prepareBody(rawFile, filename, config.endpointInfo),
+    rejectWithRequest: config.endpointInfo.rejectWithRequest,
     headers
   };
   return sendRequest(options, filename)
