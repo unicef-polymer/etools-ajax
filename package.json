@@ -1,7 +1,7 @@
 {
   "description": "Polymer element and behavior for handling ajax requests",
   "name": "@unicef-polymer/etools-ajax",
-  "version": "4.1.9",
+  "version": "4.1.10-rc.1",
   "homepage": "https://github.com/unicef-polymer/etools-ajax",
   "repository": {
     "type": "git",
@@ -12,24 +12,24 @@
     "@polymer/polymer": "^3.4.1",
     "@unicef-polymer/etools-behaviors": "^3.0.4",
     "@unicef-polymer/etools-dexie-caching": "^1.0.2",
-    "lodash": ">=4.17.19"
+    "lodash": "^4.17.20"
   },
   "devDependencies": {
+    "@polymer/gen-typescript-declarations": "^1.6.2",
     "@polymer/iron-component-page": "^4.0.0",
     "@polymer/iron-demo-helpers": "^3.0.0",
-    "@webcomponents/webcomponentsjs": "^2.4.3",
-    "@polymer/gen-typescript-declarations": "^1.6.2",
-    "eslint": "^7.2.0",
-    "prettier": "^2.0.5",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-prettier": "^3.1.3",
+    "@webcomponents/webcomponentsjs": "^2.5.0",
+    "diff": "^5.0.0",
+    "eslint": "^7.14.0",
     "eslint-config-google": "^0.14.0",
-    "eslint-plugin-html": "^6.0.2",
-    "wct-browser-legacy": "^0.0.1-pre.11",
-    "minimist": ">=0.2.1",
-    "diff": ">=3.5.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-html": "^6.1.1",
+    "eslint-plugin-prettier": "^3.1.3",
     "growl": ">=1.10.0",
-    "prismjs": ">=1.21.0"
+    "minimist": ">=0.2.1",
+    "prettier": "^2.2.0",
+    "prismjs": ">=1.21.0",
+    "wct-browser-legacy": "^0.0.1-pre.11"
   },
   "scripts": {
     "lint:javascript": "eslint . --ext js,html && exit 0",
