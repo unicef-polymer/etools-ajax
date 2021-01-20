@@ -28,18 +28,17 @@ import {getIronRequestConfigOptions} from './etools-ajax-utils';
  *  params?: object
  * } reqConfig
  * @param {string} requestKey
- * @param {boolean} checkProgress
  */
-export async function sendRequest(reqConfig, requestKey, checkProgress) {
+export async function sendRequest(reqConfig, requestKey) {
   const ironRequestConfigOptions = await getIronRequestConfigOptions(reqConfig);
 
   if (requestIsCacheable(reqConfig.method, reqConfig.endpoint)) {
     return getFromCache(reqConfig.endpoint).catch(() => {
-      return doHttpRequest(ironRequestConfigOptions, requestKey, checkProgress).then((response) =>
+      return doHttpRequest(ironRequestConfigOptions, requestKey).then((response) =>
         cacheEndpointResponse(response, reqConfig.endpoint)
       );
     });
   }
 
-  return doHttpRequest(ironRequestConfigOptions, requestKey, checkProgress);
+  return doHttpRequest(ironRequestConfigOptions, requestKey);
 }
