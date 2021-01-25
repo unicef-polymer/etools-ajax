@@ -52,5 +52,4 @@ export type EtoolsRequestEndpoint = {
   token_key?: string
 }
 
-declare function sendRequest(etoolsReqConfig: EtoolsRequestConfig, requestKey?: string,
-  checkProgress?: boolean): Promise<any>;
+declare function sendRequest(etoolsReqConfig: EtoolsRequestConfig, requestKey?: string): Promise<any>;
