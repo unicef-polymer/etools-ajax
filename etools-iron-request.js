@@ -4,7 +4,6 @@ import {logWarn} from '@unicef-polymer/etools-behaviors/etools-logging';
 import '@polymer/iron-ajax/iron-request.js';
 
 let activeAjaxRequests = [];
-const requestsProgress = [];
 
 /**
  * Fire new http request using iron-request
@@ -22,11 +21,10 @@ const requestsProgress = [];
  * } ironRequestConfigOptions
  * @param {string} requestKey
  */
-export function doHttpRequest(ironRequestConfigOptions, requestKey, checkRequestProgress) {
+export function doHttpRequest(ironRequestConfigOptions, requestKey) {
   const ironRequestElement = document.createElement('iron-request'); // typeof IronRequestElement
   ironRequestElement.send(ironRequestConfigOptions);
 
-  _checkRequestProgress(ironRequestElement, requestKey, checkRequestProgress);
   _addToActiveAjaxRequests(requestKey, ironRequestElement);
 
   return ironRequestElement.completes
@@ -37,7 +35,7 @@ export function doHttpRequest(ironRequestConfigOptions, requestKey, checkRequest
         responseData = tryJsonParse(responseData);
       }
 
-      _cleanUp(checkRequestProgress, requestKey);
+      _cleanUp(requestKey);
 
       return responseData;
     })
@@ -49,7 +47,7 @@ export function doHttpRequest(ironRequestConfigOptions, requestKey, checkRequest
         return;
       }
 
-      _cleanUp(checkRequestProgress, requestKey);
+      _cleanUp(requestKey);
 
       // check request aborted, no error handling in this case
       if (!request.aborted) {
@@ -60,9 +58,8 @@ export function doHttpRequest(ironRequestConfigOptions, requestKey, checkRequest
     });
 }
 
-function _cleanUp(checkRequestProgress, requestKey) {
+function _cleanUp(requestKey) {
   _removeActiveRequestFromList(requestKey);
-  _removeProgressInfo(checkRequestProgress, requestKey);
 }
 
 export function EtoolsRequestError(error, statusCode, statusText, response) {
@@ -106,43 +103,4 @@ function abortRequest(activeReqMapObj) {
   if (activeReqMapObj.request) {
     activeReqMapObj.request.abort();
   }
-}
-
-function _checkRequestProgress(request, requestKey, checkProgress) {
-  if (!checkProgress || !request || !request.progress) {
-    return;
-  }
-  const progressInfo = {key: requestKey, progress: 0, interval: null};
-  requestsProgress.push(progressInfo);
-
-  progressInfo.interval = setInterval(() => {
-    if (request.progress.constructor === Object && Object.keys(request.progress).length > 0) {
-      requestsProgress[requestKey] = request.progress;
-
-      if (!request.progress.lengthComputable || request.progress.loaded === request.progress.total) {
-        clearInterval(progressInfo.interval);
-      }
-    }
-  }, 500);
-}
-
-function _removeProgressInfo(checkProgress, requestKey) {
-  if (!checkProgress || !requestKey || !requestsProgress || !requestsProgress.length) {
-    return;
-  }
-  const index = requestsProgress.findIndex((p) => p.key == requestKey);
-  if (index > -1) {
-    requestsProgress.splice(index, 1);
-  }
-}
-
-export function getRequestProgress(requestKey) {
-  if (!requestKey) {
-    logWarn('You must provide an activeRequestKey string name when calling sendRequest', 'EtoolsAjax');
-  }
-  const progressInfo = requestsProgress.find((p) => p.key == requestKey);
-  if (!progressInfo) {
-    logWarn('No progress data available', 'EtoolsAjax');
-  }
-  return progressInfo.progress;
 }

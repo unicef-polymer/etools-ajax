@@ -60,20 +60,6 @@ const EtoolsAjaxRequestMixin = dedupingMixin(
             value: () => {
               return [];
             }
-          },
-          reqProgress: {
-            type: Object,
-            notify: true,
-            readOnly: true,
-            value: () => {
-              return null;
-            }
-          },
-          checkReqProgress: {
-            type: Object,
-            value: () => {
-              return null;
-            }
           }
         };
       }
@@ -87,21 +73,20 @@ const EtoolsAjaxRequestMixin = dedupingMixin(
 
         if (requestIsCacheable(reqConfig.method, reqConfig.endpoint)) {
           return getFromCache(reqConfig.endpoint).catch(() => {
-            return this._doRequest(reqConfigOptions, reqConfig.checkProgress, activeReqKey).then((response) =>
+            return this._doRequest(reqConfigOptions, activeReqKey).then((response) =>
               cacheEndpointResponse(response, reqConfig.endpoint)
             );
           });
         }
         // make request
-        return this._doRequest(reqConfigOptions, reqConfig.checkProgress, activeReqKey);
+        return this._doRequest(reqConfigOptions, activeReqKey);
       }
 
       /**
        * Fire new request
        */
-      _doRequest(reqConfigOptions, checkProgress, activeReqKey) {
+      _doRequest(reqConfigOptions, activeReqKey) {
         const request = /** @type {!IronRequestElement} */ (document.createElement('iron-request'));
-        this._checkRequestProgress(request, checkProgress);
 
         request.send(reqConfigOptions);
         this._setLastAjaxRequest(request);
@@ -241,25 +226,6 @@ const EtoolsAjaxRequestMixin = dedupingMixin(
         return headers;
       }
 
-      _checkRequestProgress(request, checkProgress) {
-        if (!checkProgress || !request || !request.progress) {
-          return;
-        }
-        this.checkReqProgress = setInterval(() => {
-          if (request.progress.constructor === Object && Object.keys(request.progress).length > 0) {
-            this._setReqProgress(request.progress);
-            if (!request.progress.lengthComputable || request.progress.loaded === request.progress.total) {
-              this._stopReqProgressCheck();
-            }
-          }
-        });
-      }
-
-      _stopReqProgressCheck() {
-        if (this.checkReqProgress) {
-          clearInterval(this.checkReqProgress);
-        }
-      }
     }
 );
 

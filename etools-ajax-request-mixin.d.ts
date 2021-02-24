@@ -16,8 +16,6 @@ declare function EtoolsAjaxRequestMixin<T extends Constructor<PolymerElement>>(b
   new (...args: any[]): {
     readonly lastAjaxRequest: object|null|undefined;
     readonly activeAjaxRequests: any[]|null|undefined;
-    readonly reqProgress: object|null|undefined;
-    checkReqProgress: object|null|undefined;
 
     /**
    * Check for cached data if needed, if no cached data then fire new request

@@ -6,7 +6,7 @@ export function getActiveXhrRequests() {
   return activeXhrRequests;
 }
 
-export async function upload(config, rawFile, filename) {
+export async function upload(config, rawFile, filename, onProgressCallback) {
   const headers = await _getHeaders(config.jwtLocalStorageKey);
   const options = {
     method: 'POST',
@@ -15,7 +15,7 @@ export async function upload(config, rawFile, filename) {
     rejectWithRequest: config.endpointInfo && config.endpointInfo.rejectWithRequest,
     headers
   };
-  return sendRequest(options, filename)
+  return sendRequest(options, filename, onProgressCallback)
     .then((response) => {
       delete activeXhrRequests[filename];
       if (typeof response === 'string') {
@@ -70,8 +70,11 @@ function _prepareBody(rawFile, filename, endpointInfo) {
   return fd;
 }
 
-function sendRequest(options, requestKey) {
+function sendRequest(options, requestKey, onProgressCallback) {
   const request = document.createElement('iron-request');
+  if (typeof(onProgressCallback) === 'function') {
+    request.xhr.upload.onprogress = onProgressCallback;
+  }
   activeXhrRequests[requestKey] = request;
   request.send(options);
   return request.completes.then((request) => {
