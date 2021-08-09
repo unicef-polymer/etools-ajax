@@ -16,15 +16,20 @@ export function tryGetResponseError(response) {
 /**
  *
  * @param errors
+ * @param keyTranslate - optional function to translate error keys
  * @returns {string[]}
  */
-export function getErrorsArray(errors) {
+export function getErrorsArray(errors, keyTranslate = defaultKeyTranslate) {
   if (!errors) {
     return [];
   }
 
   if (typeof errors === 'string') {
     return [errors];
+  }
+
+  if (Array.isArray(errors)) {
+    return errors.map((error) => typeof error === 'string' ? error : getErrorsArray(error, keyTranslate)).flat();
   }
 
   const isObject = typeof errors === 'object';
@@ -46,20 +51,19 @@ export function getErrorsArray(errors) {
     return errors.non_field_errors;
   }
 
-  if (Array.isArray(errors) && _isArrayOfStrings(errors)) {
-    return errors;
-  }
-
-  if (isObject) {
+  if (isObject && errors.code) {
+    return parseTypedError(errors, keyTranslate);
+  } else if (isObject) {
     return Object
       .entries(errors)
       .map(([field, value]) => {
+        const translatedField = keyTranslate(field);
         if (typeof value === 'string') {
-          return `Field ${field} - ${value}`;
+          return `Field ${translatedField} - ${value}`;
         }
         if (Array.isArray(value)) {
-          const baseText = `Field ${field}: `;
-          const textErrors = getErrorsArray(value);
+          const baseText = `Field ${translatedField}: `;
+          const textErrors = getErrorsArray(value, keyTranslate);
           // * The marking is used for display in etools-error-messages-box
           // * and adds a welcomed identations when displayed as a toast message
           return textErrors.length === 1 ? `${baseText}${textErrors}` : [baseText, ..._markNestedErrors(textErrors)];
@@ -68,7 +72,7 @@ export function getErrorsArray(errors) {
           return Object
             .entries(value)
             .map(([nestedField,  ]) =>
-              `Field ${field} (${nestedField}) - ${getErrorsArray(nestedValue)}`);
+              `Field ${translatedField} (${keyTranslate(nestedField)}) - ${getErrorsArray(nestedValue, keyTranslate)}`);
         }
       })
       .flat();
@@ -82,21 +86,9 @@ function _markNestedErrors(errs) {
   return errs.map((er) => ' ' + er);
 }
 
-function _isArrayOfStrings(arr) {
-  let allStrings = true;
-  let i;
-  for (i = 0; i < arr.length; i++) {
-    if (typeof arr[i] !== 'string') {
-      allStrings = false;
-      break;
-    }
-  }
-  return allStrings;
-}
-
-export function formatServerErrorAsText(error) {
+export function formatServerErrorAsText(error, keyTranslate) {
   const errorResponse = tryGetResponseError(error);
-  const errorsArray = getErrorsArray(errorResponse);
+  const errorsArray = getErrorsArray(errorResponse, keyTranslate);
   if (errorsArray && errorsArray.length) {
     return errorsArray.join('\n');
   }
@@ -118,4 +110,23 @@ export function showErrorAsToastMsg(errorsString, source) {
   if (errorsString) {
     fireEvent(source, 'toast', {text: errorsString, showCloseBtn: true});
   }
+}
+
+function parseTypedError(errorObject, keyTranslate) {
+  switch (errorObject.code) {
+    case 'required_in_status':
+      const fields = errorObject.extra.fields
+        .map((field) => keyTranslate(field))
+        .join(', ');
+      return `${keyTranslate('required_in_status')}: ${fields}`;
+    default:
+      return errorObject.description || '';
+  }
+}
+
+export function defaultKeyTranslate(key = '') {
+  return key
+    .split('_')
+    .map((fieldPart) => `${fieldPart[0].toUpperCase()}${fieldPart.slice(1)}`)
+    .join(' ');
 }
