@@ -13,84 +13,72 @@ export function tryGetResponseError(response) {
   return response.response || globalMessage;
 }
 
-export function getErrorsArray(errors) {
-  // @ts-ignore
-  const errorsArray = [];
+/**
+ *
+ * @param errors
+ * @param keyTranslate - optional function to translate error keys
+ * @returns {string[]}
+ */
+export function getErrorsArray(errors, keyTranslate = defaultKeyTranslate) {
   if (!errors) {
-    // @ts-ignore
-    return errorsArray;
+    return [];
   }
 
   if (typeof errors === 'string') {
-    errorsArray.push(errors);
-    return errorsArray;
-  }
-  if (typeof errors === 'object' && errors.error && typeof errors.error === 'string') {
-    errorsArray.push(errors.error);
-    return errorsArray;
+    return [errors];
   }
 
-  if (typeof errors === 'object' && errors.errors && Array.isArray(errors.errors)) {
-    errors.errors.forEach(function (err) {
+  if (Array.isArray(errors)) {
+    return errors.map((error) => typeof error === 'string' ? error : getErrorsArray(error, keyTranslate)).flat();
+  }
+
+  const isObject = typeof errors === 'object';
+  if (isObject && errors.error && typeof errors.error === 'string') {
+    return [errors.error];
+  }
+
+  if (isObject && errors.errors && Array.isArray(errors.errors)) {
+    return errors.errors.map(function (err) {
       if (typeof err === 'object') {
-        const errKeys = Object.keys(err);
-        if (errKeys.length > 0) {
-          errKeys.forEach(function (k) {
-            errorsArray.push(err[k]); // will work only for strings
-          });
-        }
+        return Object.values(err); // will work only for strings
       } else {
-        errorsArray.push(err);
+        return err;
       }
-    });
-    return errorsArray;
+    }).flat();
   }
 
-  if (typeof errors === 'object' && errors.non_field_errors && Array.isArray(errors.non_field_errors)) {
-    [].push.apply(errorsArray, errors.non_field_errors);
-    return errorsArray;
+  if (isObject && errors.non_field_errors && Array.isArray(errors.non_field_errors)) {
+    return errors.non_field_errors;
   }
 
-  if (Array.isArray(errors) && errors.length > 0 && _isArrayOfStrings(errors)) {
-    Array.prototype.push.apply(errorsArray, errors);
-    return errorsArray;
-  }
-
-  if (typeof errors === 'object' && Object.keys(errors).length > 0) {
-    let errField;
-    for (errField in errors) { // eslint-disable-line
-
-      if (typeof errors[errField] === 'string') {
-        errorsArray.push('Field ' + errField + ' - ' + errors[errField]);
-        continue;
-      }
-      if (Array.isArray(errors[errField]) && errors[errField].length > 0) {
-        let parentErr = 'Field ' + errField + ': ';
-        let nestedErrs = getErrorsArray(errors[errField]);
-        if (nestedErrs.length === 1) {
-          parentErr += nestedErrs[0];
-          errorsArray.push(parentErr);
-        } else {
-          errorsArray.push(parentErr);
+  if (isObject && errors.code) {
+    return parseTypedError(errors, keyTranslate);
+  } else if (isObject) {
+    return Object
+      .entries(errors)
+      .map(([field, value]) => {
+        const translatedField = keyTranslate(field);
+        if (typeof value === 'string') {
+          return `Field ${translatedField} - ${value}`;
+        }
+        if (Array.isArray(value)) {
+          const baseText = `Field ${translatedField}: `;
+          const textErrors = getErrorsArray(value, keyTranslate);
           // * The marking is used for display in etools-error-messages-box
           // * and adds a welcomed identations when displayed as a toast message
-          nestedErrs = _markNestedErrors(nestedErrs);
-          Array.prototype.push.apply(errorsArray, nestedErrs);
+          return textErrors.length === 1 ? `${baseText}${textErrors}` : [baseText, ..._markNestedErrors(textErrors)];
         }
-        continue;
-      }
-      if (typeof errors[errField] === 'object' && Object.keys(errors[errField]).length > 0) {
-        let errF;
-        for (errF in errors[errField]) {
-          if (errors[errField][errF]) {
-            errorsArray.push('Field ' + errField + '(' + errF + ') - ' + getErrorsArray(errors[errField][errF]));
-          }
+        if (typeof value === 'object') {
+          return Object
+            .entries(value)
+            .map(([nestedField,  ]) =>
+              `Field ${translatedField} (${keyTranslate(nestedField)}) - ${getErrorsArray(nestedValue, keyTranslate)}`);
         }
-      }
-    }
+      })
+      .flat();
   }
 
-  return errorsArray;
+  return [];
 }
 
 function _markNestedErrors(errs) {
@@ -98,21 +86,9 @@ function _markNestedErrors(errs) {
   return errs.map((er) => ' ' + er);
 }
 
-function _isArrayOfStrings(arr) {
-  let allStrings = true;
-  let i;
-  for (i = 0; i < arr.length; i++) {
-    if (typeof arr[i] !== 'string') {
-      allStrings = false;
-      break;
-    }
-  }
-  return allStrings;
-}
-
-export function formatServerErrorAsText(error) {
+export function formatServerErrorAsText(error, keyTranslate) {
   const errorResponse = tryGetResponseError(error);
-  const errorsArray = getErrorsArray(errorResponse);
+  const errorsArray = getErrorsArray(errorResponse, keyTranslate);
   if (errorsArray && errorsArray.length) {
     return errorsArray.join('\n');
   }
@@ -134,4 +110,23 @@ export function showErrorAsToastMsg(errorsString, source) {
   if (errorsString) {
     fireEvent(source, 'toast', {text: errorsString, showCloseBtn: true});
   }
+}
+
+function parseTypedError(errorObject, keyTranslate) {
+  switch (errorObject.code) {
+    case 'required_in_status':
+      const fields = errorObject.extra.fields
+        .map((field) => keyTranslate(field))
+        .join(', ');
+      return `${keyTranslate('required_in_status')}: ${fields}`;
+    default:
+      return errorObject.description || '';
+  }
+}
+
+export function defaultKeyTranslate(key = '') {
+  return key
+    .split('_')
+    .map((fieldPart) => `${fieldPart[0].toUpperCase()}${fieldPart.slice(1)}`)
+    .join(' ');
 }
