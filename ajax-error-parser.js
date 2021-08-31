@@ -71,7 +71,7 @@ export function getErrorsArray(errors, keyTranslate = defaultKeyTranslate) {
         if (typeof value === 'object') {
           return Object
             .entries(value)
-            .map(([nestedField,  ]) =>
+            .map(([nestedField,  nestedValue]) =>
               `Field ${translatedField} (${keyTranslate(nestedField)}) - ${getErrorsArray(nestedValue, keyTranslate)}`);
         }
       })
