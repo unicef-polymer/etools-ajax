@@ -1,7 +1,7 @@
 {
   "description": "Polymer element and behavior for handling ajax requests",
   "name": "@unicef-polymer/etools-ajax",
-  "version": "4.3.1",
+  "version": "4.3.2",
   "homepage": "https://github.com/unicef-polymer/etools-ajax",
   "repository": {
     "type": "git",
@@ -32,9 +32,9 @@
     "wct-browser-legacy": "^0.0.1-pre.11"
   },
   "scripts": {
-    "lint:javascript": "eslint . --ext js,html && exit 0",
-    "lint": "npm run lint:javascript && polymer lint && exit 0",
-    "gen-typings": "gen-typescript-declarations --deleteExisting --outDir './'"
+    "lint": "eslint . --ext js,html",
+    "gen-typings": "gen-typescript-declarations --deleteExisting --outDir './'",
+    "prepublishOnly": "npm run lint"
   },
   "resolutions": {
     "inherits": "2.0.3",

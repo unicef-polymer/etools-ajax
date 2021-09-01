@@ -72,7 +72,7 @@ function _prepareBody(rawFile, filename, endpointInfo) {
 
 function sendRequest(options, requestKey, onProgressCallback) {
   const request = document.createElement('iron-request');
-  if (typeof(onProgressCallback) === 'function') {
+  if (typeof onProgressCallback === 'function') {
     request.xhr.upload.onprogress = onProgressCallback;
   }
   activeXhrRequests[requestKey] = request;
