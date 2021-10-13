@@ -13,9 +13,19 @@ jobs:
 
     steps:
       - checkout
+      - restore_cache:
+          key: cache-{{ checksum "package.json" }}
+      - run:
+          name: Install node modules
+          command: npm install
+      - save_cache:
+          key: cache-{{ checksum "package.json" }}
+          paths:
+            - node_modules
       - run:
           name: Authenticate with registry
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/repo/.npmrc
+      - checkout
       - run:
           name: Publish package
           command: npm publish
