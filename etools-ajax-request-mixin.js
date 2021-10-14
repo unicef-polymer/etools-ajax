@@ -10,14 +10,7 @@ import {
   getFromCache,
   cacheEndpointResponse
 } from '@unicef-polymer/etools-dexie-caching/etools-dexie-caching';
-import {
-  csrfSafeMethod,
-  getCsrfHeader,
-  getClientConfiguredHeaders,
-  determineContentType,
-  isNonEmptyObject,
-  getRequestUrl
-} from './etools-ajax-utils';
+import {getCsrfHeader, getClientConfiguredHeaders, determineContentType, getRequestUrl} from './etools-ajax-utils';
 
 export function EtoolsRequestError(error, statusCode, statusText, response) {
   this.error = error;
@@ -225,7 +218,6 @@ const EtoolsAjaxRequestMixin = dedupingMixin(
 
         return headers;
       }
-
     }
 );
 
