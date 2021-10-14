@@ -1,7 +1,7 @@
 {
   "description": "Polymer element and behavior for handling ajax requests",
   "name": "@unicef-polymer/etools-ajax",
-  "version": "4.3.1",
+  "version": "4.3.2",
   "homepage": "https://github.com/unicef-polymer/etools-ajax",
   "repository": {
     "type": "git",
@@ -12,7 +12,7 @@
     "@polymer/polymer": "^3.4.1",
     "@unicef-polymer/etools-behaviors": "^3.0.4",
     "@unicef-polymer/etools-dexie-caching": "^1.0.2",
-    "lodash": "^4.17.20"
+    "lodash": ">=4.17.21"
   },
   "devDependencies": {
     "@polymer/gen-typescript-declarations": "^1.6.2",
@@ -28,13 +28,15 @@
     "growl": ">=1.10.0",
     "minimist": ">=0.2.1",
     "prettier": "^2.2.0",
-    "prismjs": ">=1.21.0",
+    "prismjs": ">=1.25.0",
+    "path-parse": ">=1.0.7",
+    "glob-parent": ">=5.1.2",
     "wct-browser-legacy": "^0.0.1-pre.11"
   },
   "scripts": {
-    "lint:javascript": "eslint . --ext js,html && exit 0",
-    "lint": "npm run lint:javascript && polymer lint && exit 0",
-    "gen-typings": "gen-typescript-declarations --deleteExisting --outDir './'"
+    "lint": "eslint . --ext js,html",
+    "gen-typings": "gen-typescript-declarations --deleteExisting --outDir './'",
+    "prepublishOnly": "npm run lint"
   },
   "resolutions": {
     "inherits": "2.0.3",

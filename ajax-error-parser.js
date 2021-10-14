@@ -29,7 +29,7 @@ export function getErrorsArray(errors, keyTranslate = defaultKeyTranslate) {
   }
 
   if (Array.isArray(errors)) {
-    return errors.map((error) => typeof error === 'string' ? error : getErrorsArray(error, keyTranslate)).flat();
+    return errors.map((error) => (typeof error === 'string' ? error : getErrorsArray(error, keyTranslate))).flat();
   }
 
   const isObject = typeof errors === 'object';
@@ -38,13 +38,15 @@ export function getErrorsArray(errors, keyTranslate = defaultKeyTranslate) {
   }
 
   if (isObject && errors.errors && Array.isArray(errors.errors)) {
-    return errors.errors.map(function (err) {
-      if (typeof err === 'object') {
-        return Object.values(err); // will work only for strings
-      } else {
-        return err;
-      }
-    }).flat();
+    return errors.errors
+      .map(function (err) {
+        if (typeof err === 'object') {
+          return Object.values(err); // will work only for strings
+        } else {
+          return err;
+        }
+      })
+      .flat();
   }
 
   if (isObject && errors.non_field_errors && Array.isArray(errors.non_field_errors)) {
@@ -54,8 +56,7 @@ export function getErrorsArray(errors, keyTranslate = defaultKeyTranslate) {
   if (isObject && errors.code) {
     return parseTypedError(errors, keyTranslate);
   } else if (isObject) {
-    return Object
-      .entries(errors)
+    return Object.entries(errors)
       .map(([field, value]) => {
         const translatedField = keyTranslate(field);
         if (typeof value === 'string') {
@@ -69,10 +70,10 @@ export function getErrorsArray(errors, keyTranslate = defaultKeyTranslate) {
           return textErrors.length === 1 ? `${baseText}${textErrors}` : [baseText, ..._markNestedErrors(textErrors)];
         }
         if (typeof value === 'object') {
-          return Object
-            .entries(value)
-            .map(([nestedField,  nestedValue]) =>
-              `Field ${translatedField} (${keyTranslate(nestedField)}) - ${getErrorsArray(nestedValue, keyTranslate)}`);
+          return Object.entries(value).map(
+            ([nestedField, nestedValue]) =>
+              `Field ${translatedField} (${keyTranslate(nestedField)}) - ${getErrorsArray(nestedValue, keyTranslate)}`
+          );
         }
       })
       .flat();
@@ -115,9 +116,7 @@ export function showErrorAsToastMsg(errorsString, source) {
 function parseTypedError(errorObject, keyTranslate) {
   switch (errorObject.code) {
     case 'required_in_status':
-      const fields = errorObject.extra.fields
-        .map((field) => keyTranslate(field))
-        .join(', ');
+      const fields = errorObject.extra.fields.map((field) => keyTranslate(field)).join(', ');
       return `${keyTranslate('required_in_status')}: ${fields}`;
     default:
       return errorObject.description || '';

@@ -25,6 +25,7 @@
     "linebreak-style": "off",
     "require-jsdoc": "off",
     "valid-jsdoc": "off",
+    "no-case-declarations": "off",
     "comma-dangle": ["error", "never"],
     "max-len": [
       "error",
