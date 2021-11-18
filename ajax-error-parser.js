@@ -2,10 +2,14 @@ import {fireEvent} from './fire-custom-event.js';
 
 const globalMessage = 'An error occurred. Please try again later.';
 const httpStatus413Msg = 'The uploaded file is too large!';
+const http403Msg = 'Forbidden action due to lack of permissions';
 
 export function tryGetResponseError(response) {
   if (response.status === 413) {
     return httpStatus413Msg;
+  }
+  if (response.status == 403) {
+    return http403Msg;
   }
   if (response.status >= 401) {
     return globalMessage;
