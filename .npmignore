@@ -1,0 +1,9 @@
+/node_modules
+/.circleci
+/demo
+/test
+.prettierrc
+analysis.json
+.eslintrc.json
+.eslintignore
+polymer.json
