@@ -29,7 +29,7 @@ export function getErrorsArray(errors, keyTranslate) {
   }
 
   if (typeof errors === 'string') {
-    return [errors];
+    return [translateSomeBkErrMessages(errors)];
   }
 
   if (!keyTranslate) {
@@ -37,12 +37,16 @@ export function getErrorsArray(errors, keyTranslate) {
   }
 
   if (Array.isArray(errors)) {
-    return errors.map((error) => (typeof error === 'string' ? error : getErrorsArray(error, keyTranslate))).flat();
+    return errors
+      .map((error) =>
+        typeof error === 'string' ? translateSomeBkErrMessages(error) : getErrorsArray(error, keyTranslate)
+      )
+      .flat();
   }
 
   const isObject = typeof errors === 'object';
   if (isObject && errors.error && typeof errors.error === 'string') {
-    return [errors.error];
+    return [translateSomeBkErrMessages(errors.error)];
   }
 
   if (isObject && errors.errors && Array.isArray(errors.errors)) {
