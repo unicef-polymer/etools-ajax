@@ -68,7 +68,7 @@ export function getErrorsArray(errors, keyTranslate) {
       .map(([field, value]) => {
         const translatedField = keyTranslate(field);
         if (typeof value === 'string') {
-          return `${keyTranslate('Field')} ${translatedField} - ${value}`;
+          return `${keyTranslate('Field')} ${translatedField} - ${translateSomeBkErrMessages(value)}`;
         }
         if (Array.isArray(value)) {
           const baseText = `${keyTranslate('Field')} ${translatedField}: `;
@@ -139,4 +139,12 @@ export function defaultKeyTranslate(key = '') {
     .split('_')
     .map((fieldPart) => `${fieldPart[0].toUpperCase()}${fieldPart.slice(1)}`)
     .join(' ');
+}
+
+// Errors that come from unicef-attachements library are not translated on the BK (Feb 2023)
+function translateSomeBkErrMessages(error) {
+  if (window.ajaxErrorParserTranslateFunction) {
+    return window.ajaxErrorParserTranslateFunction(error);
+  }
+  return error;
 }
