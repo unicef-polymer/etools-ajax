@@ -29,7 +29,7 @@ export function getErrorsArray(errors, keyTranslate) {
   }
 
   if (typeof errors === 'string') {
-    return [errors];
+    return [translateSomeBkErrMessages(errors)];
   }
 
   if (!keyTranslate) {
@@ -37,12 +37,16 @@ export function getErrorsArray(errors, keyTranslate) {
   }
 
   if (Array.isArray(errors)) {
-    return errors.map((error) => (typeof error === 'string' ? error : getErrorsArray(error, keyTranslate))).flat();
+    return errors
+      .map((error) =>
+        typeof error === 'string' ? translateSomeBkErrMessages(error) : getErrorsArray(error, keyTranslate)
+      )
+      .flat();
   }
 
   const isObject = typeof errors === 'object';
   if (isObject && errors.error && typeof errors.error === 'string') {
-    return [errors.error];
+    return [translateSomeBkErrMessages(errors.error)];
   }
 
   if (isObject && errors.errors && Array.isArray(errors.errors)) {
@@ -68,7 +72,7 @@ export function getErrorsArray(errors, keyTranslate) {
       .map(([field, value]) => {
         const translatedField = keyTranslate(field);
         if (typeof value === 'string') {
-          return `${keyTranslate('Field')} ${translatedField} - ${value}`;
+          return `${keyTranslate('Field')} ${translatedField} - ${translateSomeBkErrMessages(value)}`;
         }
         if (Array.isArray(value)) {
           const baseText = `${keyTranslate('Field')} ${translatedField}: `;
@@ -139,4 +143,12 @@ export function defaultKeyTranslate(key = '') {
     .split('_')
     .map((fieldPart) => `${fieldPart[0].toUpperCase()}${fieldPart.slice(1)}`)
     .join(' ');
+}
+
+// Errors that come from unicef-attachements library are not translated on the BK (Feb 2023)
+function translateSomeBkErrMessages(error) {
+  if (window.ajaxErrorParserTranslateFunction) {
+    return window.ajaxErrorParserTranslateFunction(error);
+  }
+  return error;
 }
