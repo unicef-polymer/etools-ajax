@@ -128,7 +128,7 @@ An object that must have this properties
 - `params` - request params, will be used to build url query string . It is recomended that etools-ajax receives the final form of the url it needs to call, so avoid using this.
 - `body` - request body for POST | PUT | PATCH | DELETE methods
 - `csrfCheck` - if other than `disabled`, x-csrftoken header will be set with value of `csrftoken` cookie
-- `headers` - object of additional headers that can be set on request
+- `headers` - object of additional headers that can be set on request. Will automatically add 'language' header to the request if window.EtoolsLanguage is set.
 - `multiPart` - if `true` it will take the `body` and convert it in `FormData`
 - `prepareMultipartData` - used by etools apps to convert request complex json `body` to `FromData` and prefix objects
   properties with `_obj`

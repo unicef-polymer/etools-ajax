@@ -23,22 +23,30 @@ export function tryGetResponseError(response) {
  * @param keyTranslate - optional function to translate error keys
  * @returns {string[]}
  */
-export function getErrorsArray(errors, keyTranslate = defaultKeyTranslate) {
+export function getErrorsArray(errors, keyTranslate) {
   if (!errors) {
     return [];
   }
 
   if (typeof errors === 'string') {
-    return [errors];
+    return [translateSomeBkErrMessages(errors)];
+  }
+
+  if (!keyTranslate) {
+    keyTranslate = window.ajaxErrorParserTranslateFunction || defaultKeyTranslate;
   }
 
   if (Array.isArray(errors)) {
-    return errors.map((error) => (typeof error === 'string' ? error : getErrorsArray(error, keyTranslate))).flat();
+    return errors
+      .map((error) =>
+        typeof error === 'string' ? translateSomeBkErrMessages(error) : getErrorsArray(error, keyTranslate)
+      )
+      .flat();
   }
 
   const isObject = typeof errors === 'object';
   if (isObject && errors.error && typeof errors.error === 'string') {
-    return [errors.error];
+    return [translateSomeBkErrMessages(errors.error)];
   }
 
   if (isObject && errors.errors && Array.isArray(errors.errors)) {
@@ -64,10 +72,10 @@ export function getErrorsArray(errors, keyTranslate = defaultKeyTranslate) {
       .map(([field, value]) => {
         const translatedField = keyTranslate(field);
         if (typeof value === 'string') {
-          return `Field ${translatedField} - ${value}`;
+          return `${keyTranslate('Field')} ${translatedField} - ${translateSomeBkErrMessages(value)}`;
         }
         if (Array.isArray(value)) {
-          const baseText = `Field ${translatedField}: `;
+          const baseText = `${keyTranslate('Field')} ${translatedField}: `;
           const textErrors = getErrorsArray(value, keyTranslate);
           // * The marking is used for display in etools-error-messages-box
           // * and adds a welcomed identations when displayed as a toast message
@@ -76,7 +84,10 @@ export function getErrorsArray(errors, keyTranslate = defaultKeyTranslate) {
         if (typeof value === 'object') {
           return Object.entries(value).map(
             ([nestedField, nestedValue]) =>
-              `Field ${translatedField} (${keyTranslate(nestedField)}) - ${getErrorsArray(nestedValue, keyTranslate)}`
+              `${keyTranslate('Field')} ${translatedField} (${keyTranslate(nestedField)}) - ${getErrorsArray(
+                nestedValue,
+                keyTranslate
+              )}`
           );
         }
       })
@@ -132,4 +143,12 @@ export function defaultKeyTranslate(key = '') {
     .split('_')
     .map((fieldPart) => `${fieldPart[0].toUpperCase()}${fieldPart.slice(1)}`)
     .join(' ');
+}
+
+// Errors that come from unicef-attachements library are not translated on the BK (Feb 2023)
+function translateSomeBkErrMessages(error) {
+  if (window.ajaxErrorParserTranslateFunction) {
+    return window.ajaxErrorParserTranslateFunction(error);
+  }
+  return error;
 }
