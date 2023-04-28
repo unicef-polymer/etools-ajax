@@ -31,7 +31,8 @@
     "prismjs": ">=1.27.0",
     "path-parse": ">=1.0.7",
     "glob-parent": ">=5.1.2",
-    "wct-browser-legacy": "^0.0.1-pre.11"
+    "wct-browser-legacy": "^0.0.1-pre.11",
+    "minimatch": ">=3.1.2"
   },
   "scripts": {
     "lint": "eslint . --ext js,html",
