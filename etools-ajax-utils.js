@@ -65,7 +65,7 @@ export async function getRequestHeaders(reqConfig) {
   headers['content-type'] = determineContentType(reqConfig.body);
   const authHeader = await getAuthorizationHeader(reqConfig.endpoint);
   if (window.EtoolsLanguage) {
-    headers['language'] = window.EtoolsLanguage;
+    headers['HTTP_LANGUAGE'] = window.EtoolsLanguage;
   }
   headers = Object.assign(
     {},
