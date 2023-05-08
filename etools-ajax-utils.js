@@ -85,7 +85,16 @@ async function getAuthorizationHeader(endpoint) {
       try {
         token = await window.AppMsalInstance.acquireTokenSilent();
       } catch (err) {
-        window.location.reload(true);
+        await window.AppMsalInstance.msal
+          .acquireTokenPopup({
+            account: window.AppMsalInstance.tryGetAccount(),
+            scopes: window.AppMsalInstance.config.tokenReqScopes
+          })
+          .then((response) => {
+            window.AppMsalInstance.token = response.accessToken;
+            window.AppMsalInstance.homeAccountId = response.account.homeAccountId;
+            token = response.accessToken;
+          });
       }
     }
     return {

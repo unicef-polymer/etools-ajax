@@ -1,7 +1,7 @@
 {
   "description": "Polymer element and behavior for handling ajax requests",
   "name": "@unicef-polymer/etools-ajax",
-  "version": "4.5.0",
+  "version": "4.6.0-rc.1",
   "homepage": "https://github.com/unicef-polymer/etools-ajax",
   "repository": {
     "type": "git",
