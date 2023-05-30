@@ -204,6 +204,13 @@ const EtoolsAjaxRequestMixin = dedupingMixin(
           headers['content-type'] = 'text';
         }
 
+        if (
+          window.EtoolsLanguage &&
+          (String(reqConfig.endpoint.url).startsWith('/') || reqConfig.endpoint.url.includes(window.location.host))
+        ) {
+          headers['language'] = window.EtoolsLanguage;
+        }
+
         headers = Object.assign(
           {},
           headers,
