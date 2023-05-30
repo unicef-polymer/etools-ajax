@@ -82,7 +82,6 @@ function sendRequest(options, requestKey, onProgressCallback) {
       return request.response;
     })
     .catch((err) => {
-      const error = err.error;
       const request = err.request;
       const message = Object.values(tryJsonParse(request.xhr.response)).join(',');
 
@@ -90,7 +89,7 @@ function sendRequest(options, requestKey, onProgressCallback) {
       if (!request.aborted) {
         throw new EtoolsUploadRequestError(request, {message: message});
       } else {
-        throw error;
+        throw err.error;
       }
     });
 }
