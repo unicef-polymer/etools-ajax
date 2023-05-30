@@ -96,7 +96,7 @@ function sendRequest(options, requestKey, onProgressCallback) {
 }
 
 export function EtoolsUploadRequestError(request, error) {
-  this.request = error;
+  this.request = request;
   this.error = error;
 }
 
