@@ -1,4 +1,4 @@
-import {_getCSRFCookie} from './etools-ajax-utils';
+import {_getCSRFCookie, tryJsonParse} from './etools-ajax-utils';
 
 const activeXhrRequests = {};
 
@@ -12,7 +12,7 @@ export async function upload(config, rawFile, filename, onProgressCallback) {
     method: 'POST',
     url: _getEndpoint(config.endpointInfo, config.uploadEndpoint),
     body: _prepareBody(rawFile, filename, config.endpointInfo),
-    rejectWithRequest: config.endpointInfo && config.endpointInfo.rejectWithRequest,
+    rejectWithRequest: true,
     headers
   };
   return sendRequest(options, filename, onProgressCallback)
@@ -77,9 +77,26 @@ function sendRequest(options, requestKey, onProgressCallback) {
   }
   activeXhrRequests[requestKey] = request;
   request.send(options);
-  return request.completes.then((request) => {
-    return request.response;
-  });
+  return request.completes
+    .then((request) => {
+      return request.response;
+    })
+    .catch((err) => {
+      const request = err.request;
+      const message = Object.values(tryJsonParse(request.xhr.response)).join(',');
+
+      // check request aborted, no error handling in this case
+      if (!request.aborted) {
+        throw new EtoolsUploadRequestError(request, {message: message});
+      } else {
+        throw err.error;
+      }
+    });
+}
+
+export function EtoolsUploadRequestError(request, error) {
+  this.request = request;
+  this.error = error;
 }
 
 function _getRawFilePropertyName(endpointInfo) {
